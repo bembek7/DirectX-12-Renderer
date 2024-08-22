@@ -1,4 +1,6 @@
 #include "IndexBuffer.h"
+#include "Bindable.h"
+#include "Graphics.h"
 
 IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices)
 {

@@ -11,7 +11,7 @@ SoundPlayer::~SoundPlayer()
 	engine.deinit();
 }
 
-void SoundPlayer::LoadSong(const std::string fileName)
+void SoundPlayer::LoadSong(const std::string& fileName)
 {
 	const SoLoud::result returnCode = mainSong.load(fileName.c_str());
 	if (returnCode > 0)

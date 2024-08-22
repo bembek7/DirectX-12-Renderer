@@ -1,6 +1,7 @@
 #pragma once
 #include "ThrowMacros.h"
 #include "Bindable.h"
+#include "Graphics.h"
 
 enum class BufferType
 {

@@ -1,7 +1,10 @@
 #pragma once
 #include "ThrowMacros.h"
-#include "Bindable.h"
 #include <vector>
+#include "Bindable.h"
+#include <wrl\client.h>
+
+class Graphics;
 
 class IndexBuffer : public Bindable
 {

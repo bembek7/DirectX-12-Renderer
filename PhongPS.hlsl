@@ -48,14 +48,14 @@ cbuffer LightCBuf : register(b1)
     const float diffuseIntensity;
     const float3 ambient;
     const float specularIntensity;
-    const float3 lightPos;
+    const float3 lightViewPos;
     const float specularPower;
 };
 
 float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL) : SV_TARGET
 {
     LightVectorData lightVector;
-    lightVector.vectorToLight = lightPos - viewPos;
+    lightVector.vectorToLight = lightViewPos - viewPos;
     lightVector.distanceToLight = length(lightVector.vectorToLight);
     lightVector.directionToLight = lightVector.vectorToLight / lightVector.distanceToLight;
     

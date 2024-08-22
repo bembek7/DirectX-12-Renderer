@@ -12,7 +12,7 @@ public:
 	SoundPlayer(const SoundPlayer&) = delete;
 	SoundPlayer& operator=(const SoundPlayer&) = delete;
 
-	void LoadSong(const std::string fileName);
+	void LoadSong(const std::string& fileName);
 	void Play(const bool loop) noexcept;
 	double GetCurrentPlaytime() noexcept;
 private:
