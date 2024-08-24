@@ -52,12 +52,36 @@ cbuffer LightCBuf : register(b1)
     const float specularPower;
 };
 
-float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL) : SV_TARGET
+Texture2D shadowMap : register(t0);
+SamplerComparisonState shadowSampler : register(s0);
+
+float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
 {
+    float2 shadowTexCoords;
+    shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
+    shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
+    float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
+  
+    float lighting = 1;
+    
     LightVectorData lightVector;
     lightVector.vectorToLight = lightViewPos - viewPos;
     lightVector.distanceToLight = length(lightVector.vectorToLight);
     lightVector.directionToLight = lightVector.vectorToLight / lightVector.distanceToLight;
+    
+    // Check if the pixel texture coordinate is in the view frustum of the 
+    // light before doing any shadow work.
+    if (saturate(shadowTexCoords.x) == shadowTexCoords.x &&
+    saturate(shadowTexCoords.y) == shadowTexCoords.y &&
+    pixelDepth > 0)
+    {
+        float margin = acos(saturate(max(0.f, dot(lightVector.directionToLight, viewNormal))));
+
+        float epsilon = 0.0005 / margin;
+        epsilon = clamp(epsilon, 0, 0.1);
+        
+        lighting = float(shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth + epsilon));
+    }
     
     viewNormal = normalize(viewNormal);
     
@@ -67,5 +91,5 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL) : SV_TARGET
 	
     const float3 specular = Speculate(diffuseColor, diffuseIntensity * specularIntensity, viewNormal, lightVector.vectorToLight, viewPos, attenuation, specularPower);
 	
-    return float4(saturate((diffuse + ambient) * color.rgb + specular), color.a);
+    return float4(saturate((diffuse * lighting + ambient) * color.rgb + specular * lighting), color.a);
 }

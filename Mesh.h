@@ -20,6 +20,7 @@ public:
 	Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const DirectX::XMVECTOR& position = { 0.f, 0.f, 5.f }, const DirectX::XMVECTOR& rotation = { 0.f, 0.f, 0.f }, const DirectX::XMVECTOR& scale = { 1.f, 1.f, 1.f });
 
 	void Draw(Graphics& graphics);
+	void RenderShadowMap(Graphics& graphics);
 
 	void AddRotation(const DirectX::XMVECTOR& rotationToAdd) noexcept;
 	void AddPosition(const DirectX::XMVECTOR& posiationToAdd) noexcept;
@@ -35,15 +36,18 @@ private:
 private:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;
+	std::vector<std::shared_ptr<Bindable>> shadowMapSharedBindables;
 	std::shared_ptr<Model> model;
 
 	struct TransformBuffer
 	{
 		TransformBuffer() = default;
-		TransformBuffer(const DirectX::XMMATRIX& newTransformView, const DirectX::XMMATRIX& newTransformViewProjection) :
+		TransformBuffer(const DirectX::XMMATRIX& newTransform, const DirectX::XMMATRIX& newTransformView, const DirectX::XMMATRIX& newTransformViewProjection) :
+			transform(newTransform),
 			transformView(newTransformView),
 			transformViewProjection(newTransformViewProjection)
 		{}
+		DirectX::XMMATRIX transform;
 		DirectX::XMMATRIX transformView;
 		DirectX::XMMATRIX transformViewProjection;
 	};

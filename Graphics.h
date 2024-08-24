@@ -15,6 +15,8 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 
 	void BeginFrame() noexcept;
+	void SetRenderTargetForShadowMap();
+	void SetNormalRenderTarget();
 	void EndFrame();
 
 	void SetProjection(const DirectX::XMMATRIX& proj) noexcept;
@@ -30,6 +32,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> shadowMap;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowRenderDepthView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> comparisonSampler;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> drawingRenderState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRenderState;
+	D3D11_VIEWPORT viewport{};
+	D3D11_VIEWPORT shadowViewport{};
 
 	DirectX::XMMATRIX camera;
 	DirectX::XMMATRIX projection;

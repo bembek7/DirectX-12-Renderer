@@ -50,11 +50,24 @@ Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType sha
 	};
 	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), WstringToString(vertexShaderPath)));
 	sharedBindables.push_back(std::move(vertexShader));
+
+	if (shaderType == ShaderType::Phong)
+	{
+		auto vertexShaderSM = bindablesPool.GetBindable<VertexShader>(graphics, L"VertexShader.cso");
+		const VertexShader& vertexShaderRefSM = dynamic_cast<VertexShader&>(*vertexShaderSM);
+		std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescsSM =
+		{
+			{"POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u}
+		};
+		shadowMapSharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescsSM, vertexShaderRefSM.GetBufferPointer(), vertexShaderRefSM.GetBufferSize(), WstringToString(L"VertexShader.cso")));
+		shadowMapSharedBindables.push_back(std::move(vertexShaderSM));
+		shadowMapSharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, L""));
+	}
 }
 
 void Mesh::Draw(Graphics& graphics)
 {
-	SetTransformBuffer(graphics); // in this case does not have to be updated every frame but wif wee add any movement of camera or object it should be
+	SetTransformBuffer(graphics);
 
 	for (auto& bindable : bindables)
 	{
@@ -66,6 +79,31 @@ void Mesh::Draw(Graphics& graphics)
 	{
 		sharedBindable->Update(graphics);
 		sharedBindable->Bind(graphics);
+	}
+
+	graphics.DrawIndexed(model->indices.size());
+}
+
+void Mesh::RenderShadowMap(Graphics& graphics)
+{
+	SetTransformBuffer(graphics);
+
+	for (auto& bindable : bindables)
+	{
+		bindable->Update(graphics);
+		bindable->Bind(graphics);
+	}
+
+	for (auto& sharedBindable : sharedBindables)
+	{
+		sharedBindable->Update(graphics);
+		sharedBindable->Bind(graphics);
+	}
+
+	for (auto& bindable : shadowMapSharedBindables)
+	{
+		bindable->Update(graphics);
+		bindable->Bind(graphics);
 	}
 
 	graphics.DrawIndexed(model->indices.size());
@@ -112,5 +150,5 @@ void Mesh::SetTransformBuffer(Graphics& graphics)
 {
 	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera());
 	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera() * graphics.GetProjection());
-	transformBuffer = TransformBuffer(std::move(transformView), std::move(transformViewProjection));
+	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(GetTransformMatrix()), std::move(transformView), std::move(transformViewProjection));
 }

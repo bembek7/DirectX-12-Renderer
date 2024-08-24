@@ -61,7 +61,7 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	depthDesc.Height = windowHeight;
 	depthDesc.MipLevels = 1u;
 	depthDesc.ArraySize = 1u;
-	depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
 	depthDesc.SampleDesc.Count = 1u;
 	depthDesc.SampleDesc.Quality = 0u;
 	depthDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -71,15 +71,71 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	CHECK_HR(device->CreateTexture2D(&depthDesc, nullptr, &depthStencil));
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0u;
 
 	CHECK_HR(device->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, &depthStencilView));
 
-	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView.Get());
+	D3D11_TEXTURE2D_DESC depthSMDesc = {};
+	depthSMDesc.Width = windowWidth;
+	depthSMDesc.Height = windowHeight;
+	depthSMDesc.MipLevels = 1u;
+	depthSMDesc.ArraySize = 1u;
+	depthSMDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	depthSMDesc.SampleDesc.Count = 1u;
+	depthSMDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
 
-	D3D11_VIEWPORT viewport{};
+	CHECK_HR(device->CreateTexture2D(&depthSMDesc, nullptr, &shadowMap));
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewSMDesc = {};
+	depthStencilViewSMDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewSMDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewSMDesc.Texture2D.MipSlice = 0u;
+
+	CHECK_HR(device->CreateDepthStencilView(shadowMap.Get(), &depthStencilViewSMDesc, &shadowRenderDepthView));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	CHECK_HR(device->CreateShaderResourceView(shadowMap.Get(), &shaderResourceViewDesc, &shaderResourceView));
+
+	context->PSSetShaderResources(0u, 1u, shaderResourceView.GetAddressOf());
+
+	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
+	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	comparisonSamplerDesc.BorderColor[0] = 1.0f;
+	comparisonSamplerDesc.BorderColor[1] = 1.0f;
+	comparisonSamplerDesc.BorderColor[2] = 1.0f;
+	comparisonSamplerDesc.BorderColor[3] = 1.0f;
+	comparisonSamplerDesc.MinLOD = 0.f;
+	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	comparisonSamplerDesc.MipLODBias = 0.f;
+	comparisonSamplerDesc.MaxAnisotropy = 0;
+	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+
+	CHECK_HR(device->CreateSamplerState(&comparisonSamplerDesc, &comparisonSampler));
+
+	context->PSSetSamplers(0u, 1u, comparisonSampler.GetAddressOf());
+
+	D3D11_RASTERIZER_DESC drawingRenderStateDesc = {};
+	drawingRenderStateDesc.CullMode = D3D11_CULL_BACK;
+	drawingRenderStateDesc.FillMode = D3D11_FILL_SOLID;
+	drawingRenderStateDesc.DepthClipEnable = true;
+	CHECK_HR(device->CreateRasterizerState(&drawingRenderStateDesc, &drawingRenderState));
+
+	D3D11_RASTERIZER_DESC shadowRenderStateDesc = {};
+	shadowRenderStateDesc.CullMode = D3D11_CULL_FRONT;
+	shadowRenderStateDesc.FillMode = D3D11_FILL_SOLID;
+	shadowRenderStateDesc.DepthClipEnable = true;
+
+	CHECK_HR(device->CreateRasterizerState(&shadowRenderStateDesc, &shadowRenderState));
+
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.Width = (FLOAT)windowWidth;
@@ -87,12 +143,17 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	viewport.MaxDepth = 1.f;
 	viewport.MinDepth = 0.f;
 
-	context->RSSetViewports(1u, &viewport);
+	shadowViewport.TopLeftX = 0;
+	shadowViewport.TopLeftY = 0;
+	shadowViewport.Width = (FLOAT)windowWidth;
+	shadowViewport.Height = (FLOAT)windowHeight;
+	shadowViewport.MaxDepth = 1.f;
+	shadowViewport.MinDepth = 0.f;
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	const float screenRatio = viewport.Height / viewport.Width;
-	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.7f, 50.0f));
+	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 30.0f));
 }
 
 void Graphics::DrawIndexed(const size_t numIndices) noexcept
@@ -104,7 +165,24 @@ void Graphics::BeginFrame() noexcept
 {
 	const float color[] = { 0.04f, 0.02f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(renderTargetView.Get(), color);
-	context->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	context->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+	context->ClearDepthStencilView(shadowRenderDepthView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+}
+
+void Graphics::SetRenderTargetForShadowMap()
+{
+	context->OMSetRenderTargets(0u, nullptr, shadowRenderDepthView.Get());
+	context->RSSetState(shadowRenderState.Get());
+	context->RSSetViewports(1u, &shadowViewport);
+}
+
+void Graphics::SetNormalRenderTarget()
+{
+	const float color[] = { 0.04f, 0.02f, 0.1f, 1.0f };
+	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView.Get());
+	context->RSSetState(drawingRenderState.Get());
+	context->PSSetShaderResources(0u, 1u, shaderResourceView.GetAddressOf());
+	context->RSSetViewports(1u, &viewport);
 }
 
 void Graphics::EndFrame()

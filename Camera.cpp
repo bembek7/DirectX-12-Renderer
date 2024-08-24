@@ -17,3 +17,8 @@ void Camera::Rotate(const DirectX::XMVECTOR& rotateVector) noexcept
 {
 	rotation = DirectX::XMVectorAdd(rotation, rotateVector);
 }
+
+void Camera::SetPosition(const DirectX::XMVECTOR& newPosition) noexcept
+{
+	position = newPosition;
+}

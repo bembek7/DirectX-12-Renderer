@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
+#include "Camera.h"
 
 class Graphics;
 
@@ -10,7 +11,7 @@ public:
 	PointLight(Graphics& graphics, const DirectX::XMVECTOR& position);
 	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3& newColor);
 	void Bind(Graphics& graphics, const DirectX::XMMATRIX& cameraView);
-
+	DirectX::XMMATRIX GetLightPerspective() const noexcept;
 private:
 	struct LightBuffer
 	{
@@ -22,7 +23,13 @@ private:
 		float specularPower = 0.8f;
 	} lightBuffer;
 
-	DirectX::XMVECTOR position;
+	struct ShadowMapBuffer
+	{
+		DirectX::XMMATRIX lightPerspective;
+	} shadowMapBuffer;
 
+	DirectX::XMVECTOR position;
+	Camera shadowMapCamera;
 	std::unique_ptr<ConstantBuffer<LightBuffer>> constantLightBuffer;
+	std::unique_ptr<ConstantBuffer<ShadowMapBuffer>> constantShadowMapBuffer;
 };
