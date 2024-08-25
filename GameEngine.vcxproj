@@ -155,6 +155,7 @@
     <ClCompile Include="Bindable.cpp" />
     <ClCompile Include="BindablesPool.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DepthStencilView.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayout.cpp" />
@@ -163,30 +164,6 @@
     <ClCompile Include="ModelsPool.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="SoLoud\audiosource\wav\dr_impl.cpp" />
-    <ClCompile Include="SoLoud\audiosource\wav\soloud_wav.cpp" />
-    <ClCompile Include="SoLoud\audiosource\wav\soloud_wavstream.cpp" />
-    <ClCompile Include="SoLoud\audiosource\wav\stb_vorbis.c" />
-    <ClCompile Include="SoLoud\backend\winmm\soloud_winmm.cpp" />
-    <ClCompile Include="SoLoud\core\soloud.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_audiosource.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_bus.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_3d.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_basicops.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_faderops.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_filterops.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_getters.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_setters.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_voicegroup.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_core_voiceops.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_fader.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_fft.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_fft_lut.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_file.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_filter.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_queue.cpp" />
-    <ClCompile Include="SoLoud\core\soloud_thread.cpp" />
-    <ClCompile Include="SoundPlayer.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -199,6 +176,7 @@
     <ClInclude Include="BindablesPool.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="DepthStencilView.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayout.h" />
@@ -209,43 +187,6 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="SoLoud\audiosource\wav\dr_flac.h" />
-    <ClInclude Include="SoLoud\audiosource\wav\dr_mp3.h" />
-    <ClInclude Include="SoLoud\audiosource\wav\dr_wav.h" />
-    <ClInclude Include="SoLoud\audiosource\wav\stb_vorbis.h" />
-    <ClInclude Include="SoLoud\include\soloud.h" />
-    <ClInclude Include="SoLoud\include\soloud_audiosource.h" />
-    <ClInclude Include="SoLoud\include\soloud_bassboostfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_biquadresonantfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_bus.h" />
-    <ClInclude Include="SoLoud\include\soloud_c.h" />
-    <ClInclude Include="SoLoud\include\soloud_dcremovalfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_echofilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_error.h" />
-    <ClInclude Include="SoLoud\include\soloud_fader.h" />
-    <ClInclude Include="SoLoud\include\soloud_fft.h" />
-    <ClInclude Include="SoLoud\include\soloud_fftfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_file.h" />
-    <ClInclude Include="SoLoud\include\soloud_file_hack_off.h" />
-    <ClInclude Include="SoLoud\include\soloud_file_hack_on.h" />
-    <ClInclude Include="SoLoud\include\soloud_filter.h" />
-    <ClInclude Include="SoLoud\include\soloud_flangerfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_internal.h" />
-    <ClInclude Include="SoLoud\include\soloud_lofifilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_monotone.h" />
-    <ClInclude Include="SoLoud\include\soloud_openmpt.h" />
-    <ClInclude Include="SoLoud\include\soloud_queue.h" />
-    <ClInclude Include="SoLoud\include\soloud_robotizefilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_sfxr.h" />
-    <ClInclude Include="SoLoud\include\soloud_speech.h" />
-    <ClInclude Include="SoLoud\include\soloud_tedsid.h" />
-    <ClInclude Include="SoLoud\include\soloud_thread.h" />
-    <ClInclude Include="SoLoud\include\soloud_vic.h" />
-    <ClInclude Include="SoLoud\include\soloud_vizsn.h" />
-    <ClInclude Include="SoLoud\include\soloud_wav.h" />
-    <ClInclude Include="SoLoud\include\soloud_waveshaperfilter.h" />
-    <ClInclude Include="SoLoud\include\soloud_wavstream.h" />
-    <ClInclude Include="SoundPlayer.h" />
     <ClInclude Include="ThrowMacros.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexBuffer.h" />
@@ -278,26 +219,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="ShadowMapPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="ShadowMapVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>

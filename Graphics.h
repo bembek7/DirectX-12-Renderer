@@ -4,6 +4,8 @@
 #include <d3d11.h>
 #include <wrl\client.h>
 #include <DirectXMath.h>
+#include "DepthStencilView.h"
+#include <memory>
 
 class Graphics
 {
@@ -31,13 +33,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> shadowMap;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowRenderDepthView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> comparisonSampler;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> drawingRenderState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRenderState;
+	std::unique_ptr<DepthStencilView> depthStencilView;
+	std::unique_ptr<DepthStencilView> shadowMapDepthStencilView;
 	D3D11_VIEWPORT viewport{};
 	D3D11_VIEWPORT shadowViewport{};
 

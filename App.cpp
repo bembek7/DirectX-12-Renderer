@@ -3,7 +3,6 @@
 #include "Mesh.h"
 #include "PointLight.h"
 #include <numbers>
-#include "SoundPlayer.h"
 #include "Camera.h"
 
 int App::Run()
