@@ -7,13 +7,25 @@
 
 int App::Run()
 {
-	Mesh plane = Mesh(window.GetGraphics(), "plane.obj", ShaderType::Phong, { 0.f, 0.f, 9.f }, { 0.f, 0.f, 0.f }, { 10.f, 10.f, 1.f });
+	std::vector<std::shared_ptr<Mesh>> meshes;
+	std::vector<std::shared_ptr<PointLight>> lights;
 
-	Mesh sphere = Mesh(window.GetGraphics(), "sphere.obj", ShaderType::Phong, { 0.f, 0.f, 6.5f }, { 0.f, 0.f, 0.f }, { 0.5f, 0.5f, 0.5f });
+	auto zeroVector = DirectX::XMVECTOR{ 0.f, 0.f, 0.f };
 
-	Mesh lightSphere = Mesh(window.GetGraphics(), "sphere.obj", ShaderType::Solid, { 0.f, 1.f, 1.0f }, { 0.f, 0.f, 0.f }, { 0.1f, 0.1f, 0.1f });
-	Mesh sphere3 = Mesh(window.GetGraphics(), "sphere.obj", ShaderType::Phong, { -2.f, -2.f, 6.f }, { 0.f, 0.f, 0.f }, { 0.5f, 0.5f, 0.5f });
-	PointLight pointLight = PointLight(window.GetGraphics(), { 0.f, 1.f, 1.0f });
+	auto plane = std::make_shared<Mesh>(window.GetGraphics(), "plane.obj", ShaderType::Phong, DirectX::XMVECTOR{ 0.f, 0.f, 9.f }, zeroVector, DirectX::XMVECTOR{ 10.f, 10.f, 1.f });
+	auto sphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, DirectX::XMVECTOR{ 0.f, 0.f, 6.5f }, zeroVector, DirectX::XMVECTOR{ 0.5f, 0.5f, 0.5f });
+	auto sphere2 = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, DirectX::XMVECTOR{ -2.f, -2.f, 6.f }, zeroVector, DirectX::XMVECTOR{ 0.5f, 0.5f, 0.5f });
+	auto lightSphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, DirectX::XMVECTOR{ 0.f, 1.f, 1.0f }, zeroVector, DirectX::XMVECTOR{0.1f, 0.1f, 0.1f });
+	
+	meshes.push_back(plane);
+	meshes.push_back(sphere);
+	meshes.push_back(sphere2);
+	meshes.push_back(lightSphere);
+
+	auto lightSphereLocation = lightSphere->GetPosition();
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), DirectX::XMLoadFloat3(&lightSphereLocation));
+	lights.push_back(pointLight);
+
 	Camera camera;
 
 	constexpr float cameraMovementSpeed = 0.3f;
@@ -64,43 +76,31 @@ int App::Run()
 			camera.Rotate({ cameraRotationSpeed, 0.0f, 0.0f });
 		}
 
-		// Shadow Map rendering
+		
 		window.GetGraphics().BeginFrame();
+
+		// Shadow Map rendering
 		window.GetGraphics().SetRenderTargetForShadowMap();
-		window.GetGraphics().SetCamera(pointLight.GetLightPerspective());
-		sphere.RenderShadowMap(window.GetGraphics());
-		sphere3.RenderShadowMap(window.GetGraphics());
-		plane.RenderShadowMap(window.GetGraphics());
+		window.GetGraphics().SetCamera(pointLight->GetLightPerspective());
+		for (const auto& mesh : meshes)
+		{
+			mesh->RenderShadowMap(window.GetGraphics());
+		}
 
 		// Regular drawing
 		window.GetGraphics().SetNormalRenderTarget();
 		window.GetGraphics().SetCamera(camera.GetMatrix());
-		pointLight.Bind(window.GetGraphics(), window.GetGraphics().GetCamera());
-		sphere.Draw(window.GetGraphics());
-		lightSphere.Draw(window.GetGraphics());
-		sphere3.Draw(window.GetGraphics());
-		plane.Draw(window.GetGraphics());
+		for (const auto& light : lights)
+		{
+			light->Bind(window.GetGraphics(), window.GetGraphics().GetCamera());
+		}
+		for (const auto& mesh : meshes)
+		{
+			mesh->Draw(window.GetGraphics());
+		}
+
 		window.GetGraphics().EndFrame();
 	}
 
 	return 0;
-}
-
-App::HitType App::EvaluateHit(const double timeFromStart, const float timeStep) noexcept
-{
-	double missTime = std::fmod(timeFromStart, timeStep);
-	if (missTime > timeStep / 2)
-	{
-		missTime = std::abs(timeStep - missTime);
-	}
-
-	if (missTime < 0.1f)
-	{
-		return HitType::Perfect;
-	}
-	else if (missTime < 0.15f)
-	{
-		return HitType::Good;
-	}
-	return HitType::Miss;
 }

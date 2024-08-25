@@ -66,4 +66,6 @@ private:
 	DirectX::XMVECTOR position = { 0.f, 0.f, 5.f };
 	DirectX::XMVECTOR rotation = { 0.f, 0.f, 0.f };
 	DirectX::XMVECTOR scale = { 1.f, 1.f, 1.f };
+
+	bool rendersShadowMap = false;
 };

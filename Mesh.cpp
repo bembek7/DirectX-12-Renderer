@@ -30,6 +30,7 @@ Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType sha
 		vertexShaderPath = L"VertexShader.cso";
 		break;
 	case ShaderType::Phong:
+		rendersShadowMap = true;
 		pixelShaderPath = L"PhongPS.cso";
 		vertexShaderPath = L"PhongVS.cso";
 		break;
@@ -86,27 +87,30 @@ void Mesh::Draw(Graphics& graphics)
 
 void Mesh::RenderShadowMap(Graphics& graphics)
 {
-	SetTransformBuffer(graphics);
-
-	for (auto& bindable : bindables)
+	if (rendersShadowMap)
 	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
-	}
+		SetTransformBuffer(graphics);
 
-	for (auto& sharedBindable : sharedBindables)
-	{
-		sharedBindable->Update(graphics);
-		sharedBindable->Bind(graphics);
-	}
+		for (auto& bindable : bindables)
+		{
+			bindable->Update(graphics);
+			bindable->Bind(graphics);
+		}
 
-	for (auto& bindable : shadowMapSharedBindables)
-	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
-	}
+		for (auto& sharedBindable : sharedBindables)
+		{
+			sharedBindable->Update(graphics);
+			sharedBindable->Bind(graphics);
+		}
 
-	graphics.DrawIndexed(model->indices.size());
+		for (auto& bindable : shadowMapSharedBindables)
+		{
+			bindable->Update(graphics);
+			bindable->Bind(graphics);
+		}
+
+		graphics.DrawIndexed(model->indices.size());
+	}
 }
 
 void Mesh::AddRotation(const DirectX::XMVECTOR& rotationToAdd) noexcept
