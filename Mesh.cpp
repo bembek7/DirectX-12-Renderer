@@ -13,10 +13,8 @@
 #include "BindablesPool.h"
 #include "Utils.h"
 
-Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const DirectX::XMVECTOR& position, const DirectX::XMVECTOR& rotation, const DirectX::XMVECTOR& scale) :
-	position(position),
-	rotation(rotation),
-	scale(scale)
+Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const DirectX::XMVECTOR& location, const DirectX::XMVECTOR& rotation, const DirectX::XMVECTOR& scale) :
+	WorldObject(location, rotation, scale)
 {
 	model = ModelsPool::GetInstance().GetModel(fileName);
 
@@ -68,7 +66,7 @@ Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType sha
 
 void Mesh::Draw(Graphics& graphics)
 {
-	SetTransformBuffer(graphics);
+	UpdateTransformBuffer(graphics);
 
 	for (auto& bindable : bindables)
 	{
@@ -89,7 +87,7 @@ void Mesh::RenderShadowMap(Graphics& graphics)
 {
 	if (rendersShadowMap)
 	{
-		SetTransformBuffer(graphics);
+		UpdateTransformBuffer(graphics);
 
 		for (auto& bindable : bindables)
 		{
@@ -113,21 +111,6 @@ void Mesh::RenderShadowMap(Graphics& graphics)
 	}
 }
 
-void Mesh::AddRotation(const DirectX::XMVECTOR& rotationToAdd) noexcept
-{
-	rotation = DirectX::XMVectorAdd(rotation, rotationToAdd);
-}
-
-void Mesh::AddPosition(const DirectX::XMVECTOR& posiationToAdd) noexcept
-{
-	position = DirectX::XMVectorAdd(position, posiationToAdd);
-}
-
-void Mesh::Scale(const float scaleFactor) noexcept
-{
-	scale = DirectX::XMVectorScale(scale, scaleFactor);
-}
-
 void Mesh::SetColor(Graphics& graphics, const DirectX::XMFLOAT4& newColor)
 {
 	colorBuffer = newColor;
@@ -138,19 +121,7 @@ DirectX::XMFLOAT3 Mesh::GetColor() const noexcept
 	return DirectX::XMFLOAT3(colorBuffer.color.x, colorBuffer.color.y, colorBuffer.color.z);
 }
 
-DirectX::XMFLOAT3 Mesh::GetPosition() const noexcept
-{
-	DirectX::XMFLOAT3 retPosition;
-	DirectX::XMStoreFloat3(&retPosition, position);
-	return retPosition;
-}
-
-DirectX::XMMATRIX Mesh::GetTransformMatrix() const noexcept
-{
-	return DirectX::XMMatrixScalingFromVector(scale) * DirectX::XMMatrixRotationRollPitchYawFromVector(rotation) * DirectX::XMMatrixTranslationFromVector(position);
-}
-
-void Mesh::SetTransformBuffer(Graphics& graphics)
+void Mesh::UpdateTransformBuffer(Graphics& graphics)
 {
 	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera());
 	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera() * graphics.GetProjection());
