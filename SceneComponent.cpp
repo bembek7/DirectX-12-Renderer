@@ -31,12 +31,12 @@ void SceneComponent::AddRelativeLocation(const DirectX::XMFLOAT3 locationToAdd) 
 
 void SceneComponent::AddRelativeScale(const DirectX::XMVECTOR scaleToAdd) noexcept
 {
-    DirectX::XMStoreFloat3(&relativeScale, DirectX::XMVectorAdd(GetRelativeLocationVector(), scaleToAdd));
+    DirectX::XMStoreFloat3(&relativeScale, DirectX::XMVectorAdd(GetRelativeScaleVector(), scaleToAdd));
 }
 
 void SceneComponent::AddRelativeRotation(const DirectX::XMVECTOR rotationToAdd) noexcept
 {
-    DirectX::XMStoreFloat3(&relativeRotation, DirectX::XMVectorAdd(GetRelativeLocationVector(), rotationToAdd));
+    DirectX::XMStoreFloat3(&relativeRotation, DirectX::XMVectorAdd(GetRelativeRotationVector(), rotationToAdd));
 }
 
 void SceneComponent::AddRelativeLocation(const DirectX::XMVECTOR locationToAdd) noexcept
