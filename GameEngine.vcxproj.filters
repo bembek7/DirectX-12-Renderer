@@ -66,7 +66,10 @@
     <ClCompile Include="DepthStencilView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WorldObject.cpp">
+    <ClCompile Include="SceneComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,13 +134,13 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorldObject.h">
+    <ClInclude Include="SceneComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

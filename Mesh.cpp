@@ -12,9 +12,10 @@
 #include "ModelsPool.h"
 #include "BindablesPool.h"
 #include "Utils.h"
+#include "SceneComponent.h"
 
-Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const DirectX::XMVECTOR& location, const DirectX::XMVECTOR& rotation, const DirectX::XMVECTOR& scale) :
-	WorldObject(location, rotation, scale)
+Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, SceneComponent* const parent, const DirectX::XMFLOAT3 location, const DirectX::XMFLOAT3 rotation, const DirectX::XMFLOAT3 scale) :
+	SceneComponent(parent, location, rotation, scale)
 {
 	model = ModelsPool::GetInstance().GetModel(fileName);
 
@@ -126,4 +127,11 @@ void Mesh::UpdateTransformBuffer(Graphics& graphics)
 	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera());
 	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera() * graphics.GetProjection());
 	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(GetTransformMatrix()), std::move(transformView), std::move(transformViewProjection));
+}
+
+Mesh::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection)
+{
+	DirectX::XMStoreFloat4x4(&transform, newTransform);
+	DirectX::XMStoreFloat4x4(&transformView, newTransformView);
+	DirectX::XMStoreFloat4x4(&transformViewProjection, newTransformViewProjection);
 }

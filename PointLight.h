@@ -2,15 +2,16 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Camera.h"
+#include "Actor.h"
 
 class Graphics;
 
-class PointLight
+class PointLight : public Actor
 {
 public:
-	PointLight(Graphics& graphics, const DirectX::XMVECTOR& position);
-	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3& newColor);
-	void Bind(Graphics& graphics, const DirectX::XMMATRIX& cameraView);
+	PointLight(Graphics& graphics, const DirectX::XMFLOAT3 location);
+	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor);
+	void Bind(Graphics& graphics, const DirectX::XMMATRIX cameraView);
 	DirectX::XMMATRIX GetLightPerspective() const noexcept;
 private:
 	struct LightBuffer
@@ -19,16 +20,15 @@ private:
 		float diffuseIntensity = 0.6f;
 		DirectX::XMFLOAT3 ambient = { 0.15f, 0.15f, 0.15f };
 		float specularIntensity = 0.6f;
-		DirectX::XMFLOAT3 lightViewPosition = { 0.f, 0.f, 0.f };
+		DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
 		float specularPower = 0.8f;
 	} lightBuffer;
 
 	struct ShadowMapBuffer
 	{
-		DirectX::XMMATRIX lightPerspective;
+		DirectX::XMFLOAT4X4 lightPerspective;
 	} shadowMapBuffer;
 
-	DirectX::XMVECTOR position;
 	Camera shadowMapCamera;
 	std::unique_ptr<ConstantBuffer<LightBuffer>> constantLightBuffer;
 	std::unique_ptr<ConstantBuffer<ShadowMapBuffer>> constantShadowMapBuffer;

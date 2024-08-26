@@ -5,7 +5,7 @@
 #include <memory>
 #include "Bindable.h"
 #include "Model.h"
-#include "WorldObject.h"
+#include "SceneComponent.h"
 
 class Graphics;
 
@@ -15,10 +15,10 @@ enum class ShaderType
 	Phong
 };
 
-class Mesh : public WorldObject
+class Mesh : public SceneComponent
 {
 public:
-	Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const DirectX::XMVECTOR& location = { 0.f, 0.f, 0.f }, const DirectX::XMVECTOR& scale = { 1.f, 1.f, 1.f }, const DirectX::XMVECTOR& rotation = { 0.f, 0.f, 0.f });
+	Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, SceneComponent* const parent, const DirectX::XMFLOAT3 location = { 0.f, 0.f, 0.f }, const DirectX::XMFLOAT3 scale = { 1.f, 1.f, 1.f }, const DirectX::XMFLOAT3 rotation = { 0.f, 0.f, 0.f });
 
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
@@ -38,14 +38,10 @@ private:
 	struct TransformBuffer
 	{
 		TransformBuffer() = default;
-		TransformBuffer(const DirectX::XMMATRIX& newTransform, const DirectX::XMMATRIX& newTransformView, const DirectX::XMMATRIX& newTransformViewProjection) :
-			transform(newTransform),
-			transformView(newTransformView),
-			transformViewProjection(newTransformViewProjection)
-		{}
-		DirectX::XMMATRIX transform;
-		DirectX::XMMATRIX transformView;
-		DirectX::XMMATRIX transformViewProjection;
+		TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection);
+		DirectX::XMFLOAT4X4 transform;
+		DirectX::XMFLOAT4X4 transformView;
+		DirectX::XMFLOAT4X4 transformViewProjection;
 	};
 	TransformBuffer transformBuffer;
 

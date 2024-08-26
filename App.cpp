@@ -10,17 +10,17 @@ int App::Run()
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<std::shared_ptr<PointLight>> lights;
 
-	auto plane = std::make_shared<Mesh>(window.GetGraphics(), "plane.obj", ShaderType::Phong, DirectX::XMVECTOR{ 0.f, 0.f, 9.f }, DirectX::XMVECTOR{ 10.f, 10.f, 1.f });
-	auto sphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, DirectX::XMVECTOR{ 0.f, 0.f, 6.5f }, DirectX::XMVECTOR{ 0.5f, 0.5f, 0.5f });
-	auto sphere2 = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, DirectX::XMVECTOR{ -2.f, -2.f, 6.f }, DirectX::XMVECTOR{ 0.5f, 0.5f, 0.5f });
-	auto lightSphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, DirectX::XMVECTOR{ 0.f, 1.f, 1.0f }, DirectX::XMVECTOR{0.1f, 0.1f, 0.1f });
+	auto plane = std::make_shared<Mesh>(window.GetGraphics(), "plane.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ 0.f, 0.f, 9.f }, DirectX::XMFLOAT3{ 10.f, 10.f, 1.f });
+	auto sphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ 0.f, 0.f, 6.5f }, DirectX::XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+	auto sphere2 = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ -2.f, -2.f, 6.f }, DirectX::XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+	auto lightSphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, nullptr, DirectX::XMFLOAT3{ 0.f, 1.f, 1.0f }, DirectX::XMFLOAT3{0.1f, 0.1f, 0.1f });
 	
 	meshes.push_back(plane);
 	meshes.push_back(sphere);
 	meshes.push_back(sphere2);
 	meshes.push_back(lightSphere);
 
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), lightSphere->GetLocation());
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), lightSphere->GetRelativeLocation());
 	lights.push_back(pointLight);
 
 	Camera camera;
@@ -42,38 +42,38 @@ int App::Run()
 
 		if (window.IsKeyPressed('W'))
 		{
-			camera.Move({ 0.f,0.f,cameraMovementSpeed });
+			camera.AddActorLocation(DirectX::XMVECTOR{ 0.f,0.f,cameraMovementSpeed });
 		}
 		if (window.IsKeyPressed('S'))
 		{
-			camera.Move({ 0.f,0.f,-cameraMovementSpeed });
+			camera.AddActorLocation(DirectX::XMVECTOR{ 0.f,0.f,-cameraMovementSpeed });
 		}
 		if (window.IsKeyPressed('D'))
 		{
-			camera.Move({ cameraMovementSpeed,0.f,0.0f });
+			camera.AddActorLocation(DirectX::XMVECTOR{ cameraMovementSpeed,0.f,0.0f });
 		}
 		if (window.IsKeyPressed('A'))
 		{
-			camera.Move({ -cameraMovementSpeed,0.f,0.0f });
+			camera.AddActorLocation(DirectX::XMVECTOR{ -cameraMovementSpeed,0.f,0.0f });
 		}
 		if (window.IsKeyPressed(VK_LEFT))
 		{
-			camera.Rotate({ 0.0f, -cameraRotationSpeed,0.0f });
+			camera.AddActorRotation(DirectX::XMVECTOR{ 0.0f, -cameraRotationSpeed,0.0f });
 		}
 		if (window.IsKeyPressed(VK_RIGHT))
 		{
-			camera.Rotate({ 0.0f, cameraRotationSpeed, 0.0f });
+			camera.AddActorRotation(DirectX::XMVECTOR{ 0.0f, cameraRotationSpeed, 0.0f });
 		}
 		if (window.IsKeyPressed(VK_UP))
 		{
-			camera.Rotate({ -cameraRotationSpeed, 0.0f, 0.0f });
+			camera.AddActorRotation(DirectX::XMVECTOR{ -cameraRotationSpeed, 0.0f, 0.0f });
 		}
 		if (window.IsKeyPressed(VK_DOWN))
 		{
-			camera.Rotate({ cameraRotationSpeed, 0.0f, 0.0f });
+			camera.AddActorRotation(DirectX::XMVECTOR{ cameraRotationSpeed, 0.0f, 0.0f });
 		}
 
-		
+
 		window.GetGraphics().BeginFrame();
 
 		// Shadow Map rendering

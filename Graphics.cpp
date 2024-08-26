@@ -171,22 +171,22 @@ void Graphics::EndFrame()
 	CHECK_HR(swapChain->Present(1u, 0u));
 }
 
-void Graphics::SetProjection(const DirectX::XMMATRIX& proj) noexcept
+void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 {
-	projection = proj;
+	DirectX::XMStoreFloat4x4(&projection, proj);
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
-	return projection;
+	return DirectX::XMLoadFloat4x4(&projection);
 }
 
-void Graphics::SetCamera(const DirectX::XMMATRIX& cam) noexcept
+void Graphics::SetCamera(const DirectX::XMMATRIX cam) noexcept
 {
-	camera = cam;
+	DirectX::XMStoreFloat4x4(&camera, cam);
 }
 
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept
 {
-	return camera;
+	return DirectX::XMLoadFloat4x4(&camera);
 }

@@ -21,9 +21,9 @@ public:
 	void SetNormalRenderTarget();
 	void EndFrame();
 
-	void SetProjection(const DirectX::XMMATRIX& proj) noexcept;
+	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
-	void SetCamera(const DirectX::XMMATRIX& cam) noexcept;
+	void SetCamera(const DirectX::XMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
 
 	void DrawIndexed(const size_t numIndices) noexcept;
@@ -42,6 +42,6 @@ private:
 	D3D11_VIEWPORT viewport{};
 	D3D11_VIEWPORT shadowViewport{};
 
-	DirectX::XMMATRIX camera;
-	DirectX::XMMATRIX projection;
+	DirectX::XMFLOAT4X4 camera;
+	DirectX::XMFLOAT4X4 projection;
 };
