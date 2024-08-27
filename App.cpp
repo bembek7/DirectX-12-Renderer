@@ -13,17 +13,17 @@ int App::Run()
 	auto plane = std::make_shared<Mesh>(window.GetGraphics(), "plane.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ 0.f, 0.f, 9.f }, DirectX::XMFLOAT3{ 10.f, 10.f, 1.f });
 	auto sphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ 0.f, 0.f, 6.5f }, DirectX::XMFLOAT3{ 0.5f, 0.5f, 0.5f });
 	auto sphere2 = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, nullptr, DirectX::XMFLOAT3{ -2.f, -2.f, 6.f }, DirectX::XMFLOAT3{ 0.5f, 0.5f, 0.5f });
-	auto lightSphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, nullptr, DirectX::XMFLOAT3{ 0.f, 1.f, 1.0f }, DirectX::XMFLOAT3{0.1f, 0.1f, 0.1f });
-	
+	auto lightSphere = std::make_shared<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, nullptr, DirectX::XMFLOAT3{ 0.f, 1.f, 1.0f }, DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
+
 	meshes.push_back(plane);
 	meshes.push_back(sphere);
 	meshes.push_back(sphere2);
 	meshes.push_back(lightSphere);
 
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), lightSphere->GetRelativeLocation());
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), lightSphere->GetComponentLocation());
 	lights.push_back(pointLight);
 
-	Camera camera;
+	Camera camera = Camera(nullptr);
 
 	constexpr float cameraMovementSpeed = 0.3f;
 	constexpr float cameraRotationSpeed = 0.03f;
@@ -40,39 +40,43 @@ int App::Run()
 			const short keyPressed = window.PopPressedKey();
 		}
 
+		DirectX::XMFLOAT2 cameraMoveInput = { 0.f, 0.f };
+		DirectX::XMFLOAT2 cameraLookInput = { 0.f, 0.f };
 		if (window.IsKeyPressed('W'))
 		{
-			camera.AddActorLocation(DirectX::XMVECTOR{ 0.f,0.f,cameraMovementSpeed });
+			cameraMoveInput.y += cameraMovementSpeed;
 		}
 		if (window.IsKeyPressed('S'))
 		{
-			camera.AddActorLocation(DirectX::XMVECTOR{ 0.f,0.f,-cameraMovementSpeed });
+			cameraMoveInput.y -= cameraMovementSpeed;
 		}
 		if (window.IsKeyPressed('D'))
 		{
-			camera.AddActorLocation(DirectX::XMVECTOR{ cameraMovementSpeed,0.f,0.0f });
+			cameraMoveInput.x += cameraMovementSpeed;
 		}
 		if (window.IsKeyPressed('A'))
 		{
-			camera.AddActorLocation(DirectX::XMVECTOR{ -cameraMovementSpeed,0.f,0.0f });
+			cameraMoveInput.x -= cameraMovementSpeed;
 		}
 		if (window.IsKeyPressed(VK_LEFT))
 		{
-			camera.AddActorRotation(DirectX::XMVECTOR{ 0.0f, -cameraRotationSpeed,0.0f });
+			cameraLookInput.x -= cameraRotationSpeed;
 		}
 		if (window.IsKeyPressed(VK_RIGHT))
 		{
-			camera.AddActorRotation(DirectX::XMVECTOR{ 0.0f, cameraRotationSpeed, 0.0f });
+			cameraLookInput.x += cameraRotationSpeed;
 		}
 		if (window.IsKeyPressed(VK_UP))
 		{
-			camera.AddActorRotation(DirectX::XMVECTOR{ -cameraRotationSpeed, 0.0f, 0.0f });
+			cameraLookInput.y -= cameraRotationSpeed;
 		}
 		if (window.IsKeyPressed(VK_DOWN))
 		{
-			camera.AddActorRotation(DirectX::XMVECTOR{ cameraRotationSpeed, 0.0f, 0.0f });
+			cameraLookInput.y += cameraRotationSpeed;
 		}
-
+		camera.AddMovementInput(cameraMoveInput);
+		camera.AddYawInput(cameraLookInput.x);
+		camera.AddPitchInput(cameraLookInput.y);
 
 		window.GetGraphics().BeginFrame();
 
