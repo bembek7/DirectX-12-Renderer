@@ -5,7 +5,7 @@
 class Actor
 {
 public:
-	Actor();
+	Actor() = default;
 	Actor(SceneComponent&& rootComponent);
 
 	void AddActorScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept;
@@ -28,7 +28,6 @@ public:
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
 
 protected:
-	
 	std::unique_ptr<SceneComponent> rootComponent;
 };
 

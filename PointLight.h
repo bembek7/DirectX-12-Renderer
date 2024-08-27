@@ -29,7 +29,7 @@ private:
 		DirectX::XMFLOAT4X4 lightPerspective;
 	} shadowMapBuffer;
 
-	Camera shadowMapCamera;
+	Camera* shadowMapCamera;
 	std::unique_ptr<ConstantBuffer<LightBuffer>> constantLightBuffer;
 	std::unique_ptr<ConstantBuffer<ShadowMapBuffer>> constantShadowMapBuffer;
 };

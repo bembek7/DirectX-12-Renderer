@@ -32,6 +32,7 @@ private:
 private:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;
+	std::vector<std::unique_ptr<Bindable>> techinquesMutualBindables;
 	std::vector<std::shared_ptr<Bindable>> shadowMapSharedBindables;
 	std::shared_ptr<Model> model;
 

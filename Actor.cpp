@@ -1,10 +1,5 @@
 #include "Actor.h"
 
-Actor::Actor()
-{
-	rootComponent = std::make_unique<SceneComponent>(nullptr);
-}
-
 Actor::Actor(SceneComponent&& initialRootComponent)
 {
 	rootComponent = std::make_unique<SceneComponent>(std::move(initialRootComponent));
