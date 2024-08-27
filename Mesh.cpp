@@ -53,7 +53,7 @@ Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType sha
 	bindables.push_back(std::make_unique<ConstantBuffer<ColorBuffer>>(graphics, colorBuffer, BufferType::Pixel));
 
 	auto& bindablesPool = BindablesPool::GetInstance();
-	
+
 	sharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, pixelShaderPath));
 	auto vertexShader = bindablesPool.GetBindable<VertexShader>(graphics, vertexShaderPath);
 	const VertexShader& vertexShaderRef = dynamic_cast<VertexShader&>(*vertexShader);

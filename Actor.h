@@ -30,4 +30,3 @@ public:
 protected:
 	std::unique_ptr<SceneComponent> rootComponent;
 };
-

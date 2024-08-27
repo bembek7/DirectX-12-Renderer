@@ -34,6 +34,9 @@ public:
 	DirectX::XMVECTOR GetComponentScaleVector() const noexcept;
 	DirectX::XMVECTOR GetComponentRotationVector() const noexcept;
 	DirectX::XMVECTOR GetComponentLocationVector() const noexcept;
+	DirectX::XMVECTOR GetComponentForwardVector() const noexcept;
+	DirectX::XMVECTOR GetComponentUpVector() const noexcept;
+	DirectX::XMVECTOR GetComponentRightVector() const noexcept;
 protected:
 	//std::vector<std::unique_ptr<SceneComponent>> children;
 	SceneComponent* parent = nullptr;
@@ -41,4 +44,3 @@ protected:
 	DirectX::XMFLOAT3 relativeRotation = { 0.f, 0.f, 0.f };
 	DirectX::XMFLOAT3 relativeScale = { 1.f, 1.f, 1.f };
 };
-

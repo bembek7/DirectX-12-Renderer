@@ -6,7 +6,6 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-
 namespace TestGameEngine
 {
 	using namespace DirectX;
@@ -29,7 +28,7 @@ namespace TestGameEngine
 	{
 		return AreVectorsEqual(XMLoadFloat3(&v1), XMLoadFloat3(&v2));
 	}
-	
+
 	TEST_CLASS(TestGameEngine)
 	{
 	public:

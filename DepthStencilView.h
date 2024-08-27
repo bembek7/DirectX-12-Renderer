@@ -11,4 +11,3 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
 };
-
