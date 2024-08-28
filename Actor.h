@@ -5,7 +5,7 @@
 class Actor
 {
 public:
-	Actor() = default;
+	Actor();
 	Actor(SceneComponent&& rootComponent);
 
 	void AddActorScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept;

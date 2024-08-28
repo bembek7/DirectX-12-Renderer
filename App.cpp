@@ -25,9 +25,6 @@ int App::Run()
 
 	Camera camera = Camera(nullptr);
 
-	constexpr float cameraMovementSpeed = 0.3f;
-	constexpr float cameraRotationSpeed = 0.03f;
-
 	while (true)
 	{
 		if (const auto ecode = Window::ProcessMessages())
@@ -35,30 +32,49 @@ int App::Run()
 			return *ecode;
 		}
 
-		while (!window.IsKeyQueueEmpty())
+		while (const auto keyPressed = window.ReadPressedKey())
 		{
-			const short keyPressed = window.PopPressedKey();
+			if (keyPressed == VK_ESCAPE)
+			{
+				if (window.IsCursorEnabled())
+				{
+					window.DisableCursor();
+					window.EnableRawInput();
+				}
+				else
+				{
+					window.EnableCursor();
+					window.DisableRawInput();
+				}
+			}
 		}
 
 		DirectX::XMFLOAT2 cameraMoveInput = { 0.f, 0.f };
 		DirectX::XMFLOAT2 cameraLookInput = { 0.f, 0.f };
+
+		while (const auto rawDelta = window.ReadRawDelta())
+		{
+			cameraLookInput.x += rawDelta->first;
+			cameraLookInput.y += rawDelta->second;
+		}
+
 		if (window.IsKeyPressed('W'))
 		{
-			cameraMoveInput.y += cameraMovementSpeed;
+			cameraMoveInput.y += 1.f;
 		}
 		if (window.IsKeyPressed('S'))
 		{
-			cameraMoveInput.y -= cameraMovementSpeed;
+			cameraMoveInput.y -= 1.f;
 		}
 		if (window.IsKeyPressed('D'))
 		{
-			cameraMoveInput.x += cameraMovementSpeed;
+			cameraMoveInput.x += 1.f;
 		}
 		if (window.IsKeyPressed('A'))
 		{
-			cameraMoveInput.x -= cameraMovementSpeed;
+			cameraMoveInput.x -= 1.f;
 		}
-		if (window.IsKeyPressed(VK_LEFT))
+		/*if (window.IsKeyPressed(VK_LEFT))
 		{
 			cameraLookInput.x -= cameraRotationSpeed;
 		}
@@ -73,7 +89,7 @@ int App::Run()
 		if (window.IsKeyPressed(VK_DOWN))
 		{
 			cameraLookInput.y += cameraRotationSpeed;
-		}
+		}*/
 		camera.AddMovementInput(cameraMoveInput);
 		camera.AddYawInput(cameraLookInput.x);
 		camera.AddPitchInput(cameraLookInput.y);

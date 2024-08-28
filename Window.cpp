@@ -45,6 +45,14 @@ Window::Window(const unsigned int clientAreaWidth, const unsigned int clientArea
 		throw std::runtime_error(std::system_category().message(GetLastError()));
 	}
 
+	RAWINPUTDEVICE rawInputDevice = {};
+	rawInputDevice.usUsagePage = 0x01;
+	rawInputDevice.usUsage = 0x02;
+	if (RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice)) == FALSE)
+	{
+		throw std::runtime_error("Could not register raw input device");
+	}
+
 	graphics = std::make_unique<Graphics>(hWnd, clientAreaWidth, clientAreaHeight);
 	ShowWindow(hWnd, SW_SHOW);
 }
@@ -71,27 +79,78 @@ void Window::SetWidnowTitle(const std::string& newTitle) noexcept
 	SetWindowText(hWnd, newTitle.c_str());
 }
 
-bool Window::IsKeyQueueEmpty() const noexcept
-{
-	return keyPressedEvents.empty();
-}
-
-short Window::PopPressedKey() noexcept
-{
-	assert(!keyPressedEvents.empty());
-	const short pressedKey = keyPressedEvents.front();
-	keyPressedEvents.pop();
-	return pressedKey;
-}
-
 bool Window::IsKeyPressed(const short key) const noexcept
 {
 	return keys[key];
 }
 
+std::optional<short> Window::ReadPressedKey() noexcept
+{
+	if (keyPressedEvents.empty())
+	{
+		return std::nullopt;
+	}
+	const short pressedKey = keyPressedEvents.front();
+	keyPressedEvents.pop();
+	return pressedKey;
+}
+
 Graphics& Window::GetGraphics() noexcept
 {
 	return *graphics;
+}
+
+void Window::EnableCursor() noexcept
+{
+	cursorEnabled = true;
+	while (ShowCursor(TRUE) < 0);
+	FreeCursor();
+}
+
+void Window::DisableCursor() noexcept
+{
+	cursorEnabled = false;
+	while (ShowCursor(FALSE) >= 0);
+	LockCursorToClientArea();
+}
+
+bool Window::IsCursorEnabled() const noexcept
+{
+	return cursorEnabled;
+}
+
+void Window::EnableRawInput() noexcept
+{
+	rawInputEnabled = true;
+}
+
+void Window::DisableRawInput() noexcept
+{
+	rawInputEnabled = false;
+}
+
+std::optional<std::pair<int, int>> Window::ReadRawDelta() noexcept
+{
+	if (rawDeltaEvents.empty())
+	{
+		return std::nullopt;
+	}
+	const auto rawDelta = rawDeltaEvents.front();
+	rawDeltaEvents.pop();
+	return rawDelta;
+}
+
+void Window::FreeCursor() noexcept
+{
+	ClipCursor(nullptr);
+}
+
+void Window::LockCursorToClientArea() noexcept
+{
+	RECT rect;
+	GetClientRect(hWnd, &rect);
+	MapWindowPoints(hWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+	ClipCursor(&rect);
 }
 
 LRESULT Window::WindowProcBeforeCreation(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -145,6 +204,31 @@ LRESULT Window::HandleMessage(const HWND hWnd, const UINT uMsg, const WPARAM wPa
 	case WM_KEYUP:
 		keys[wParam] = false;
 		break;
+	case WM_INPUT:
+	{
+		if (rawInputEnabled)
+		{
+			UINT size = 0u;
+
+			if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) == -1)
+			{
+				break;
+			}
+			rawBuffer.resize(size);
+
+			if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, rawBuffer.data(), &size, sizeof(RAWINPUTHEADER)) != size)
+			{
+				break;
+			}
+			auto& rawInput = reinterpret_cast<const RAWINPUT&>(*rawBuffer.data());
+			const auto mouseMotion = std::make_pair<int, int>(rawInput.data.mouse.lLastX, rawInput.data.mouse.lLastY);
+			if (rawInput.header.dwType == RIM_TYPEMOUSE && (mouseMotion.first != 0 || mouseMotion.second != 0))
+			{
+				rawDeltaEvents.push(mouseMotion);
+			}
+		}
+		break;
+	}
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		return 0;
