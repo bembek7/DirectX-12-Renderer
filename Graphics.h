@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include "DepthStencilView.h"
 #include <memory>
+#include "Gui.h"
 
 class Graphics
 {
@@ -44,4 +45,6 @@ private:
 
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
+
+	std::unique_ptr<Gui> gui;
 };

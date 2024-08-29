@@ -4,6 +4,9 @@
 #include <cassert>
 #include <string>
 #include <errhandlingapi.h>
+#include <backends/imgui_impl_win32.h>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Window::Window(const unsigned int clientAreaWidth, const unsigned int clientAreaHeight)
 {
@@ -103,6 +106,7 @@ Graphics& Window::GetGraphics() noexcept
 void Window::EnableCursor() noexcept
 {
 	cursorEnabled = true;
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 	while (ShowCursor(TRUE) < 0);
 	FreeCursor();
 }
@@ -110,6 +114,7 @@ void Window::EnableCursor() noexcept
 void Window::DisableCursor() noexcept
 {
 	cursorEnabled = false;
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
 	while (ShowCursor(FALSE) >= 0);
 	LockCursorToClientArea();
 }
@@ -135,7 +140,7 @@ std::optional<std::pair<int, int>> Window::ReadRawDelta() noexcept
 	{
 		return std::nullopt;
 	}
-	const auto rawDelta = rawDeltaEvents.front();
+	const auto& rawDelta = rawDeltaEvents.front();
 	rawDeltaEvents.pop();
 	return rawDelta;
 }
@@ -179,6 +184,11 @@ LRESULT Window::WindowProcAfterCreation(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 LRESULT Window::HandleMessage(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	{
+		return true;
+	}
+
 	switch (uMsg)
 	{
 	case WM_KILLFOCUS:

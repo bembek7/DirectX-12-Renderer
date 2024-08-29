@@ -136,6 +136,8 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	const float screenRatio = viewport.Height / viewport.Width;
 	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 30.0f));
+
+	gui = std::make_unique<Gui>(hWnd, device.Get(), context.Get());
 }
 
 void Graphics::DrawIndexed(const size_t numIndices) noexcept
@@ -149,6 +151,8 @@ void Graphics::BeginFrame() noexcept
 	context->ClearRenderTargetView(renderTargetView.Get(), color);
 	context->ClearDepthStencilView(depthStencilView->Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	context->ClearDepthStencilView(shadowMapDepthStencilView->Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+
+	gui->BeginFrame();
 }
 
 void Graphics::SetRenderTargetForShadowMap()
@@ -168,9 +172,11 @@ void Graphics::SetNormalRenderTarget()
 
 void Graphics::EndFrame()
 {
+	gui->EndFrame();
+
 	CHECK_HR(swapChain->Present(1u, 0u));
-	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
-	context->PSSetShaderResources(0, 1, nullSRV);
+	ID3D11ShaderResourceView* const nullSRV = nullptr;
+	context->PSSetShaderResources(0, 1, &nullSRV);
 }
 
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
