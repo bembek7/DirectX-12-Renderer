@@ -2,14 +2,14 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Camera.h"
-#include "Actor.h"
+#include "MeshActor.h"
 
 class Graphics;
 
-class PointLight : public Actor
+class PointLight : public MeshActor
 {
 public:
-	PointLight(Graphics& graphics, const DirectX::XMFLOAT3 location);
+	PointLight(Graphics& graphics, const DirectX::XMFLOAT3 location = { 0.f, 0.f, 0.f }, const std::string& actorName = "Point Light");
 	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor);
 	void Bind(Graphics& graphics, const DirectX::XMMATRIX cameraView);
 	DirectX::XMMATRIX GetLightPerspective() const noexcept;

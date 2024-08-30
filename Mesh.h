@@ -15,16 +15,18 @@ enum class ShaderType
 	Phong
 };
 
-class Mesh : public SceneComponent
+class Mesh
 {
 public:
-	Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, SceneComponent* const parent, const DirectX::XMFLOAT3 location = { 0.f, 0.f, 0.f }, const DirectX::XMFLOAT3 scale = { 1.f, 1.f, 1.f }, const DirectX::XMFLOAT3 rotation = { 0.f, 0.f, 0.f });
+	Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType);
 
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
 	void SetColor(Graphics& graphics, const DirectX::XMFLOAT4& newColor);
 	DirectX::XMFLOAT3 GetColor() const noexcept;
+
+	void SetTransform(DirectX::XMMATRIX newTransform) noexcept;
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
@@ -55,6 +57,6 @@ private:
 		DirectX::XMFLOAT4 color;
 	};
 	ColorBuffer colorBuffer = { { 1.0f, 1.0f, 1.0f, 1.0f } };
-
+	DirectX::XMFLOAT4X4 transform;
 	bool rendersShadowMap = false;
 };

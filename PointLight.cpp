@@ -2,11 +2,10 @@
 #include "ThrowMacros.h"
 #include "Graphics.h"
 
-PointLight::PointLight(Graphics& graphics, const DirectX::XMFLOAT3 location)
+PointLight::PointLight(Graphics& graphics, const DirectX::XMFLOAT3 location, const std::string& actorName) :
+	MeshActor(actorName)
 {
-	auto shadowMapCameraInit = std::make_unique<Camera>(nullptr);
-	shadowMapCamera = shadowMapCameraInit.get();
-	rootComponent = std::move(shadowMapCameraInit);
+	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), meshComp);
 
 	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 1u);
 	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * graphics.GetProjection()));

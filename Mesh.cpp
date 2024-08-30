@@ -14,8 +14,7 @@
 #include "Utils.h"
 #include "SceneComponent.h"
 
-Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, SceneComponent* const parent, const DirectX::XMFLOAT3 location, const DirectX::XMFLOAT3 rotation, const DirectX::XMFLOAT3 scale) :
-	SceneComponent(parent, location, rotation, scale)
+Mesh::Mesh(Graphics& graphics, const std::string& fileName, const ShaderType shaderType)
 {
 	model = ModelsPool::GetInstance().GetModel(fileName);
 
@@ -131,11 +130,17 @@ DirectX::XMFLOAT3 Mesh::GetColor() const noexcept
 	return DirectX::XMFLOAT3(colorBuffer.color.x, colorBuffer.color.y, colorBuffer.color.z);
 }
 
+void Mesh::SetTransform(DirectX::XMMATRIX newTransform) noexcept
+{
+	DirectX::XMStoreFloat4x4(&transform, newTransform);
+}
+
 void Mesh::UpdateTransformBuffer(Graphics& graphics)
 {
-	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera());
-	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(GetTransformMatrix() * graphics.GetCamera() * graphics.GetProjection());
-	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(GetTransformMatrix()), std::move(transformView), std::move(transformViewProjection));
+	DirectX::XMMATRIX transformMatrix = DirectX::XMLoadFloat4x4(&transform);
+	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera());
+	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera() * graphics.GetProjection());
+	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(transformMatrix), std::move(transformView), std::move(transformViewProjection));
 }
 
 Mesh::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection)
