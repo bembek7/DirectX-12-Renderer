@@ -1,14 +1,9 @@
 #include "Actor.h"
+#include "imgui.h"
 
-Actor::Actor()
-{
-	rootComponent = std::make_unique<SceneComponent>(nullptr);
-}
-
-Actor::Actor(SceneComponent&& initialRootComponent)
-{
-	rootComponent = std::make_unique<SceneComponent>(std::move(initialRootComponent));
-}
+Actor::Actor(const std::string& actorName) :
+	actorName(actorName)
+{}
 
 void Actor::AddActorScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept
 {
@@ -70,6 +65,13 @@ void Actor::SetActorLocation(const DirectX::XMVECTOR newLocation) noexcept
 	rootComponent->SetRelativeLocation(newLocation);
 }
 
+void Actor::SetActorTransform(const DirectX::XMFLOAT3 newLocation, const DirectX::XMFLOAT3 newRotation, const DirectX::XMFLOAT3 newScale) noexcept
+{
+	SetActorLocation(newLocation);
+	SetActorRotation(newRotation);
+	SetActorScale(newScale);
+}
+
 DirectX::XMFLOAT3 Actor::GetActorScale() const noexcept
 {
 	return rootComponent->GetRelativeScale();
@@ -98,4 +100,30 @@ DirectX::XMVECTOR Actor::GetActorRotationVector() const noexcept
 DirectX::XMVECTOR Actor::GetActorLocationVector() const noexcept
 {
 	return rootComponent->GetRelativeLocationVector();
+}
+
+void Actor::Draw(Graphics& graphics)
+{
+	if (rootComponent)
+	{
+		rootComponent->Draw(graphics);
+	}
+}
+
+void Actor::RenderShadowMap(Graphics& graphics)
+{
+	if (rootComponent)
+	{
+		rootComponent->RenderShadowMap(graphics);
+	}
+}
+
+void Actor::CreateDefaultRoot()
+{
+	rootComponent = SceneComponent::CreateComponent();
+}
+
+std::string Actor::GetActorFullName()
+{
+	return actorName + " " + typeid(*this).name();
 }

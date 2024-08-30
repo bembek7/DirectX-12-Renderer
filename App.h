@@ -7,5 +7,5 @@ public:
 	int Run();
 
 private:
-	Window window = Window(1280, 720);
+	Window window = Window(1444, 810);
 };

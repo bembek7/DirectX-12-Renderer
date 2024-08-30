@@ -1,6 +1,11 @@
 #include "Camera.h"
 #include "algorithm"
 
+std::unique_ptr<Camera> Camera::CreateComponent(const std::string& componentName)
+{
+	return std::unique_ptr<Camera>(new Camera(componentName));
+}
+
 DirectX::XMMATRIX Camera::GetMatrix() const noexcept
 {
 	const auto camLocation = GetComponentLocationVector();

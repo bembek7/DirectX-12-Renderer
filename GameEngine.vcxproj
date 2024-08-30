@@ -180,6 +180,8 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshActor.cpp" />
+    <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelsPool.cpp" />
     <ClCompile Include="PixelShader.cpp" />
@@ -214,6 +216,8 @@
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshActor.h" />
+    <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelsPool.h" />
     <ClInclude Include="PixelShader.h" />

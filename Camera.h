@@ -5,7 +5,7 @@
 class Camera : public SceneComponent
 {
 public:
-	using SceneComponent::SceneComponent;
+	static std::unique_ptr<Camera> CreateComponent(const std::string& componentName = "Camera");
 
 	DirectX::XMMATRIX GetMatrix() const noexcept;
 
@@ -14,6 +14,8 @@ public:
 	void AddPitchInput(const float pitchInput) noexcept;
 	void AddYawInput(const float yawInput) noexcept;
 
+protected:
+	using SceneComponent::SceneComponent;
 private:
 	const float movementSpeed = 0.3f;
 	const float rotationSpeed = 0.001f;

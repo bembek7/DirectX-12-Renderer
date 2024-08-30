@@ -2,12 +2,37 @@
 #include <DirectXMath.h>
 #include <memory>
 #include <vector>
+#include <string>
+
+class Graphics;
 
 class SceneComponent
 {
+	friend class Gui;
 public:
-	// Parent should be nullptr only if object is root component
-	SceneComponent(SceneComponent* const parent, DirectX::XMFLOAT3 relativeLocation = { 0.f, 0.f, 0.f }, DirectX::XMFLOAT3 relativeScale = { 1.f, 1.f, 1.f }, DirectX::XMFLOAT3 relativeRotation = { 0.f, 0.f, 0.f });
+	virtual ~SceneComponent() = default;
+
+	static std::unique_ptr<SceneComponent> CreateComponent(const std::string& componentName = "Scene Component");
+
+	template <typename T>
+	static T* AttachComponents(std::unique_ptr<SceneComponent> child, SceneComponent* const newParent)
+	{
+		static_assert(std::is_base_of<SceneComponent, T>::value, "T must be derived from SceneComponent");
+		T* const rawChild = reinterpret_cast<T*>(child.get());
+		if (child->parent)
+		{
+			child->DeattachFromParent();
+		}
+		if (newParent)
+		{
+			child->parent = newParent;
+			newParent->children.push_back(std::move(child));
+		}
+		return rawChild;
+	}
+
+	virtual void Draw(Graphics& graphics);
+	virtual void RenderShadowMap(Graphics& graphics);
 
 	DirectX::XMMATRIX GetTransformMatrix() const noexcept;
 	void AddRelativeScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept;
@@ -37,10 +62,25 @@ public:
 	DirectX::XMVECTOR GetComponentForwardVector() const noexcept;
 	DirectX::XMVECTOR GetComponentUpVector() const noexcept;
 	DirectX::XMVECTOR GetComponentRightVector() const noexcept;
+
+	std::string GetComponentFullName();
+
 protected:
-	//std::vector<std::unique_ptr<SceneComponent>> children;
+	SceneComponent(const std::string& componentName);
+
+	/*template <typename T, typename... Args>
+	static std::unique_ptr<T> CreateComponent(Args&&... args) {
+		static_assert(std::is_base_of<SceneComponent, T>::value, "T must be derived from SceneComponent");
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+	}*/
+private:
+	void DeattachFromParent();
+
+protected:
+	std::vector<std::unique_ptr<SceneComponent>> children;
 	SceneComponent* parent = nullptr;
 	DirectX::XMFLOAT3 relativeLocation = { 0.f, 0.f, 0.f };
 	DirectX::XMFLOAT3 relativeRotation = { 0.f, 0.f, 0.f };
 	DirectX::XMFLOAT3 relativeScale = { 1.f, 1.f, 1.f };
+	std::string componentName;
 };

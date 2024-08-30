@@ -1,11 +1,45 @@
 #include "SceneComponent.h"
+#include <imgui.h>
+#include "Graphics.h"
 
-SceneComponent::SceneComponent(SceneComponent* const parent, const DirectX::XMFLOAT3 relativeLocation, const DirectX::XMFLOAT3 relativeScale, const DirectX::XMFLOAT3 relativeRotation) :
-	parent(parent),
-	relativeLocation(relativeLocation),
-	relativeScale(relativeScale),
-	relativeRotation(relativeRotation)
+SceneComponent::SceneComponent(const std::string& componentName) :
+	componentName(componentName)
 {}
+
+void SceneComponent::DeattachFromParent()
+{
+	if (parent)
+	{
+		const auto it = std::find_if(parent->children.begin(), parent->children.end(), [this](auto& child) { return child.get() == this; });
+		if (it != parent->children.end())
+		{
+			it->release();
+		}
+
+		parent = nullptr;
+	}
+}
+
+std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)
+{
+	return std::unique_ptr<SceneComponent>(new SceneComponent(componentName));
+}
+
+void SceneComponent::Draw(Graphics& graphics)
+{
+	for (auto& child : children)
+	{
+		child->Draw(graphics);
+	}
+}
+
+void SceneComponent::RenderShadowMap(Graphics& graphics)
+{
+	for (auto& child : children)
+	{
+		child->RenderShadowMap(graphics);
+	}
+}
 
 DirectX::XMMATRIX SceneComponent::GetTransformMatrix() const noexcept
 {
@@ -165,4 +199,9 @@ DirectX::XMVECTOR SceneComponent::GetComponentUpVector() const noexcept
 DirectX::XMVECTOR SceneComponent::GetComponentRightVector() const noexcept
 {
 	return DirectX::XMVector3Rotate({ 1.f, 0.f, 0.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationVector()));
+}
+
+std::string SceneComponent::GetComponentFullName()
+{
+	return componentName + " " + typeid(*this).name();
 }
