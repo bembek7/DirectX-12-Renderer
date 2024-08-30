@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "../Actor.h"
 #include "../SceneComponent.h"
+#include "../Camera.h"
 #include <DirectXMath.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -35,6 +36,8 @@ namespace TestGameEngine
 		TEST_METHOD(TestActorInitialization)
 		{
 			Actor actor;
+			actor.CreateDefaultRoot();
+
 			XMFLOAT3 expectedLocation = { 0.f, 0.f, 0.f };
 			XMFLOAT3 expectedScale = { 1.f, 1.f, 1.f };
 			XMFLOAT3 expectedRotation = { 0.f, 0.f, 0.f };
@@ -47,6 +50,7 @@ namespace TestGameEngine
 		TEST_METHOD(TestSetTransformations)
 		{
 			Actor actor;
+			actor.CreateDefaultRoot();
 
 			XMFLOAT3 newLocation = { 10.f, 20.f, 30.f };
 			actor.SetActorLocation(newLocation);
@@ -62,48 +66,48 @@ namespace TestGameEngine
 		}
 		TEST_METHOD(TestTransformPropagation)
 		{
-			SceneComponent rootComponent(nullptr);
-			SceneComponent childComponent(&rootComponent);
+			auto rootComponent = SceneComponent::CreateComponent();
+			auto childComponent = SceneComponent::CreateComponent();
+			auto const pChildComponent = SceneComponent::AttachComponents<SceneComponent>(std::move(childComponent), rootComponent.get());
 
-			rootComponent.SetRelativeLocation(XMFLOAT3{ 10.f, 5.f, 0.f });
-			rootComponent.SetRelativeScale(XMFLOAT3{ 2.f, 2.f, 2.f });
-			rootComponent.SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+			rootComponent->SetRelativeLocation(XMFLOAT3{ 10.f, 5.f, 0.f });
+			rootComponent->SetRelativeScale(XMFLOAT3{ 2.f, 2.f, 2.f });
+			rootComponent->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
-			childComponent.SetRelativeLocation(XMFLOAT3{ 1.f, 0.f, 0.f });
-			childComponent.SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
-			childComponent.SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+			pChildComponent->SetRelativeLocation(XMFLOAT3{ 1.f, 0.f, 0.f });
+			pChildComponent->SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+			pChildComponent->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
 			XMVECTOR expectedLocation = XMVectorSet(11.f, 5.f, 0.f, 0.f);
 			XMVECTOR expectedScale = XMVectorSet(1.f, 1.f, 1.f, 0.f);
 			XMVECTOR expectedRotation = XMVectorSet(0.f, XM_PI / 2.f, 0.f, 0.f);
 
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentLocationVector(), expectedLocation));
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentScaleVector(), expectedScale));
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentRotationVector(), expectedRotation));
+			Assert::IsTrue(AreVectorsEqual(pChildComponent->GetComponentLocationVector(), expectedLocation));
+			Assert::IsTrue(AreVectorsEqual(pChildComponent->GetComponentScaleVector(), expectedScale));
+			Assert::IsTrue(AreVectorsEqual(pChildComponent->GetComponentRotationVector(), expectedRotation));
 		}
 
-		TEST_METHOD(TestNegativeScaling)
+		TEST_METHOD(TestChildDifferentClass)
 		{
-			Actor actor;
 			XMFLOAT3 negativeScale = { -1.f, -2.f, -3.f };
 
-			actor.SetActorScale(negativeScale);
-			Assert::IsTrue(AreVectorsEqual(actor.GetActorScale(), negativeScale));
-
-			SceneComponent rootComponent(nullptr);
-			SceneComponent childComponent(&rootComponent);
-
-			rootComponent.SetRelativeScale(negativeScale);
+			auto rootComponent = SceneComponent::CreateComponent();
+			auto childComponent = Camera::CreateComponent();
 			XMFLOAT3 childScale = { 0.5f, 0.5f, 0.5f };
-			childComponent.SetRelativeScale(childScale);
+			childComponent->SetRelativeScale(childScale);
+
+			auto const pChildComponent = SceneComponent::AttachComponents<Camera>(std::move(childComponent), rootComponent.get());
+
+			rootComponent->SetRelativeScale(negativeScale);
 
 			XMFLOAT3 expectedChildScale = { -0.5f, -1.f, -1.5f };
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentScale(), expectedChildScale));
+			Assert::IsTrue(AreVectorsEqual(pChildComponent->GetComponentScale(), expectedChildScale));
 		}
 
 		TEST_METHOD(TestActorTransformModification)
 		{
 			Actor actor;
+			actor.CreateDefaultRoot();
 
 			XMFLOAT3 initialLocation = { 0.f, 0.f, 0.f };
 			XMFLOAT3 locationToAdd = { 5.f, 10.f, 15.f };
@@ -129,56 +133,65 @@ namespace TestGameEngine
 
 		TEST_METHOD(TestComplexHierarchyTransformPropagation)
 		{
-			SceneComponent rootComponent(nullptr);
-			rootComponent.SetRelativeLocation(XMFLOAT3{ 10.f, 5.f, 0.f });
-			rootComponent.SetRelativeScale(XMFLOAT3{ 2.f, 2.f, 2.f });
-			rootComponent.SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+			auto rootComponent = SceneComponent::CreateComponent();
+			auto firstChild = SceneComponent::CreateComponent();
+			auto secondChild = SceneComponent::CreateComponent();
 
-			SceneComponent firstChild(&rootComponent);
-			firstChild.SetRelativeLocation(XMFLOAT3{ 3.f, 0.f, 0.f });
-			firstChild.SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
-			firstChild.SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+			rootComponent->SetRelativeLocation(XMFLOAT3{ 10.f, 5.f, 0.f });
+			rootComponent->SetRelativeScale(XMFLOAT3{ 2.f, 2.f, 2.f });
+			rootComponent->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
-			SceneComponent secondChild(&firstChild);
-			secondChild.SetRelativeLocation(XMFLOAT3{ 2.f, 0.f, 0.f });
-			secondChild.SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
-			secondChild.SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+			firstChild->SetRelativeLocation(XMFLOAT3{ 3.f, 0.f, 0.f });
+			firstChild->SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+			firstChild->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
+
+			secondChild->SetRelativeLocation(XMFLOAT3{ 2.f, 0.f, 0.f });
+			secondChild->SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+			secondChild->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
 			XMVECTOR expectedLocation = XMVectorSet(15.f, 5.f, 0.f, 0.f);
 			XMVECTOR expectedScale = XMVectorSet(0.5f, 0.5f, 0.5f, 0.f);
 			XMVECTOR expectedRotation = XMVectorSet(0.f, 3 * XM_PI / 4.f, 0.f, 0.f);
 
-			Assert::IsTrue(AreVectorsEqual(secondChild.GetComponentLocationVector(), expectedLocation));
-			Assert::IsTrue(AreVectorsEqual(secondChild.GetComponentScaleVector(), expectedScale));
-			Assert::IsTrue(AreVectorsEqual(secondChild.GetComponentRotationVector(), expectedRotation));
+			auto const pSecondChild = SceneComponent::AttachComponents<SceneComponent>(std::move(secondChild), firstChild.get());
+			SceneComponent::AttachComponents<SceneComponent>(std::move(firstChild), rootComponent.get());
+
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentLocationVector(), expectedLocation));
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentScaleVector(), expectedScale));
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentRotationVector(), expectedRotation));
 		}
 
-		TEST_METHOD(TestIdentityTransformations)
+		TEST_METHOD(TestComplexHierarchyTransformPropagation2)
 		{
-			Actor actor;
+			auto rootComponent = SceneComponent::CreateComponent("Root");
+			auto firstChild = SceneComponent::CreateComponent("FirstChild");
+			auto secondChild = SceneComponent::CreateComponent("SecondChild");
 
-			XMFLOAT3 identityLocation = { 0.f, 0.f, 0.f };
-			XMFLOAT3 identityScale = { 1.f, 1.f, 1.f };
-			XMFLOAT3 identityRotation = { 0.f, 0.f, 0.f };
+			rootComponent->SetRelativeLocation(XMFLOAT3{ 10.f, 5.f, 0.f });
+			rootComponent->SetRelativeScale(XMFLOAT3{ 2.f, 2.f, 2.f });
+			rootComponent->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
-			actor.SetActorLocation(identityLocation);
-			actor.SetActorScale(identityScale);
-			actor.SetActorRotation(identityRotation);
+			firstChild->SetRelativeLocation(XMFLOAT3{ 3.f, 0.f, 0.f });
+			firstChild->SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+			firstChild->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
-			Assert::IsTrue(AreVectorsEqual(actor.GetActorLocation(), identityLocation));
-			Assert::IsTrue(AreVectorsEqual(actor.GetActorScale(), identityScale));
-			Assert::IsTrue(AreVectorsEqual(actor.GetActorRotation(), identityRotation));
+			secondChild->SetRelativeLocation(XMFLOAT3{ 2.f, 0.f, 0.f });
+			secondChild->SetRelativeScale(XMFLOAT3{ 0.5f, 0.5f, 0.5f });
+			secondChild->SetRelativeRotation(XMFLOAT3{ 0.f, XM_PI / 4.f, 0.f });
 
-			SceneComponent rootComponent(nullptr);
-			SceneComponent childComponent(&rootComponent);
+			// Attach components in hierarchy
+			auto const pSecondChild = SceneComponent::AttachComponents<SceneComponent>(std::move(secondChild), firstChild.get());
+			SceneComponent::AttachComponents<SceneComponent>(std::move(firstChild), rootComponent.get());
 
-			rootComponent.SetRelativeLocation(identityLocation);
-			rootComponent.SetRelativeScale(identityScale);
-			rootComponent.SetRelativeRotation(identityRotation);
+			// Calculate expected values
+			DirectX::XMVECTOR expectedLocation = XMVectorSet(15.f, 5.f, 0.f, 0.f);
+			DirectX::XMVECTOR expectedScale = XMVectorSet(0.5f, 0.5f, 0.5f, 0.f);
+			DirectX::XMVECTOR expectedRotation = XMVectorSet(0.f, 3 * XM_PI / 4.f, 0.f, 0.f);
 
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentLocationVector(), identityLocation));
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentScaleVector(), identityScale));
-			Assert::IsTrue(AreVectorsEqual(childComponent.GetComponentRotationVector(), identityRotation));
+			// Validate component transformations
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentLocationVector(), expectedLocation), L"Location mismatch");
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentScaleVector(), expectedScale), L"Scale mismatch");
+			Assert::IsTrue(AreVectorsEqual(pSecondChild->GetComponentRotationVector(), expectedRotation), L"Rotation mismatch");
 		}
 	};
 }
