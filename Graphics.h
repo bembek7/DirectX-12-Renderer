@@ -21,6 +21,7 @@ public:
 	void SetRenderTargetForShadowMap();
 	void SetNormalRenderTarget();
 	void EndFrame();
+	Gui* const GetGui() noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;

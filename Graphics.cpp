@@ -135,7 +135,7 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	const float screenRatio = viewport.Height / viewport.Width;
-	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 30.0f));
+	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 400.0f));
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), context.Get());
 }
@@ -177,6 +177,11 @@ void Graphics::EndFrame()
 	CHECK_HR(swapChain->Present(1u, 0u));
 	ID3D11ShaderResourceView* const nullSRV = nullptr;
 	context->PSSetShaderResources(0, 1, &nullSRV);
+}
+
+Gui* const Graphics::GetGui() noexcept
+{
+	return gui.get();
 }
 
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
