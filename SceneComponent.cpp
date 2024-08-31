@@ -1,6 +1,7 @@
 #include "SceneComponent.h"
 #include <imgui.h>
 #include "Graphics.h"
+#include "numbers"
 
 SceneComponent::SceneComponent(const std::string& componentName) :
 	componentName(componentName)
@@ -44,7 +45,7 @@ void SceneComponent::RenderShadowMap(Graphics& graphics)
 DirectX::XMMATRIX SceneComponent::GetTransformMatrix() const noexcept
 {
 	return DirectX::XMMatrixScalingFromVector(GetComponentScaleVector()) *
-		DirectX::XMMatrixRotationRollPitchYawFromVector(GetComponentRotationVector()) *
+		DirectX::XMMatrixRotationRollPitchYawFromVector(GetComponentRotationRadians()) *
 		DirectX::XMMatrixTranslationFromVector(GetComponentLocationVector());
 }
 
@@ -188,17 +189,23 @@ DirectX::XMVECTOR SceneComponent::GetComponentLocationVector() const noexcept
 
 DirectX::XMVECTOR SceneComponent::GetComponentForwardVector() const noexcept
 {
-	return DirectX::XMVector3Rotate({ 0.f, 0.f, 1.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationVector()));
+	return DirectX::XMVector3Rotate({ 0.f, 0.f, 1.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationRadians()));
 }
 
 DirectX::XMVECTOR SceneComponent::GetComponentUpVector() const noexcept
 {
-	return DirectX::XMVector3Rotate({ 0.f, 1.f, 0.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationVector()));
+	return DirectX::XMVector3Rotate({ 0.f, 1.f, 0.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationRadians()));
 }
 
 DirectX::XMVECTOR SceneComponent::GetComponentRightVector() const noexcept
 {
-	return DirectX::XMVector3Rotate({ 1.f, 0.f, 0.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationVector()));
+	return DirectX::XMVector3Rotate({ 1.f, 0.f, 0.f }, DirectX::XMQuaternionRotationRollPitchYawFromVector(GetComponentRotationRadians()));
+}
+
+DirectX::XMVECTOR SceneComponent::GetComponentRotationRadians() const noexcept
+{
+	const DirectX::XMVECTOR rotationRadians = DirectX::XMVectorScale(GetComponentRotationVector(), float(std::numbers::pi) / 180.0f);
+	return DirectX::XMVECTOR(rotationRadians);
 }
 
 std::string SceneComponent::GetComponentFullName()

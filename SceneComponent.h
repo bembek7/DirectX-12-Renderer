@@ -63,6 +63,8 @@ public:
 	DirectX::XMVECTOR GetComponentUpVector() const noexcept;
 	DirectX::XMVECTOR GetComponentRightVector() const noexcept;
 
+	DirectX::XMVECTOR GetComponentRotationRadians() const noexcept;
+
 	std::string GetComponentFullName();
 
 protected:
