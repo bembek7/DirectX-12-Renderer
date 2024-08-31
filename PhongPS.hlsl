@@ -75,12 +75,12 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightP
     saturate(shadowTexCoords.y) == shadowTexCoords.y &&
     pixelDepth > 0)
     {
-        float margin = acos(saturate(max(0.f, dot(lightVector.directionToLight, viewNormal))));
+        float margin = acos(saturate(max(0.f, min(dot(lightVector.directionToLight, viewNormal), 0.95f))));
 
-        float epsilon = 0.0005 / margin;
-        epsilon = clamp(epsilon, 0, 0.1);
+        float epsilon = 0.0005f / margin;
+        epsilon = clamp(epsilon, 0.f, 0.1f);
         
-        lighting = float(shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth + epsilon));
+        lighting = float(shadowMap.SampleCmp(shadowSampler, shadowTexCoords, pixelDepth + epsilon));
     }
     
     viewNormal = normalize(viewNormal);
