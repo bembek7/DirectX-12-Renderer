@@ -12,15 +12,10 @@ int App::Run()
 	std::vector<std::shared_ptr<MeshActor>> meshActors;
 	std::vector<std::shared_ptr<PointLight>> lightActors;
 
-	auto plane = std::make_shared<MeshActor>("Plane");
-	auto sphere = std::make_shared<MeshActor>("Sphere");
-	auto sphere2 = std::make_shared<MeshActor>("Sphere2");
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics());
-
-	plane->SetMesh(std::make_unique<Mesh>(window.GetGraphics(), "plane.obj", ShaderType::Phong));
-	sphere->SetMesh(std::make_unique<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong));
-	sphere2->SetMesh(std::make_unique<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Phong));
-	pointLight->SetMesh(std::make_unique<Mesh>(window.GetGraphics(), "sphere.obj", ShaderType::Solid));
+	auto plane = std::make_shared<MeshActor>(window.GetGraphics(), "plane.obj", ShaderType::Phong, "Plane", "Plane");
+	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, "Sphere", "Sphere");
+	auto sphere2 = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", ShaderType::Phong, "Sphere2", "Sphere2");
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), "sphere.obj", ShaderType::Solid, "Point Light");
 
 	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	plane->SetActorTransform({ 0.f, 0.f, 9.f }, zeroVec, { 10.f, 10.f, 1.f });

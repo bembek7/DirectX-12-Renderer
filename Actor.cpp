@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include "imgui.h"
+#include <sstream>
 
 Actor::Actor(const std::string& actorName) :
 	actorName(actorName)
@@ -125,5 +126,7 @@ void Actor::CreateDefaultRoot()
 
 std::string Actor::GetActorFullName()
 {
-	return actorName + " " + typeid(*this).name();
+	std::stringstream ss;
+	ss << actorName << " " << typeid(*this).name() << "##" << this;
+	return ss.str();
 }
