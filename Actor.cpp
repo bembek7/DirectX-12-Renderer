@@ -1,6 +1,12 @@
+#include "BetterWindows.h"
 #include "Actor.h"
 #include "imgui.h"
 #include <sstream>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <numbers>
+#include "MeshComponent.h"
 
 Actor::Actor(const std::string& actorName) :
 	actorName(actorName)
@@ -129,4 +135,36 @@ std::string Actor::GetActorFullName()
 	std::stringstream ss;
 	ss << actorName << " " << typeid(*this).name() << "##" << this;
 	return ss.str();
+}
+
+void Actor::LoadFromFile(Graphics& graphics, const std::string& fileName)
+{
+	Assimp::Importer importer;
+
+	const aiScene* const scene = importer.ReadFile(fileName,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_SortByPType |
+		aiProcess_GenNormals
+	);
+
+	if (!scene)
+	{
+		throw std::runtime_error(importer.GetErrorString());
+	}
+
+	if (scene->mRootNode)
+	{
+		std::unique_ptr<SceneComponent> newRootComponent;
+		if (scene->mRootNode->mNumMeshes == 0)
+		{
+			newRootComponent = std::move(SceneComponent::CreateComponent(graphics, scene->mRootNode, scene));
+		}
+		else
+		{
+			newRootComponent = std::move(MeshComponent::CreateComponent(graphics, scene->mRootNode, scene));
+		}
+		SetRootComponent<SceneComponent>(std::move(newRootComponent));
+	}
 }

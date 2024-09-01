@@ -5,6 +5,8 @@
 #include <string>
 
 class Graphics;
+struct aiNode;
+struct aiScene;
 
 class SceneComponent
 {
@@ -13,6 +15,7 @@ public:
 	virtual ~SceneComponent() = default;
 
 	static std::unique_ptr<SceneComponent> CreateComponent(const std::string& componentName = "Scene Component");
+	static std::unique_ptr<SceneComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 	template <typename T>
 	static T* AttachComponents(std::unique_ptr<SceneComponent> child, SceneComponent* const newParent)
@@ -69,6 +72,7 @@ public:
 
 protected:
 	SceneComponent(const std::string& componentName);
+	SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 	/*template <typename T, typename... Args>
 	static std::unique_ptr<T> CreateComponent(Args&&... args) {

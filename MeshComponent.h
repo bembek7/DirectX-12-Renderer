@@ -19,6 +19,7 @@ class MeshComponent : public SceneComponent
 {
 public:
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const std::string& componentName = "Mesh");
+	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
@@ -28,6 +29,7 @@ public:
 
 protected:
 	MeshComponent(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const std::string& componentName);
+	MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
@@ -47,7 +49,7 @@ private:
 		DirectX::XMFLOAT4X4 transformView;
 		DirectX::XMFLOAT4X4 transformViewProjection;
 	};
-	TransformBuffer transformBuffer;
+	TransformBuffer transformBuffer = {};
 
 	struct ColorBuffer
 	{

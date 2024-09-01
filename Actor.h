@@ -40,6 +40,8 @@ public:
 
 	std::string GetActorFullName();
 
+	void LoadFromFile(Graphics& graphics, const std::string& fileName);
+
 protected:
 	// this should be used for setting the root
 	template <typename T>

@@ -5,8 +5,7 @@
 #include <assimp/postprocess.h>
 #include <stdexcept>
 
-Model::Model(const std::string& fileName) :
-	fileName(fileName)
+Model::Model(const std::string& fileName)
 {
 	Assimp::Importer importer;
 
@@ -30,8 +29,8 @@ Model::Model(const std::string& fileName) :
 	assert(scene->mMeshes[0]->HasNormals());
 	for (size_t i = 0; i < numVertices; i++)
 	{
-		vertices.push_back(Vertex(scene->mMeshes[0]->mVertices[i].x, scene->mMeshes[0]->mVertices[i].y, scene->mMeshes[0]->mVertices[i].z,
-			scene->mMeshes[0]->mNormals[i].x, scene->mMeshes[0]->mNormals[i].y, scene->mMeshes[0]->mNormals[i].z));
+		vertices.push_back(Vertex({ scene->mMeshes[0]->mVertices[i].x, scene->mMeshes[0]->mVertices[i].y, scene->mMeshes[0]->mVertices[i].z },
+			{ scene->mMeshes[0]->mNormals[i].x, scene->mMeshes[0]->mNormals[i].y, scene->mMeshes[0]->mNormals[i].z }));
 	}
 
 	for (size_t i = 0; i < scene->mMeshes[0]->mNumFaces; i++)

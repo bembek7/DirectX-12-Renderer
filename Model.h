@@ -8,14 +8,13 @@ class Model
 {
 public:
 	Model(const std::string& fileName);
-
+	Model() = default;
 public:
 	struct Vertex {
-		Vertex(const float x, const float y, const float z, const float nx, const float ny, const float nz) : position(x, y, z), normal(nx, ny, nz) {}
+		Vertex(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 normal) : position(position), normal(normal) {}
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT3 normal;
 	};
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::string fileName;
 };

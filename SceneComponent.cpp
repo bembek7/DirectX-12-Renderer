@@ -2,10 +2,48 @@
 #include <imgui.h>
 #include "Graphics.h"
 #include "numbers"
+#include "BetterWindows.h"
+#include <assimp\scene.h>
+#include "MeshComponent.h"
 
 SceneComponent::SceneComponent(const std::string& componentName) :
 	componentName(componentName)
 {}
+
+SceneComponent::SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
+{
+	componentName = node->mName.C_Str();
+
+	aiVector3D aiScale;
+	aiVector3D aiRotation;
+	aiVector3D aiLocation;
+	node->mTransformation.Decompose(aiScale, aiRotation, aiLocation);
+	aiRotation *= 180.0f / float(std::numbers::pi);
+	DirectX::XMFLOAT3 scale = { aiScale.x, aiScale.y, aiScale.z };
+	DirectX::XMFLOAT3 rotation = { aiRotation.x, aiRotation.y, aiRotation.z };
+	DirectX::XMFLOAT3 location = { aiLocation.x, aiLocation.y, aiLocation.z };
+	SetRelativeLocation(location);
+	SetRelativeRotation(rotation);
+	SetRelativeScale(scale);
+
+	using SC = SceneComponent;
+	for (size_t i = 0; i < node->mNumChildren; i++)
+	{
+		if (node->mChildren[i]->mNumMeshes > 0 || node->mChildren[i]->mNumChildren > 0)
+		{
+			std::unique_ptr<SceneComponent> childComponent;
+			if (node->mChildren[i]->mNumMeshes == 0)
+			{
+				childComponent = std::move(SC::CreateComponent(graphics, node->mChildren[i], scene));
+			}
+			else
+			{
+				childComponent = std::move(MeshComponent::CreateComponent(graphics, node->mChildren[i], scene));
+			}
+			SC::AttachComponents<SC>(std::move(childComponent), this);
+		}
+	}
+}
 
 void SceneComponent::DeattachFromParent()
 {
@@ -24,6 +62,11 @@ void SceneComponent::DeattachFromParent()
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)
 {
 	return std::unique_ptr<SceneComponent>(new SceneComponent(componentName));
+}
+
+std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
+{
+	return std::unique_ptr<SceneComponent>(new SceneComponent(graphics, node, scene));
 }
 
 void SceneComponent::Draw(Graphics& graphics)
