@@ -11,7 +11,7 @@ public:
 	ModelsPool(ModelsPool const&) = delete;
 	void operator=(ModelsPool const&) = delete;
 
-	std::shared_ptr<Model> GetModel(const std::string& modelPath);
+	//std::shared_ptr<Model> GetModel(const std::string& modelPath);
 private:
 	ModelsPool() = default;
 private:

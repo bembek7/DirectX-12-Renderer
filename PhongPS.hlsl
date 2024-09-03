@@ -80,7 +80,7 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightP
         float epsilon = 0.0005f / margin;
         epsilon = clamp(epsilon, 0.f, 0.1f);
         
-        lighting = float(shadowMap.SampleCmp(shadowSampler, shadowTexCoords, pixelDepth + epsilon));
+        lighting = shadowMap.SampleCmp(shadowSampler, shadowTexCoords, pixelDepth + epsilon).r;
     }
     
     viewNormal = normalize(viewNormal);

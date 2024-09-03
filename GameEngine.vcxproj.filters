@@ -90,9 +90,6 @@
     <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\misc\freetype\imgui_freetype.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="Gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -128,6 +125,12 @@
     </ClCompile>
     <ClCompile Include="MeshComponent.cpp">
       <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files\Bindables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,9 +188,6 @@
     <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\misc\freetype\imgui_freetype.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imgui_internal.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -235,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="MeshComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

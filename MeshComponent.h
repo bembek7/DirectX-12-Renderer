@@ -6,6 +6,8 @@
 #include "Bindable.h"
 #include "Model.h"
 #include "SceneComponent.h"
+#include "Material.h"
+#include "ConstantBuffer.h"
 
 class Graphics;
 
@@ -18,28 +20,24 @@ enum class ShaderType
 class MeshComponent : public SceneComponent
 {
 public:
-	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const std::string& componentName = "Mesh");
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
-	void SetColor(Graphics& graphics, const DirectX::XMFLOAT4& newColor);
-	DirectX::XMFLOAT3 GetColor() const noexcept;
-
 protected:
-	MeshComponent(Graphics& graphics, const std::string& fileName, const ShaderType shaderType, const std::string& componentName);
 	MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
 private:
-	std::vector<std::unique_ptr<Bindable>> bindables;
-	std::vector<std::shared_ptr<Bindable>> sharedBindables;
-	std::vector<std::unique_ptr<Bindable>> techinquesMutualBindables;
-	std::vector<std::shared_ptr<Bindable>> shadowMapSharedBindables;
-	std::shared_ptr<Model> model;
+	//std::vector<std::unique_ptr<Bindable>> bindables;
+	//std::vector<std::shared_ptr<Bindable>> sharedBindables;
+	//std::vector<std::unique_ptr<Bindable>> techinquesMutualBindables;
+	//std::vector<std::shared_ptr<Bindable>> shadowMapSharedBindables;
+	std::unique_ptr<Model> model;
+	std::unique_ptr<Material> material;
 
 	struct TransformBuffer
 	{
@@ -51,14 +49,7 @@ private:
 	};
 	TransformBuffer transformBuffer = {};
 
-	struct ColorBuffer
-	{
-		ColorBuffer() = default;
-		ColorBuffer(const DirectX::XMFLOAT4 newColor) :
-			color(newColor)
-		{}
-		DirectX::XMFLOAT4 color;
-	};
-	ColorBuffer colorBuffer = { { 1.0f, 1.0f, 1.0f, 1.0f } };
+	std::unique_ptr<ConstantBuffer<TransformBuffer>> transformConstantBuffer;
+
 	bool rendersShadowMap = false;
 };

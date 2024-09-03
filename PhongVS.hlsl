@@ -1,4 +1,4 @@
-cbuffer TransformCBuf
+cbuffer TransformCBuf : register(b0)
 {
     matrix model;
     matrix modelView;
@@ -18,7 +18,7 @@ struct VSOut
     float4 pos : SV_Position;
 };
 
-VSOut main(float3 position : POSITION, float3 normal : NORMAL)
+VSOut main(float3 position : POSITION, float3 normal : NORMAL, float3 tex_coord : TEX_COORD)
 {
     VSOut vsout;
     vsout.viewPos = (float3) mul(float4(position, 1.0f), modelView);
