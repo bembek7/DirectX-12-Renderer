@@ -5,6 +5,9 @@
 #include "BetterWindows.h"
 #include <assimp\scene.h>
 #include "MeshComponent.h"
+#include <assimp\Importer.hpp>
+#include <stdexcept>
+#include <assimp\postprocess.h>
 
 SceneComponent::SceneComponent(const std::string& componentName) :
 	componentName(componentName)
@@ -67,6 +70,39 @@ std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::strin
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {
 	return std::unique_ptr<SceneComponent>(new SceneComponent(graphics, node, scene));
+}
+
+std::unique_ptr<SceneComponent> SceneComponent::LoadComponent(Graphics& graphics, const std::string& fileName)
+{
+	Assimp::Importer importer;
+
+	const aiScene* const scene = importer.ReadFile(fileName,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_SortByPType |
+		aiProcess_GenNormals
+	);
+
+	if (!scene)
+	{
+		throw std::runtime_error(importer.GetErrorString());
+	}
+
+	if (scene->mRootNode)
+	{
+		std::unique_ptr<SceneComponent> newRootComponent;
+		if (scene->mRootNode->mNumMeshes == 0)
+		{
+			newRootComponent = std::move(SceneComponent::CreateComponent(graphics, scene->mRootNode, scene));
+		}
+		else
+		{
+			newRootComponent = std::move(MeshComponent::CreateComponent(graphics, scene->mRootNode, scene));
+		}
+		return newRootComponent;
+	}
+	return std::unique_ptr<SceneComponent>();
 }
 
 void SceneComponent::Draw(Graphics& graphics)

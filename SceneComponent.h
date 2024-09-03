@@ -16,6 +16,7 @@ public:
 
 	static std::unique_ptr<SceneComponent> CreateComponent(const std::string& componentName = "Scene Component");
 	static std::unique_ptr<SceneComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
+	static std::unique_ptr<SceneComponent> LoadComponent(Graphics& graphics, const std::string& fileName);
 
 	template <typename T>
 	static T* AttachComponents(std::unique_ptr<SceneComponent> child, SceneComponent* const newParent)
