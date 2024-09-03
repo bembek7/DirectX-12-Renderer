@@ -33,7 +33,7 @@ private:
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT3 texCords;
 	};*/
-	std::vector<DirectX::XMFLOAT3> verticesData;
+	std::vector<float> verticesData;
 	unsigned int vertexSize = 0;
 	std::vector<unsigned int> indices;
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescs;

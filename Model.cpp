@@ -18,19 +18,19 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh)
 	{
 		inputElementDescs.push_back({ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Position] = vertexSize;
-		vertexSize += sizeof(DirectX::XMFLOAT3);
+		vertexSize += sizeof(float) * 3;
 	}
 	if (assignedMesh->HasNormals())
 	{
 		inputElementDescs.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Normal] = vertexSize;
-		vertexSize += sizeof(DirectX::XMFLOAT3);
+		vertexSize += sizeof(float) * 3;
 	}
 	if (assignedMesh->HasTextureCoords(0))
 	{
-		inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::TexCoords] = vertexSize;
-		vertexSize += sizeof(DirectX::XMFLOAT3);
+		vertexSize += sizeof(float) * 2;
 	}
 
 	for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
@@ -42,28 +42,40 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh)
 	}
 
 	const unsigned int numVertices = assignedMesh->mNumVertices;
-	verticesData.resize(vertexSize / sizeof(DirectX::XMFLOAT3) * numVertices);
+	verticesData.resize(vertexSize / sizeof(float) * numVertices);
 	for (size_t i = 0; i < numVertices; i++)
 	{
 		for (const auto& element : elementOffset)
 		{
-			DirectX::XMFLOAT3 data = {};
+			const auto elementIndex = i * vertexSize / sizeof(float) + element.second / sizeof(float);
 			switch (element.first)
 			{
 			case VertexElement::Position:
-				data = { assignedMesh->mVertices[i].x, assignedMesh->mVertices[i].y, assignedMesh->mVertices[i].z };
+			{
+				const auto position = assignedMesh->mVertices[i];
+				verticesData[elementIndex] = position.x;
+				verticesData[elementIndex + 1] = position.y;
+				verticesData[elementIndex + 2] = position.z;
 				break;
+			}
 			case VertexElement::Normal:
-				data = { assignedMesh->mNormals[i].x, assignedMesh->mNormals[i].y, assignedMesh->mNormals[i].z };
+			{
+				const auto normal = assignedMesh->mNormals[i];
+				verticesData[elementIndex] = normal.x;
+				verticesData[elementIndex + 1] = normal.y;
+				verticesData[elementIndex + 2] = normal.z;
 				break;
+			}
 			case VertexElement::TexCoords:
-				// flip the y beacuse of how d3d and opengl tex coords differ
-				data = { assignedMesh->mTextureCoords[0][i].x, 1 - assignedMesh->mTextureCoords[0][i].y, assignedMesh->mTextureCoords[0][i].z };
+			{
+				const auto texCoords = assignedMesh->mTextureCoords[0][i];
+				verticesData[elementIndex] = texCoords.x;
+				verticesData[elementIndex + 1] = 1 - texCoords.y; // flip the y beacuse of how d3d and opengl tex coords differ
 				break;
+			}
 			default:
 				break;
 			}
-			verticesData[i * vertexSize / sizeof(DirectX::XMFLOAT3) + element.second / sizeof(DirectX::XMFLOAT3)] = data;
 		}
 	}
 

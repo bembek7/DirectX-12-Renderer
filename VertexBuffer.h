@@ -7,7 +7,7 @@
 class VertexBuffer : public Bindable
 {
 public:
-	VertexBuffer(Graphics& graphics, const std::vector<DirectX::XMFLOAT3>& vertices, const unsigned int vertexSize);
+	VertexBuffer(Graphics& graphics, const std::vector<float>& vertices, const unsigned int vertexSize);
 	virtual void Bind(Graphics& graphics) noexcept override;
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
