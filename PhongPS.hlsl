@@ -55,7 +55,10 @@ cbuffer LightCBuf : register(b1)
 Texture2D shadowMap : register(t0);
 SamplerComparisonState shadowSampler : register(s0);
 
-float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
+Texture2D tex : register(t1);
+SamplerState texSampler : register(s1);
+
+float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float3 texCoord : TEX_COORD, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
 {
     float2 shadowTexCoords;
     shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
@@ -91,5 +94,5 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightP
 	
     const float3 specular = Speculate(diffuseColor, diffuseIntensity * specularIntensity, viewNormal, lightVector.vectorToLight, viewPos, attenuation, specularPower);
 	
-    return float4(saturate((diffuse * lighting + ambient) * color.rgb + specular * lighting), color.a);
+    return float4(saturate((diffuse * lighting + ambient) * tex.Sample(texSampler, texCoord.xy).rgb + specular * lighting), tex.Sample(texSampler, texCoord.xy).a);
 }

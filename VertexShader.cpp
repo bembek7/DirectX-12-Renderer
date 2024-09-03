@@ -7,7 +7,7 @@
 
 VertexShader::VertexShader(Graphics& graphics, const std::wstring& shaderPath)
 {
-	id = WstringToString(shaderPath);
+	id = Utils::WstringToString(shaderPath);
 	CHECK_HR(D3DReadFileToBlob(shaderPath.c_str(), &blob));
 	CHECK_HR(GetDevice(graphics)->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 }

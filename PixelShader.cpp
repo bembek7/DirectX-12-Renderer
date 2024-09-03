@@ -8,7 +8,7 @@ PixelShader::PixelShader(Graphics& graphics, const std::wstring& shaderPath)
 {
 	if (!shaderPath.empty())
 	{
-		id = WstringToString(shaderPath);
+		id = Utils::WstringToString(shaderPath);
 		Microsoft::WRL::ComPtr<ID3DBlob> blob;
 		CHECK_HR(D3DReadFileToBlob(shaderPath.c_str(), &blob));
 		CHECK_HR(GetDevice(graphics)->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader));

@@ -57,7 +57,8 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh)
 				data = { assignedMesh->mNormals[i].x, assignedMesh->mNormals[i].y, assignedMesh->mNormals[i].z };
 				break;
 			case VertexElement::TexCoords:
-				data = { assignedMesh->mTextureCoords[0][i].x, assignedMesh->mTextureCoords[0][i].y, assignedMesh->mTextureCoords[0][i].z };
+				// flip the y beacuse of how d3d and opengl tex coords differ
+				data = { assignedMesh->mTextureCoords[0][i].x, 1 - assignedMesh->mTextureCoords[0][i].y, assignedMesh->mTextureCoords[0][i].z };
 				break;
 			default:
 				break;
@@ -78,7 +79,7 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh)
 
 	auto vertexShader = bindablesPool.GetBindable<VertexShader>(graphics, vertexShaderPath);
 	const VertexShader& vertexShaderRef = dynamic_cast<VertexShader&>(*vertexShader);
-	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), WstringToString(vertexShaderPath)));
+	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), Utils::WstringToString(vertexShaderPath)));
 	sharedBindables.push_back(std::move(vertexShader));
 }
 

@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include <cstdlib>
 
-std::string WstringToString(const std::wstring& ws) noexcept
+std::string Utils::WstringToString(const std::wstring& ws) noexcept
 {
 	size_t len = wcstombs(nullptr, ws.c_str(), 0) + 1;
 
@@ -14,4 +14,19 @@ std::string WstringToString(const std::wstring& ws) noexcept
 
 	delete[] buffer;
 	return str;
+}
+
+std::wstring Utils::StringToWstring(const std::string& s) noexcept
+{
+	size_t len = mbstowcs(nullptr, s.c_str(), 0) + 1;
+
+	wchar_t* buffer = new wchar_t[len];
+
+	mbstowcs(buffer, s.c_str(), len);
+
+	std::wstring ws = std::wstring(buffer);
+
+	delete[] buffer;
+
+	return ws;
 }
