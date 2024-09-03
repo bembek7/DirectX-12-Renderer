@@ -29,7 +29,7 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial)
 	std::wstring pixelShaderPath;
 	pixelShaderPath = L"PhongPS.cso";
 
-	bindables.push_back(std::make_unique<ConstantBuffer<ColorBuffer>>(graphics, colorBuffer, BufferType::Pixel));
+	bindables.push_back(std::make_unique<ConstantBuffer<Shininess>>(graphics, shininessBuffer, BufferType::Pixel, 1u));
 
 	sharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, pixelShaderPath));
 }

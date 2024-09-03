@@ -18,10 +18,9 @@ private:
 	{
 		DirectX::XMFLOAT3 diffuseColor = { 1.0f, 1.0f, 1.0f };
 		float diffuseIntensity = 0.6f;
-		DirectX::XMFLOAT3 ambient = { 0.15f, 0.15f, 0.15f };
+		DirectX::XMFLOAT3 ambient = { 0.25f, 0.25f, 0.25f };
 		float specularIntensity = 0.6f;
-		DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
-		float specularPower = 0.8f;
+		alignas(16) DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
 	} lightBuffer;
 
 	struct ShadowMapBuffer

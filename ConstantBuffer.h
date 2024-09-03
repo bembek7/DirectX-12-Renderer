@@ -13,7 +13,7 @@ template<typename Structure>
 class ConstantBuffer : public Bindable
 {
 public:
-	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot = 0u) :
+	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot) :
 		bufferData(&data),
 		bufferType(bufferType),
 		slot(slot)

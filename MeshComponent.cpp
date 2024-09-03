@@ -36,7 +36,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	rendersShadowMap = true;
 
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex);
+	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
 	//techinquesMutualBindables.push_back(std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex));
 
 	/*if (rendersShadowMap)
