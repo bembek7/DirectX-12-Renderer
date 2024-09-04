@@ -5,6 +5,7 @@
 
 class Actor;
 class SceneComponent;
+class MeshComponent;
 
 class Gui
 {
@@ -17,9 +18,16 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
-	void RenderActorControlWindow(Actor* const actor);
+	void RenderActorTree(Actor* const actor);
+
+	void RenderControlWindow();
+	void RenderComponentDetails(SceneComponent* const component);
+	void RenderComponentDetails(MeshComponent* const component);
 
 private:
-	std::unordered_map<Actor*, SceneComponent*> actorsSelectedComponentsMap;
 	void RenderComponentTree(SceneComponent* const component, Actor* const actor);
+
+private:
+	Actor* selectedActor = nullptr;
+	SceneComponent* selectedComponent = nullptr;
 };

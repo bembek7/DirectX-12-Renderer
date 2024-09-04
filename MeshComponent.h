@@ -25,8 +25,12 @@ public:
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
+	Material* GetMaterial() noexcept;
+
 protected:
 	MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
+
+	virtual void RenderComponentDetails(Gui& gui) override;
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
@@ -51,5 +55,5 @@ private:
 
 	std::unique_ptr<ConstantBuffer<TransformBuffer>> transformConstantBuffer;
 
-	bool rendersShadowMap = false;
+	bool usesPhong = false;
 };

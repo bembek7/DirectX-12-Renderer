@@ -17,7 +17,7 @@ int App::Run()
 	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", "Sphere1");
 	auto sphere2 = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", "Sphere2");
 
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), "sphere.obj", "Point Light");
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), "lightSphere.obj", "Point Light");
 
 	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
@@ -111,8 +111,9 @@ int App::Run()
 
 		for (auto& actor : allActors)
 		{
-			window.GetGraphics().GetGui()->RenderActorControlWindow(actor.get());
+			window.GetGraphics().GetGui()->RenderActorTree(actor.get());
 		}
+		window.GetGraphics().GetGui()->RenderControlWindow();
 
 		window.GetGraphics().EndFrame();
 	}

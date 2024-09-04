@@ -80,9 +80,10 @@ protected:
 		static_assert(std::is_base_of<SceneComponent, T>::value, "T must be derived from SceneComponent");
 		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}*/
+	virtual void RenderComponentDetails(Gui& gui);
+
 private:
 	void DeattachFromParent();
-
 protected:
 	std::vector<std::unique_ptr<SceneComponent>> children;
 	SceneComponent* parent = nullptr;

@@ -8,6 +8,7 @@
 #include <assimp\Importer.hpp>
 #include <stdexcept>
 #include <assimp\postprocess.h>
+#include "Gui.h"
 
 SceneComponent::SceneComponent(const std::string& componentName) :
 	componentName(componentName)
@@ -60,6 +61,11 @@ void SceneComponent::DeattachFromParent()
 
 		parent = nullptr;
 	}
+}
+
+void SceneComponent::RenderComponentDetails(Gui& gui)
+{
+	gui.RenderComponentDetails(this);
 }
 
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)

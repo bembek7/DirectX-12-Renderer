@@ -13,7 +13,7 @@ struct aiMesh;
 class Model
 {
 public:
-	Model(Graphics& graphics, const aiMesh* const assignedMesh);
+	Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong);
 	void Bind(Graphics& graphics) noexcept;
 
 	size_t GetIndicesNumber() const noexcept;

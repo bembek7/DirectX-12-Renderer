@@ -29,12 +29,37 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const unsigned int meshIndex = *node->mMeshes;
 
 	const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
-	model = std::make_unique<Model>(graphics, assignedMesh);
-
 	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
-	material = std::make_unique<Material>(graphics, assignedMaterial);
 
-	rendersShadowMap = true;
+	aiString texFileName;
+	assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+
+	int shadingModel = 0;
+	assignedMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
+
+	switch (shadingModel) {
+	case aiShadingMode_NoShading:
+		shadingModel = 0;
+		break;
+	case aiShadingMode_Gouraud:
+		shadingModel = 1;
+		break;
+	case aiShadingMode_Phong:
+		shadingModel = 2;
+		break;
+	default:
+		shadingModel = 0;
+	}
+	const bool hasTexture = texFileName.length > 0;
+	const bool usesPhong = shadingModel > 0;
+
+	if (hasTexture && !usesPhong)
+	{
+		throw std::runtime_error("Meshes not using phong but using texture aren't implement yet, it just needs a bit of boilerplating");
+	}
+
+	model = std::make_unique<Model>(graphics, assignedMesh, hasTexture, usesPhong);
+	material = std::make_unique<Material>(graphics, assignedMaterial, usesPhong);
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
 	//techinquesMutualBindables.push_back(std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex));
@@ -52,6 +77,11 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		shadowMapSharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescsSM, vertexShaderRefSM.GetBufferPointer(), vertexShaderRefSM.GetBufferSize(), WstringToString(L"VertexShader.cso")));
 		shadowMapSharedBindables.push_back(std::move(vertexShaderSM));
 	}*/
+}
+
+void MeshComponent::RenderComponentDetails(Gui& gui)
+{
+	gui.RenderComponentDetails(this);
 }
 
 std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
@@ -73,7 +103,7 @@ void MeshComponent::Draw(Graphics& graphics)
 
 void MeshComponent::RenderShadowMap(Graphics& graphics)
 {
-	if (rendersShadowMap)
+	if (usesPhong)
 	{
 		UpdateTransformBuffer(graphics);
 
@@ -84,6 +114,11 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 
 		graphics.DrawIndexed(model->GetIndicesNumber());
 	}
+}
+
+Material* MeshComponent::GetMaterial() noexcept
+{
+	return material.get();
 }
 
 void MeshComponent::UpdateTransformBuffer(Graphics& graphics)

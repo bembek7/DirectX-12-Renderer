@@ -9,15 +9,17 @@ cbuffer LightCBuf : register(b0)
     const float3 lightViewPos;
 };
 
-cbuffer ShininessCBuf : register(b1)
+cbuffer RoughnessCBuf : register(b1)
 {
-    const float shininess;
+    const float roughness;
 };
 
-Texture2D tex : register(t1);
-SamplerState texSampler : register(s1);
+cbuffer colorCBuf : register(b2)
+{
+    const float4 color;
+};
 
-float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float3 texCoord : TEX_COORD, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
+float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
 {
     float3 realViewNormal = normalize(viewNormal);
     
@@ -29,7 +31,7 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float3 texCoo
 	
     const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
 	
-    const float3 specular = Speculate(diffuseColor, diffuseIntensity * specularIntensity, realViewNormal, lightVector.vectorToLight, viewPos, attenuation, shininess);
+    const float3 specular = Speculate(diffuseColor, diffuseIntensity * specularIntensity, realViewNormal, lightVector.vectorToLight, viewPos, attenuation, roughness);
 	
-    return float4(saturate((diffuse * lighting + ambient) * tex.Sample(texSampler, texCoord.xy).rgb + specular * lighting), tex.Sample(texSampler, texCoord.xy).a);
+    return float4(saturate((diffuse * lighting + ambient) * color.rgb + specular * lighting), color.a);
 }

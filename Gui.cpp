@@ -5,6 +5,8 @@
 #include <d3d11.h>
 #include "Actor.h"
 #include "SceneComponent.h"
+#include "MeshComponent.h"
+#include <sstream>
 
 Gui::Gui(const HWND& hWnd, ID3D11Device* const device, ID3D11DeviceContext* const context)
 {
@@ -38,7 +40,7 @@ void Gui::EndFrame()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Gui::RenderActorControlWindow(Actor* const actor)
+void Gui::RenderActorTree(Actor* const actor)
 {
 	if (actor)
 	{
@@ -46,18 +48,6 @@ void Gui::RenderActorControlWindow(Actor* const actor)
 		if (ImGui::Begin(actorFullName.c_str()))
 		{
 			RenderComponentTree(actor->rootComponent.get(), actor);
-			SceneComponent* const actorsSelected = actorsSelectedComponentsMap[actor];
-			if (actorsSelected)
-			{
-				ImGui::Text("Location");
-				ImGui::DragFloat3("##Location", (float*)&actorsSelected->relativeLocation, 0.1f, -100.0f, 100.0f);
-
-				ImGui::Text("Rotation");
-				ImGui::DragFloat3("##Rotation", (float*)&actorsSelected->relativeRotation, 1.f, -180.0f, 180.0f);
-
-				ImGui::Text("Scale");
-				ImGui::DragFloat3("##Scale", (float*)&actorsSelected->relativeScale, 0.1f, 0.01f, 10.0f);
-			}
 		}
 		ImGui::End();
 	}
@@ -71,7 +61,8 @@ void Gui::RenderComponentTree(SceneComponent* const component, Actor* const acto
 		{
 			if (ImGui::IsItemClicked())
 			{
-				actorsSelectedComponentsMap[actor] = component;
+				selectedActor = actor;
+				selectedComponent = component;
 			}
 
 			for (auto& child : component->children)
@@ -81,5 +72,55 @@ void Gui::RenderComponentTree(SceneComponent* const component, Actor* const acto
 
 			ImGui::TreePop();
 		}
+	}
+}
+
+void Gui::RenderControlWindow()
+{
+	if (selectedActor && selectedComponent)
+	{
+		const std::string componentName = selectedComponent->GetComponentFullName();
+		const std::string actorName = selectedActor->GetActorFullName();
+		std::stringstream ss;
+		ss << componentName << " | " << actorName;
+		if (ImGui::Begin("Control window"))
+		{
+			ImGui::Text(ss.str().c_str());
+
+			selectedComponent->RenderComponentDetails(*this);
+		}
+		ImGui::End();
+	}
+}
+
+void Gui::RenderComponentDetails(SceneComponent* const component)
+{
+	ImGui::Text("Relative Location");
+	ImGui::DragFloat3("##Location", (float*)&component->relativeLocation, 0.1f, -100.0f, 100.0f);
+
+	ImGui::Text("Relative Rotation");
+	ImGui::DragFloat3("##Rotation", (float*)&component->relativeRotation, 1.f, -180.0f, 180.0f);
+
+	ImGui::Text("Relative Scale");
+	ImGui::DragFloat3("##Scale", (float*)&component->relativeScale, 0.1f, 0.01f, 10.0f);
+}
+
+void Gui::RenderComponentDetails(MeshComponent* const component)
+{
+	RenderComponentDetails(reinterpret_cast<SceneComponent*>(component));
+	ImGui::Text("Roughness");
+
+	ImGui::DragFloat("##Roughness", (float*)&component->GetMaterial()->roughnessBuffer.roughness, 0.01f, 0.01f, 1.0f);
+
+	if (component->GetMaterial()->colorBuffer)
+	{
+		float maxWidth = 200.0f;
+		float availableWidth = ImGui::GetContentRegionAvail().x;
+		float itemWidth = std::clamp(availableWidth, 0.0f, maxWidth);
+		ImGui::PushItemWidth(itemWidth);
+
+		ImGui::ColorPicker4("##ColorPickerWidget", (float*)component->GetMaterial()->colorBuffer.get());
+
+		ImGui::PopItemWidth();
 	}
 }
