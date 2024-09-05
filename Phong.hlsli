@@ -35,7 +35,6 @@ SamplerComparisonState shadowSampler : register(s0);
 
 float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, float3 viewNormal)
 {
-    return 1;
     float2 shadowTexCoords;
     shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
     shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
@@ -46,7 +45,7 @@ float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, flo
     // Check if the pixel texture coordinate is in the view frustum of the light before doing any shadow work.
     if (saturate(shadowTexCoords.x) == shadowTexCoords.x &&
     saturate(shadowTexCoords.y) == shadowTexCoords.y &&
-    pixelDepth > 0)
+    saturate(pixelDepth) == pixelDepth)
     {
         float margin = acos(saturate(max(0.f, min(dot(directionToLight, viewNormal), 0.95f))));
 
