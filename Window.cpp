@@ -31,7 +31,7 @@ Window::Window(const unsigned int clientAreaWidth, const unsigned int clientArea
 	hWnd = CreateWindowEx(
 		0,
 		winClassName,
-		"Rythm",
+		"Game Engine",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,

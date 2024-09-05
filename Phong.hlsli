@@ -40,16 +40,16 @@ float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, flo
     shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
     float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
   
-    float lighting = 1;
+    float lighting = 1.f;
     
     // Check if the pixel texture coordinate is in the view frustum of the light before doing any shadow work.
-    if (saturate(shadowTexCoords.x) == shadowTexCoords.x &&
-    saturate(shadowTexCoords.y) == shadowTexCoords.y &&
-    saturate(pixelDepth) == pixelDepth)
+    if (shadowTexCoords.x >= 0.f && shadowTexCoords.x <= 1.f &&
+    shadowTexCoords.y >= 0.f && shadowTexCoords.y <= 1.f &&
+    pixelDepth >= 0.f && pixelDepth <= 1.f)
     {
         float margin = acos(saturate(max(0.f, min(dot(directionToLight, viewNormal), 0.95f))));
 
-        float epsilon = 0.0005f / margin;
+        float epsilon = 0.00005f / margin;
         epsilon = clamp(epsilon, 0.f, 0.1f);
         
         lighting = shadowMap.SampleCmp(shadowSampler, shadowTexCoords, pixelDepth + epsilon).r;

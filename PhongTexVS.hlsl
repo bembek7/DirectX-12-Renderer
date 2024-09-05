@@ -14,12 +14,12 @@ struct VSOut
 {
     float3 viewPos : POSITION;
     float3 viewNormal : NORMAL;
-    float3 texCoord : TEX_COORD;
+    float2 texCoord : TEX_COORD;
     float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION;
     float4 pos : SV_Position;
 };
 
-VSOut main(float3 position : POSITION, float3 normal : NORMAL, float3 texCoord : TEX_COORD)
+VSOut main(float3 position : POSITION, float3 normal : NORMAL, float2 texCoord : TEX_COORD)
 {
     VSOut vsout;
     vsout.viewPos = (float3) mul(float4(position, 1.0f), modelView);

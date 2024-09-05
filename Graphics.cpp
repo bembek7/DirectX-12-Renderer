@@ -97,9 +97,9 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	comparisonSamplerDesc.MinLOD = 0.f;
 	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	comparisonSamplerDesc.MipLODBias = 0.f;
-	comparisonSamplerDesc.MaxAnisotropy = 0;
+	comparisonSamplerDesc.MaxAnisotropy = 0u;
 	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 
 	CHECK_HR(device->CreateSamplerState(&comparisonSamplerDesc, &comparisonSampler));
 
