@@ -36,12 +36,10 @@ private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
 private:
-	//std::vector<std::unique_ptr<Bindable>> bindables;
-	//std::vector<std::shared_ptr<Bindable>> sharedBindables;
-	//std::vector<std::unique_ptr<Bindable>> techinquesMutualBindables;
-	//std::vector<std::shared_ptr<Bindable>> shadowMapSharedBindables;
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
+	std::shared_ptr<Bindable> nullPixelShader;
+	std::unique_ptr<Model> modelForShadowMapping;
 
 	struct TransformBuffer
 	{

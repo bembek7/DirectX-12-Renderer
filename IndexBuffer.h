@@ -11,6 +11,8 @@ class IndexBuffer : public Bindable
 public:
 	IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices);
 	virtual void Bind(Graphics& graphics) noexcept override;
+	size_t GetIndicesNumber() const noexcept;
 private:
+	size_t indicesNum = 0;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 };

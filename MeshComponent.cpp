@@ -23,7 +23,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 {
 	if (node->mNumMeshes > 1)
 	{
-		throw std::runtime_error("Nodes with more than one mesh not handled yet");
+		OutputDebugString("Nodes with more than one mesh not handled yet\n");
 	}
 
 	const unsigned int meshIndex = *node->mMeshes;
@@ -37,21 +37,8 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	int shadingModel = 0;
 	assignedMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
 
-	switch (shadingModel) {
-	case aiShadingMode_NoShading:
-		shadingModel = 0;
-		break;
-	case aiShadingMode_Gouraud:
-		shadingModel = 1;
-		break;
-	case aiShadingMode_Phong:
-		shadingModel = 2;
-		break;
-	default:
-		shadingModel = 0;
-	}
-	const bool hasTexture = texFileName.length > 0;
-	const bool usesPhong = shadingModel > 0;
+	const bool hasTexture = (texFileName.length > 0);
+	usesPhong = (shadingModel == aiShadingMode_Phong);
 
 	if (hasTexture && !usesPhong)
 	{
@@ -62,21 +49,13 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	material = std::make_unique<Material>(graphics, assignedMaterial, usesPhong);
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
-	//techinquesMutualBindables.push_back(std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex));
 
-	/*if (rendersShadowMap)
+	if (usesPhong)
 	{
+		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, false, false, model->ShareIndexBuffer());
 		auto& bindablesPool = BindablesPool::GetInstance();
-		shadowMapSharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, L""));
-		auto vertexShaderSM = bindablesPool.GetBindable<VertexShader>(graphics, L"VertexShader.cso");
-		const VertexShader& vertexShaderRefSM = dynamic_cast<VertexShader&>(*vertexShaderSM);
-		std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescsSM =
-		{
-			{"POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u}
-		};
-		shadowMapSharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescsSM, vertexShaderRefSM.GetBufferPointer(), vertexShaderRefSM.GetBufferSize(), WstringToString(L"VertexShader.cso")));
-		shadowMapSharedBindables.push_back(std::move(vertexShaderSM));
-	}*/
+		nullPixelShader = bindablesPool.GetBindable<PixelShader>(graphics, L"");
+	}
 }
 
 void MeshComponent::RenderComponentDetails(Gui& gui)
@@ -106,13 +85,12 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 	if (usesPhong)
 	{
 		UpdateTransformBuffer(graphics);
-
-		model->Bind(graphics);
-		material->Bind(graphics);
+		modelForShadowMapping->Bind(graphics);
+		nullPixelShader->Bind(graphics);
 		transformConstantBuffer->Update(graphics);
 		transformConstantBuffer->Bind(graphics);
 
-		graphics.DrawIndexed(model->GetIndicesNumber());
+		graphics.DrawIndexed(modelForShadowMapping->GetIndicesNumber());
 	}
 }
 

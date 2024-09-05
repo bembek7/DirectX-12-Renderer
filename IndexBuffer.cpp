@@ -4,6 +4,8 @@
 
 IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices)
 {
+	indicesNum = indices.size();
+
 	D3D11_BUFFER_DESC indexBufferDesc = {};
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -21,4 +23,9 @@ IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& in
 void IndexBuffer::Bind(Graphics& graphics) noexcept
 {
 	GetContext(graphics)->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+}
+
+size_t IndexBuffer::GetIndicesNumber() const noexcept
+{
+	return indicesNum;
 }

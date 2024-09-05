@@ -12,7 +12,8 @@
 #include "InputLayout.h"
 #include "Utils.h"
 
-Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong)
+Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
+	indexBuffer(givenIndexBuffer)
 {
 	std::wstring vertexShaderPath;
 
@@ -41,12 +42,17 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 		}
 	}
 
-	for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
+	if (!indexBuffer)
 	{
-		for (size_t j = 0; j < assignedMesh->mFaces[i].mNumIndices; j++)
+		for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
 		{
-			indices.push_back(assignedMesh->mFaces[i].mIndices[j]);
+			for (size_t j = 0; j < assignedMesh->mFaces[i].mNumIndices; j++)
+			{
+				indices.push_back(assignedMesh->mFaces[i].mIndices[j]);
+			}
 		}
+
+		indexBuffer = std::make_shared<IndexBuffer>(graphics, indices);
 	}
 
 	const unsigned int numVertices = assignedMesh->mNumVertices;
@@ -60,7 +66,7 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 			{
 			case VertexElement::Position:
 			{
-				const auto position = assignedMesh->mVertices[i];
+				const auto& position = assignedMesh->mVertices[i];
 				verticesData[elementIndex] = position.x;
 				verticesData[elementIndex + 1] = position.y;
 				verticesData[elementIndex + 2] = position.z;
@@ -68,7 +74,7 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 			}
 			case VertexElement::Normal:
 			{
-				const auto normal = assignedMesh->mNormals[i];
+				const auto& normal = assignedMesh->mNormals[i];
 				verticesData[elementIndex] = normal.x;
 				verticesData[elementIndex + 1] = normal.y;
 				verticesData[elementIndex + 2] = normal.z;
@@ -76,9 +82,9 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 			}
 			case VertexElement::TexCoords:
 			{
-				const auto texCoords = assignedMesh->mTextureCoords[0][i];
+				const auto& texCoords = assignedMesh->mTextureCoords[0][i];
 				verticesData[elementIndex] = texCoords.x;
-				verticesData[elementIndex + 1] = 1 - texCoords.y; // flip the y beacuse of how d3d and opengl tex coords differ
+				verticesData[elementIndex + 1] = texCoords.y;
 				break;
 			}
 			default:
@@ -90,12 +96,12 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 	auto& bindablesPool = BindablesPool::GetInstance();
 
 	bindables.push_back(std::make_unique<VertexBuffer>(graphics, verticesData, vertexSize));
-	bindables.push_back(std::make_unique<IndexBuffer>(graphics, indices));
 
 	auto vertexShader = bindablesPool.GetBindable<VertexShader>(graphics, vertexShaderPath);
 	const VertexShader& vertexShaderRef = dynamic_cast<VertexShader&>(*vertexShader);
 	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), Utils::WstringToString(vertexShaderPath)));
 	sharedBindables.push_back(std::move(vertexShader));
+	sharedBindables.push_back(indexBuffer);
 }
 
 void Model::Bind(Graphics& graphics) noexcept
@@ -113,7 +119,12 @@ void Model::Bind(Graphics& graphics) noexcept
 	}
 }
 
+std::shared_ptr<IndexBuffer> Model::ShareIndexBuffer() noexcept
+{
+	return indexBuffer;
+}
+
 size_t Model::GetIndicesNumber() const noexcept
 {
-	return indices.size();
+	return indexBuffer->GetIndicesNumber();
 }

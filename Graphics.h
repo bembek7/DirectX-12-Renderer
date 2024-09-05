@@ -35,7 +35,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowMap;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> comparisonSampler;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> drawingRenderState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRenderState;

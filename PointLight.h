@@ -11,7 +11,7 @@ class PointLight : public MeshActor
 public:
 	PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Point Light");
 	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor);
-	void Bind(Graphics& graphics, const DirectX::XMMATRIX cameraView);
+	void Bind(Graphics& graphics);
 	DirectX::XMMATRIX GetLightPerspective() const noexcept;
 private:
 	struct LightBuffer

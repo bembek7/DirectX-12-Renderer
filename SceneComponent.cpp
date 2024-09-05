@@ -85,6 +85,7 @@ std::unique_ptr<SceneComponent> SceneComponent::LoadComponent(Graphics& graphics
 	const aiScene* const scene = importer.ReadFile(fileName,
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_SortByPType |
 		aiProcess_GenNormals

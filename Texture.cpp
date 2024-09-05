@@ -8,6 +8,7 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 	slot(slot)
 {
 	id = fileName;
+	Microsoft::WRL::ComPtr<ID3D11Resource> texture;
 	CreateWICTextureFromFile(GetDevice(graphics), GetContext(graphics), Utils::StringToWstring(fileName).c_str(), &texture, &textureView);
 }
 

@@ -84,7 +84,7 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	shaderResourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
-	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shaderResourceView));
+	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shadowMap));
 
 	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
 	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
@@ -166,7 +166,7 @@ void Graphics::SetNormalRenderTarget()
 {
 	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView->Get());
 	context->RSSetState(drawingRenderState.Get());
-	context->PSSetShaderResources(0u, 1u, shaderResourceView.GetAddressOf());
+	context->PSSetShaderResources(0u, 1u, shadowMap.GetAddressOf());
 	context->RSSetViewports(1u, &viewport);
 }
 

@@ -8,7 +8,6 @@ PointLight::PointLight(Graphics& graphics, const std::string& fileName, const st
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
 	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 0u);
-	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * graphics.GetProjection()));
 	constantShadowMapBuffer = std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, BufferType::Vertex, 1u);
 }
 
@@ -17,9 +16,9 @@ void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 new
 	lightBuffer.diffuseColor = newColor;
 }
 
-void PointLight::Bind(Graphics& graphics, const DirectX::XMMATRIX cameraView)
+void PointLight::Bind(Graphics& graphics)
 {
-	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), cameraView));
+	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
 	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * graphics.GetProjection()));
 	constantLightBuffer->Update(graphics);
 	constantShadowMapBuffer->Update(graphics);

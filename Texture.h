@@ -10,6 +10,5 @@ public:
 
 private:
 	UINT slot;
-	Microsoft::WRL::ComPtr<ID3D11Resource> texture;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView;
 };

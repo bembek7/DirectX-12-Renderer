@@ -90,19 +90,19 @@ int App::Run()
 		window.GetGraphics().BeginFrame();
 
 		// Shadow Map Rendering
-		//window.GetGraphics().SetRenderTargetForShadowMap();
-		////window.GetGraphics().SetCamera(pointLight->GetLightPerspective());
-		//for (auto& actor : allActors)
-		//{
-		//	actor->RenderShadowMap(window.GetGraphics());
-		//}
+		window.GetGraphics().SetRenderTargetForShadowMap();
+		window.GetGraphics().SetCamera(pointLight->GetLightPerspective());
+		for (auto& actor : allActors)
+		{
+			actor->RenderShadowMap(window.GetGraphics());
+		}
 
 		// Regular drawing
 		window.GetGraphics().SetNormalRenderTarget();
 		window.GetGraphics().SetCamera(camera->GetMatrix());
 		for (auto& lightActor : lightActors)
 		{
-			lightActor->Bind(window.GetGraphics(), window.GetGraphics().GetCamera());
+			lightActor->Bind(window.GetGraphics());
 		}
 		for (auto& actor : allActors)
 		{
