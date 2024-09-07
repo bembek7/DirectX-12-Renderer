@@ -101,9 +101,9 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
 	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 
-	CHECK_HR(device->CreateSamplerState(&comparisonSamplerDesc, &comparisonSampler));
+	comparisonSampler = std::make_unique<Sampler>(*this, 0u, comparisonSamplerDesc);
 
-	context->PSSetSamplers(0u, 1u, comparisonSampler.GetAddressOf());
+	comparisonSampler->Bind(*this);
 
 	D3D11_RASTERIZER_DESC drawingRenderStateDesc = {};
 	drawingRenderStateDesc.CullMode = D3D11_CULL_BACK;

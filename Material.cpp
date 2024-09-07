@@ -8,7 +8,7 @@
 
 Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, const bool usesPhong)
 {
-	std::wstring pixelShaderPath = L"PixelShader.cso";
+	std::wstring pixelShaderPath = L"SolidPS.cso";
 	auto& bindablesPool = BindablesPool::GetInstance();
 
 	if (usesPhong)
@@ -22,11 +22,15 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 			pixelShaderPath = L"PhongTexPS.cso";
 
 			D3D11_SAMPLER_DESC samplerDesc = {};
-			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
 			samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+			samplerDesc.MipLODBias = 0.0f;
+			samplerDesc.MinLOD = 0.0f;
+			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 			bindables.push_back(std::make_unique<Sampler>(graphics, 1u, samplerDesc));
 			bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, roughnessBuffer, BufferType::Pixel, 1u));

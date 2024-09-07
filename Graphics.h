@@ -7,6 +7,7 @@
 #include "DepthStencilView.h"
 #include <memory>
 #include "Gui.h"
+#include "Sampler.h"
 
 class Graphics
 {
@@ -36,7 +37,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowMap;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> comparisonSampler;
+	std::unique_ptr<Sampler> comparisonSampler;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> drawingRenderState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRenderState;
 	std::unique_ptr<DepthStencilView> depthStencilView;

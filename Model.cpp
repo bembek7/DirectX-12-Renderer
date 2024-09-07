@@ -19,7 +19,7 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 
 	if (assignedMesh->HasPositions())
 	{
-		vertexShaderPath = L"VertexShader.cso";
+		vertexShaderPath = L"SolidVS.cso";
 		inputElementDescs.push_back({ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Position] = vertexSize;
 		vertexSize += sizeof(float) * 3;
