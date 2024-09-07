@@ -33,5 +33,8 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightP
 	
     const float3 specular = Speculate(diffuseColor, diffuseIntensity * specularIntensity, realViewNormal, lightVector.vectorToLight, viewPos, attenuation, roughness);
 	
-    return float4(saturate((diffuse * lighting + ambient) * color.rgb + specular * lighting), color.a);
+    float3 light = lighting * saturate(diffuse + ambient + specular);
+    float3 shadow = (1.0f - lighting) * ambient;
+    
+    return float4(color.rgb * (light + shadow), 1.f);
 }
