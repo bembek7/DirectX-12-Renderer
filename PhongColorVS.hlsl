@@ -26,7 +26,7 @@ VSOut main(float3 position : POSITION, float3 normal : NORMAL)
     vsout.pos = mul(float4(position, 1.0f), modelViewProj);
     
     // Transform the vertex position into projected space from the POV of the light.
-    float4 modelPos = mul(float4(position, 1.0f), model);
+    const float4 modelPos = mul(float4(position, 1.0f), model);
     vsout.lightPerspectivePos = mul(modelPos, lightPerspective);
     
     return vsout;
