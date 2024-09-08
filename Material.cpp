@@ -16,6 +16,9 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
 
+		aiString normalTexFileName;
+		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
+
 		if (texFileName.length > 0)
 		{
 			sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str()));
@@ -34,6 +37,12 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 
 			bindables.push_back(std::make_unique<Sampler>(graphics, 1u, samplerDesc));
 			bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, roughnessBuffer, BufferType::Pixel, 1u));
+
+			if (normalTexFileName.length > 0)
+			{
+				sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str()));
+				pixelShaderPath = L"PhongTexNMPS.cso";
+			}
 		}
 		else
 		{

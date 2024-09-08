@@ -11,6 +11,7 @@ int App::Run()
 	std::vector<std::shared_ptr<Actor>> allActors;
 	std::vector<std::shared_ptr<PointLight>> lightActors;
 
+	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), "brick_wall.obj", "BrickWall");
 	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), "Sponza/sponza.obj", "Sponza");
 	sponza->SetActorScale(DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
@@ -23,6 +24,7 @@ int App::Run()
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	sphere2->SetActorTransform({ -5.f, 13.f, 21.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	pointLight->SetActorTransform({ -5.f, 13.f, 13.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
+	brickWall->SetActorTransform(DirectX::XMFLOAT3{ 5.f, 5.f, 5.f }, zeroVec, { 2.f, 2.f, 2.f });
 
 	lightActors.push_back(pointLight);
 
@@ -30,6 +32,7 @@ int App::Run()
 	allActors.push_back(sphere2);
 	allActors.push_back(pointLight);
 	allActors.push_back(sponza);
+	allActors.push_back(brickWall);
 
 	auto camera = Camera::CreateComponent();
 

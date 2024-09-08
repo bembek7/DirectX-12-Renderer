@@ -34,25 +34,34 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	aiString texFileName;
 	assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
 
+	aiString normalTexFileName;
+	assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
+
 	int shadingModel = 0;
 	assignedMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
 
 	const bool hasTexture = (texFileName.length > 0);
 	usesPhong = (shadingModel == aiShadingMode_Phong);
+	const bool hasNormalMap = (normalTexFileName.length > 0);
 
 	if (hasTexture && !usesPhong)
 	{
 		throw std::runtime_error("Meshes not using phong but using texture aren't implement yet, it just needs a bit of boilerplating");
 	}
 
-	model = std::make_unique<Model>(graphics, assignedMesh, hasTexture, usesPhong);
+	if (!hasTexture && hasNormalMap)
+	{
+		throw std::runtime_error("Meshes not using texture diffuse but using normal map not implemented yet");
+	}
+
+	model = std::make_unique<Model>(graphics, assignedMesh, hasTexture, usesPhong, hasNormalMap);
 	material = std::make_unique<Material>(graphics, assignedMaterial, usesPhong);
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
 
 	if (usesPhong)
 	{
-		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, false, false, model->ShareIndexBuffer());
+		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, false, false, false, model->ShareIndexBuffer());
 		auto& bindablesPool = BindablesPool::GetInstance();
 		nullPixelShader = bindablesPool.GetBindable<PixelShader>(graphics, L"");
 	}

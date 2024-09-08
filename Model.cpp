@@ -12,7 +12,7 @@
 #include "InputLayout.h"
 #include "Utils.h"
 
-Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
+Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, const bool hasNormalMap, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
 	indexBuffer(givenIndexBuffer)
 {
 	std::wstring vertexShaderPath;
@@ -39,6 +39,17 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 			inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 			elementOffset[VertexElement::TexCoords] = vertexSize;
 			vertexSize += sizeof(float) * 2;
+
+			if (assignedMesh->HasTangentsAndBitangents() && hasNormalMap)
+			{
+				vertexShaderPath = L"PhongTexNMVS.cso";
+				inputElementDescs.push_back({ "TANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+				elementOffset[VertexElement::Tangent] = vertexSize;
+				vertexSize += sizeof(float) * 3;
+				inputElementDescs.push_back({ "BITANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+				elementOffset[VertexElement::Bitangent] = vertexSize;
+				vertexSize += sizeof(float) * 3;
+			}
 		}
 	}
 
@@ -86,6 +97,21 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 				verticesData[elementIndex] = texCoords.x;
 				verticesData[elementIndex + 1] = texCoords.y;
 				break;
+			}
+			case VertexElement::Tangent:
+			{
+				const auto& tangent = assignedMesh->mTangents[i];
+				verticesData[elementIndex] = tangent.x;
+				verticesData[elementIndex + 1] = tangent.y;
+				verticesData[elementIndex + 2] = tangent.z;
+				break;
+			}
+			case VertexElement::Bitangent:
+			{
+				const auto& bitangent = assignedMesh->mBitangents[i];
+				verticesData[elementIndex] = bitangent.x;
+				verticesData[elementIndex + 1] = bitangent.y;
+				verticesData[elementIndex + 2] = bitangent.z;
 			}
 			default:
 				break;

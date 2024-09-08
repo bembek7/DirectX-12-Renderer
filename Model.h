@@ -14,7 +14,7 @@ struct aiMesh;
 class Model
 {
 public:
-	Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
+	Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, const bool hasNormalMap, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
 	void Bind(Graphics& graphics) noexcept;
 	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
 	size_t GetIndicesNumber() const noexcept;
@@ -31,7 +31,9 @@ private:
 	{
 		Position,
 		Normal,
-		TexCoords
+		TexCoords,
+		Tangent,
+		Bitangent
 	};
 	std::unordered_map<VertexElement, unsigned int> elementOffset;
 };
