@@ -19,6 +19,9 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
 
+		aiString specularTexFileName;
+		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
+
 		if (texFileName.length > 0)
 		{
 			sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str()));
@@ -42,6 +45,20 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 			{
 				sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str()));
 				pixelShaderPath = L"PhongTexNMPS.cso";
+
+				if (specularTexFileName.length > 0)
+				{
+					sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
+					pixelShaderPath = L"PhongTexNMSMPS.cso";
+				}
+			}
+			else
+			{
+				if (specularTexFileName.length > 0)
+				{
+					sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
+					pixelShaderPath = L"PhongTexSMPS.cso";
+				}
 			}
 		}
 		else
