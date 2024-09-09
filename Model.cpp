@@ -12,45 +12,46 @@
 #include "InputLayout.h"
 #include "Utils.h"
 
-Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, const bool hasNormalMap, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
+const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model::vsPaths =
+{
+	{ ShaderSettings{}, L"SolidVS.cso"},
+	{ ShaderSettings::Color, L"SolidVS.cso" },
+	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorVS.cso" },
+	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexVS.cso" },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMVS.cso" },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PhongTexVS.cso" },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMVS.cso" },
+};
+
+Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
 	indexBuffer(givenIndexBuffer)
 {
-	std::wstring vertexShaderPath;
-
 	if (assignedMesh->HasPositions())
 	{
-		vertexShaderPath = L"SolidVS.cso";
 		inputElementDescs.push_back({ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Position] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
-	if (usesPhong)
+	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
-		if (assignedMesh->HasNormals())
-		{
-			vertexShaderPath = L"PhongColorVS.cso";
-			inputElementDescs.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
-			elementOffset[VertexElement::Normal] = vertexSize;
-			vertexSize += sizeof(float) * 3;
-		}
-		if (assignedMesh->HasTextureCoords(0) && hasTexture)
-		{
-			vertexShaderPath = L"PhongTexVS.cso";
-			inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
-			elementOffset[VertexElement::TexCoords] = vertexSize;
-			vertexSize += sizeof(float) * 2;
-
-			if (assignedMesh->HasTangentsAndBitangents() && hasNormalMap)
-			{
-				vertexShaderPath = L"PhongTexNMVS.cso";
-				inputElementDescs.push_back({ "TANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
-				elementOffset[VertexElement::Tangent] = vertexSize;
-				vertexSize += sizeof(float) * 3;
-				inputElementDescs.push_back({ "BITANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
-				elementOffset[VertexElement::Bitangent] = vertexSize;
-				vertexSize += sizeof(float) * 3;
-			}
-		}
+		inputElementDescs.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		elementOffset[VertexElement::Normal] = vertexSize;
+		vertexSize += sizeof(float) * 3;
+	}
+	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
+	{
+		inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		elementOffset[VertexElement::TexCoords] = vertexSize;
+		vertexSize += sizeof(float) * 2;
+	}
+	if (static_cast<bool>(shaderSettings & ShaderSettings::NormalMap))
+	{
+		inputElementDescs.push_back({ "TANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		elementOffset[VertexElement::Tangent] = vertexSize;
+		vertexSize += sizeof(float) * 3;
+		inputElementDescs.push_back({ "BITANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		elementOffset[VertexElement::Bitangent] = vertexSize;
+		vertexSize += sizeof(float) * 3;
 	}
 
 	if (!indexBuffer)
@@ -112,6 +113,7 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 				verticesData[elementIndex] = bitangent.x;
 				verticesData[elementIndex + 1] = bitangent.y;
 				verticesData[elementIndex + 2] = bitangent.z;
+				break;
 			}
 			default:
 				break;
@@ -123,6 +125,16 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool ha
 
 	bindables.push_back(std::make_unique<VertexBuffer>(graphics, verticesData, vertexSize));
 
+	std::wstring vertexShaderPath;
+	auto it = Model::vsPaths.find(shaderSettings);
+	if (it != Model::vsPaths.end())
+	{
+		vertexShaderPath = it->second;
+	}
+	else
+	{
+		throw std::runtime_error("Vertex shader path not found for given flags");
+	}
 	auto vertexShader = bindablesPool.GetBindable<VertexShader>(graphics, vertexShaderPath);
 	const VertexShader& vertexShaderRef = dynamic_cast<VertexShader&>(*vertexShader);
 	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), Utils::WstringToString(vertexShaderPath)));

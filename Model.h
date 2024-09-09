@@ -8,13 +8,14 @@
 #include <d3d11.h>
 #include "Bindable.h"
 #include "IndexBuffer.h"
+#include "ShaderSettings.h"
 
 struct aiMesh;
 
 class Model
 {
 public:
-	Model(Graphics& graphics, const aiMesh* const assignedMesh, const bool hasTexture, const bool usesPhong, const bool hasNormalMap, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
+	Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
 	void Bind(Graphics& graphics) noexcept;
 	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
 	size_t GetIndicesNumber() const noexcept;
@@ -36,4 +37,6 @@ private:
 		Bitangent
 	};
 	std::unordered_map<VertexElement, unsigned int> elementOffset;
+
+	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> vsPaths;
 };

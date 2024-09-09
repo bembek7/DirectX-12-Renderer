@@ -8,14 +8,11 @@
 #include "SceneComponent.h"
 #include "Material.h"
 #include "ConstantBuffer.h"
+#include "ShaderSettings.h"
 
 class Graphics;
 
-enum class ShaderType
-{
-	Solid,
-	Phong
-};
+struct aiMaterial;
 
 class MeshComponent : public SceneComponent
 {
@@ -35,6 +32,8 @@ protected:
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
+	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
+
 private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
@@ -53,5 +52,5 @@ private:
 
 	std::unique_ptr<ConstantBuffer<TransformBuffer>> transformConstantBuffer;
 
-	bool usesPhong = false;
+	bool generatesShadow = false;
 };

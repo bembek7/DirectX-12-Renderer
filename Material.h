@@ -4,6 +4,9 @@
 #include <vector>
 #include <memory>
 #include <DirectXMath.h>
+#include <string>
+#include <unordered_map>
+#include "ShaderSettings.h"
 
 struct aiMaterial;
 
@@ -11,7 +14,7 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, const bool usesPhong);
+	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, const ShaderSettings shaderSettings);
 	void Bind(Graphics& graphics) noexcept;
 
 private:
@@ -29,4 +32,6 @@ private:
 	};
 
 	std::unique_ptr<Color> colorBuffer = nullptr;
+
+	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> psPaths;
 };

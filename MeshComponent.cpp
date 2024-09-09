@@ -31,37 +31,18 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
 	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
 
-	aiString texFileName;
-	assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+	const ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
 
-	aiString normalTexFileName;
-	assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
+	generatesShadow = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	int shadingModel = 0;
-	assignedMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
-
-	const bool hasTexture = (texFileName.length > 0);
-	usesPhong = (shadingModel == aiShadingMode_Phong);
-	const bool hasNormalMap = (normalTexFileName.length > 0);
-
-	if (hasTexture && !usesPhong)
-	{
-		throw std::runtime_error("Meshes not using phong but using texture aren't implement yet, it just needs a bit of boilerplating");
-	}
-
-	if (!hasTexture && hasNormalMap)
-	{
-		throw std::runtime_error("Meshes not using texture diffuse but using normal map not implemented yet");
-	}
-
-	model = std::make_unique<Model>(graphics, assignedMesh, hasTexture, usesPhong, hasNormalMap);
-	material = std::make_unique<Material>(graphics, assignedMaterial, usesPhong);
+	model = std::make_unique<Model>(graphics, assignedMesh, shaderSettings);
+	material = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
 
-	if (usesPhong)
+	if (generatesShadow)
 	{
-		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, false, false, false, model->ShareIndexBuffer());
+		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
 		auto& bindablesPool = BindablesPool::GetInstance();
 		nullPixelShader = bindablesPool.GetBindable<PixelShader>(graphics, L"");
 	}
@@ -91,7 +72,7 @@ void MeshComponent::Draw(Graphics& graphics)
 
 void MeshComponent::RenderShadowMap(Graphics& graphics)
 {
-	if (usesPhong)
+	if (generatesShadow)
 	{
 		UpdateTransformBuffer(graphics);
 		modelForShadowMapping->Bind(graphics);
@@ -114,6 +95,47 @@ void MeshComponent::UpdateTransformBuffer(Graphics& graphics)
 	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera());
 	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera() * graphics.GetProjection());
 	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(transformMatrix), std::move(transformView), std::move(transformViewProjection));
+}
+
+ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material)
+{
+	ShaderSettings resolvedSettings = {};
+
+	aiString texFileName;
+	material->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+	aiString normalTexFileName;
+	material->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
+	aiString specularTexFileName;
+	material->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
+
+	int shadingModel = 0;
+	material->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
+
+	if (shadingModel == aiShadingMode_Phong)
+	{
+		resolvedSettings |= ShaderSettings::Phong;
+	}
+	if (mesh->HasTextureCoords(0))
+	{
+		if (texFileName.length > 0)
+		{
+			resolvedSettings |= ShaderSettings::Texture;
+		}
+		else
+		{
+			resolvedSettings |= ShaderSettings::Color;
+		}
+		if (normalTexFileName.length > 0 && mesh->HasNormals() && mesh->HasTangentsAndBitangents())
+		{
+			resolvedSettings |= ShaderSettings::NormalMap;
+		}
+		if (specularTexFileName.length > 0)
+		{
+			resolvedSettings |= ShaderSettings::SpecularMap;
+		}
+	}
+
+	return resolvedSettings;
 }
 
 MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection)
