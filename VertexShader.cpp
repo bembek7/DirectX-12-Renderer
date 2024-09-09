@@ -7,7 +7,6 @@
 
 VertexShader::VertexShader(Graphics& graphics, const std::wstring& shaderPath)
 {
-	id = Utils::WstringToString(shaderPath);
 	CHECK_HR(D3DReadFileToBlob(shaderPath.c_str(), &blob));
 	CHECK_HR(GetDevice(graphics)->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 }
@@ -25,4 +24,9 @@ LPVOID VertexShader::GetBufferPointer() const noexcept
 size_t VertexShader::GetBufferSize() const noexcept
 {
 	return blob->GetBufferSize();
+}
+
+std::string VertexShader::ResolveID(const std::wstring& shaderPath) noexcept
+{
+	return Utils::WstringToString(shaderPath);
 }

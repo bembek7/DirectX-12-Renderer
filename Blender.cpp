@@ -1,11 +1,9 @@
 #include "Blender.h"
 #include "ThrowMacros.h"
 
-Blender::Blender(Graphics& graphics, bool blending) :
+Blender::Blender(Graphics& graphics, const bool blending) :
 	blending(blending)
 {
-	id = (blending) ? "true" : "false";
-
 	D3D11_BLEND_DESC blendDesc = {};
 	auto& brt = blendDesc.RenderTarget[0];
 	if (blending)
@@ -31,4 +29,9 @@ Blender::Blender(Graphics& graphics, bool blending) :
 void Blender::Bind(Graphics& graphics) noexcept
 {
 	GetContext(graphics)->OMSetBlendState(blenderState.Get(), nullptr, 0xFFFFFFFFu);
+}
+
+std::string Blender::ResolveID(const bool blending) noexcept
+{
+	return (blending) ? "true" : "false";
 }

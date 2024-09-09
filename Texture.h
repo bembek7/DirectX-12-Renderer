@@ -9,7 +9,7 @@ public:
 	virtual void Bind(Graphics& graphics) noexcept override;
 
 	bool HasAlpha() const noexcept;
-
+	static std::string ResolveID(const UINT slot, const std::string& fileName) noexcept;
 private:
 	bool hasAlpha = false;
 	UINT slot;

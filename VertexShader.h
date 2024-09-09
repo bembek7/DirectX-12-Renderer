@@ -10,6 +10,8 @@ public:
 	virtual void Bind(Graphics& graphics) noexcept override;
 	LPVOID GetBufferPointer() const noexcept;
 	size_t GetBufferSize() const noexcept;
+
+	static std::string ResolveID(const std::wstring& shaderPath) noexcept;
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 	Microsoft::WRL::ComPtr<ID3DBlob> blob;

@@ -8,8 +8,6 @@
 Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName) :
 	slot(slot)
 {
-	id = fileName;
-
 	Microsoft::WRL::ComPtr<ID3D11Resource> texture;
 	DirectX::ScratchImage scratchImage;
 	CHECK_HR(DirectX::LoadFromWICFile(Utils::StringToWstring(fileName).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImage));
@@ -59,4 +57,11 @@ void Texture::Bind(Graphics& graphics) noexcept
 bool Texture::HasAlpha() const noexcept
 {
 	return hasAlpha;
+}
+
+std::string Texture::ResolveID(const UINT slot, const std::string& fileName) noexcept
+{
+	std::stringstream ss;
+	ss << slot << fileName;
+	return ss.str();
 }

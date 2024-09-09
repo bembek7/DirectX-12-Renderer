@@ -15,12 +15,11 @@ public:
 	template<typename T, typename... Params>
 	std::shared_ptr<Bindable> GetBindable(Graphics& graphics, const Params&... params)
 	{
-		std::shared_ptr<Bindable> bindableSP = std::make_shared<T>(graphics, params...);
-		const std::string bindableID = bindableSP->GetID();
+		const std::string bindableID = T::ResolveID(params...) + "#" + typeid(T).name();
 		auto bindableIt = bindablesMap.find(bindableID);
 		if (bindableIt == bindablesMap.end())
 		{
-			bindablesMap[bindableID] = std::move(bindableSP);
+			bindablesMap[bindableID] = std::make_shared<T>(graphics, params...);
 		}
 		return bindablesMap[bindableID];
 	}
