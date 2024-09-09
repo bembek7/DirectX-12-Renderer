@@ -5,6 +5,8 @@
 #include "BindablesPool.h"
 #include "Texture.h"
 #include "Sampler.h"
+#include "Blender.h"
+#include "Rasterizer.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
@@ -14,17 +16,23 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMPS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PhongTexSMPS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMSMPS.cso" },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"PhongTexNMSMATPS.cso" },
 };
 
-Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, const ShaderSettings shaderSettings)
+Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings)
 {
 	auto& bindablesPool = BindablesPool::GetInstance();
+
+	bool usesAlphaTesting = false;
 
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
 		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str()));
+
+		auto diffTex = reinterpret_cast<Texture*>(sharedBindables.back().get());
+		usesAlphaTesting = diffTex->HasAlpha();
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::NormalMap))
 	{
@@ -46,6 +54,17 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	{
 		colorBuffer = std::make_unique<Color>();
 		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u));
+		sharedBindables.push_back(bindablesPool.GetBindable<Blender>(graphics, false));
+	}
+
+	if (usesAlphaTesting)
+	{
+		sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, D3D11_CULL_NONE));
+		shaderSettings |= ShaderSettings::AlphaTesting;
+	}
+	else
+	{
+		sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, D3D11_CULL_BACK));
 	}
 
 	std::wstring pixelShaderPath;

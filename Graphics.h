@@ -8,6 +8,7 @@
 #include <memory>
 #include "Gui.h"
 #include "Sampler.h"
+#include "Rasterizer.h"
 
 class Graphics
 {
@@ -38,8 +39,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowMap;
 	std::unique_ptr<Sampler> comparisonSampler;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> drawingRenderState;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> shadowRenderState;
+	std::shared_ptr<Bindable> shadowMapRasterizer;
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<DepthStencilView> shadowMapDepthStencilView;
 	D3D11_VIEWPORT viewport{};

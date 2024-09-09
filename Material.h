@@ -14,7 +14,7 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, const ShaderSettings shaderSettings);
+	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings);
 	void Bind(Graphics& graphics) noexcept;
 
 private:

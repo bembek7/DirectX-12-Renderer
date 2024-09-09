@@ -2,6 +2,7 @@
 #include "ThrowMacros.h"
 #include <d3d11.h>
 #include <d3dcommon.h>
+#include "BindablesPool.h"
 
 Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsigned int windowHeight)
 {
@@ -105,18 +106,9 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	comparisonSampler->Bind(*this);
 
-	D3D11_RASTERIZER_DESC drawingRenderStateDesc = {};
-	drawingRenderStateDesc.CullMode = D3D11_CULL_BACK;
-	drawingRenderStateDesc.FillMode = D3D11_FILL_SOLID;
-	drawingRenderStateDesc.DepthClipEnable = true;
-	CHECK_HR(device->CreateRasterizerState(&drawingRenderStateDesc, &drawingRenderState));
+	auto& bindablesPool = BindablesPool::GetInstance();
 
-	D3D11_RASTERIZER_DESC shadowRenderStateDesc = {};
-	shadowRenderStateDesc.CullMode = D3D11_CULL_FRONT;
-	shadowRenderStateDesc.FillMode = D3D11_FILL_SOLID;
-	shadowRenderStateDesc.DepthClipEnable = true;
-
-	CHECK_HR(device->CreateRasterizerState(&shadowRenderStateDesc, &shadowRenderState));
+	shadowMapRasterizer = bindablesPool.GetBindable<Rasterizer>(*this, D3D11_CULL_FRONT);
 
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
@@ -158,14 +150,13 @@ void Graphics::BeginFrame() noexcept
 void Graphics::SetRenderTargetForShadowMap()
 {
 	context->OMSetRenderTargets(0u, nullptr, shadowMapDepthStencilView->Get());
-	context->RSSetState(shadowRenderState.Get());
+	shadowMapRasterizer->Bind(*this);
 	context->RSSetViewports(1u, &shadowViewport);
 }
 
 void Graphics::SetNormalRenderTarget()
 {
 	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView->Get());
-	context->RSSetState(drawingRenderState.Get());
 	context->PSSetShaderResources(0u, 1u, shadowMap.GetAddressOf());
 	context->RSSetViewports(1u, &viewport);
 }

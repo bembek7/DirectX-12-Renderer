@@ -6,7 +6,8 @@ enum class ShaderSettings
 	Color = 2,
 	Texture = 4,
 	NormalMap = 8,
-	SpecularMap = 16
+	SpecularMap = 16,
+	AlphaTesting = 32
 };
 
 struct ShaderSettingsHash
