@@ -312,8 +312,11 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="NormalMap.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
     <None Include="Phong.hlsli">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\PixelShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

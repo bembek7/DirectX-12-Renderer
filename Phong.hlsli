@@ -52,7 +52,7 @@ float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, flo
         float epsilon = 0.00005f / margin;
         epsilon = clamp(epsilon, 0.f, 0.1f);
         
-        lighting = shadowMap.SampleCmp(shadowSampler, shadowTexCoords, pixelDepth + epsilon).r;
+        lighting = shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth + epsilon).r;
     }
     
     return lighting;
@@ -73,6 +73,38 @@ LightVectorData CalculateLightVectorData(float3 lightViewPos, float3 viewPos)
     lightVector.directionToLight = lightVector.vectorToLight / lightVector.distanceToLight;
     
     return lightVector;
+}
+
+cbuffer LightCBuf : register(b0)
+{
+    const float3 diffuseColor;
+    const float diffuseIntensity;
+    const float3 ambient;
+    const float specularIntensity;
+    const float3 lightViewPos;
+};
+
+cbuffer RoughnessCBuf : register(b1)
+{
+    const float roughness;
+};
+
+float3 CalulateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float4 lightPerspectivePos, const float3 specularColor)
+{
+    const LightVectorData lightVector = CalculateLightVectorData(lightViewPos, viewPos);
+    
+    const float lighting = CalculateLighting(lightPerspectivePos, lightVector.directionToLight, realViewNormal);
+ 
+    const float attenuation = Attenuate(1.0f, 0.045f, 0.0075f, lightVector.distanceToLight);
+	
+    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
+	
+    const float3 specular = Speculate(specularColor, diffuseIntensity * specularIntensity, realViewNormal, lightVector.vectorToLight, viewPos, attenuation, roughness);
+	
+    const float3 light = lighting * saturate(diffuse + ambient + specular);
+    const float3 shadow = (1.0f - lighting) * ambient;
+    
+    return light + shadow;
 }
 
 

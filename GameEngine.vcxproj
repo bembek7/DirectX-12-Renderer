@@ -340,6 +340,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
