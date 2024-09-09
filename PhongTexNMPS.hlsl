@@ -41,5 +41,6 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoo
     const float3 light = lighting * saturate(diffuse + ambient + specular);
     const float3 shadow = (1.0f - lighting) * ambient;
     
-    return float4(tex.Sample(texSampler, texCoord).rgb * (light + shadow), 1.f);
+    const float4 texSample = tex.Sample(texSampler, texCoord);
+    return float4(texSample.rgb * (light + shadow), 1.0f);
 }
