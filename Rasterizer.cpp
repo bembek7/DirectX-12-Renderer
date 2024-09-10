@@ -3,12 +3,12 @@
 
 Rasterizer::Rasterizer(Graphics& graphics, const D3D11_CULL_MODE cullMode)
 {
-	D3D11_RASTERIZER_DESC drawingRenderStateDesc = {};
-	drawingRenderStateDesc.CullMode = cullMode;
-	drawingRenderStateDesc.FillMode = D3D11_FILL_SOLID;
-	drawingRenderStateDesc.DepthClipEnable = true;
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.CullMode = cullMode;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.DepthClipEnable = true;
 
-	CHECK_HR(GetDevice(graphics)->CreateRasterizerState(&drawingRenderStateDesc, &rasterizerState));
+	CHECK_HR(GetDevice(graphics)->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
 }
 
 void Rasterizer::Bind(Graphics& graphics) noexcept

@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 #include "BindablesPool.h"
+#include "ShadowRasterizer.h"
 
 Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsigned int windowHeight)
 {
@@ -108,7 +109,7 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	auto& bindablesPool = BindablesPool::GetInstance();
 
-	shadowMapRasterizer = bindablesPool.GetBindable<Rasterizer>(*this, D3D11_CULL_FRONT);
+	shadowMapRasterizer = bindablesPool.GetBindable<ShadowRasterizer>(*this, D3D11_CULL_FRONT);
 
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;

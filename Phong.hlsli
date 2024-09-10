@@ -33,6 +33,8 @@ float3 Speculate(
 Texture2D shadowMap : register(t0);
 SamplerComparisonState shadowSampler : register(s0);
 
+#define PCF_RANGE 2
+
 float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, float3 viewNormal)
 {
     float2 shadowTexCoords;
@@ -47,12 +49,20 @@ float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, flo
     shadowTexCoords.y >= 0.f && shadowTexCoords.y <= 1.f &&
     pixelDepth >= 0.f && pixelDepth <= 1.f)
     {
-        const float margin = acos(saturate(max(0.f, min(dot(directionToLight, viewNormal), 0.95f))));
-
-        float epsilon = 0.00005f / margin;
-        epsilon = clamp(epsilon, 0.f, 0.1f);
-        
-        lighting = shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth + epsilon).r;
+        lighting = 0.0f;
+        [unroll]
+        for (int x = -PCF_RANGE; x <= PCF_RANGE; x++)
+        {
+            [unroll]
+            for (int y = -PCF_RANGE; y <= PCF_RANGE; y++)
+            {
+                //const float margin = acos(saturate(max(0.f, min(dot(directionToLight, viewNormal), 0.95f))));
+                //float epsilon = 0.00005f / margin;
+                //epsilon = clamp(epsilon, 0.f, 0.1f);
+                lighting += shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth, int2(x, y));
+            }
+        }
+        lighting = lighting / ((PCF_RANGE * 2 + 1) * (PCF_RANGE * 2 + 1));
     }
     
     return lighting;
