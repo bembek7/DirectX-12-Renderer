@@ -13,14 +13,21 @@ public:
 	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor);
 	void Bind(Graphics& graphics);
 	DirectX::XMMATRIX GetLightPerspective() const noexcept;
+
+protected:
+	virtual void RenderActorDetails(Gui& gui) override;
 private:
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 diffuseColor = { 1.0f, 1.0f, 1.0f };
-		float diffuseIntensity = 0.6f;
+		float diffuseIntensity = 1.0f;
 		DirectX::XMFLOAT3 ambient = { 0.25f, 0.25f, 0.25f };
 		float specularIntensity = 0.6f;
-		alignas(16) DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
+		DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
+		const float attenuationConst = 1.0f;
+		const float attenuationLin = 0.045f;
+		const float attenuationQuad = 0.0075f;
+		char padding[8];
 	} lightBuffer;
 
 	struct ShadowMapBuffer
