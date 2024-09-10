@@ -8,6 +8,7 @@ class Graphics;
 
 class PointLight : public MeshActor
 {
+	friend class Gui;
 public:
 	PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Point Light");
 	void SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor);

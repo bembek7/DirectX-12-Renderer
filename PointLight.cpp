@@ -30,3 +30,9 @@ DirectX::XMMATRIX PointLight::GetLightPerspective() const noexcept
 {
 	return shadowMapCamera->GetMatrix();
 }
+
+void PointLight::RenderActorDetails(Gui& gui)
+{
+	Actor::RenderActorDetails(gui);
+	gui.RenderActorDetails(this);
+}

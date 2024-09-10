@@ -133,3 +133,8 @@ std::string Actor::GetActorFullName()
 	ss << actorName << " " << typeid(*this).name() << "##" << this;
 	return ss.str();
 }
+
+void Actor::RenderActorDetails(Gui& gui)
+{
+	gui.RenderActorDetails(this);
+}

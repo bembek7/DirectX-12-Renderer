@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "SceneComponent.h"
 #include "MeshComponent.h"
+#include "PointLight.h"
 #include <sstream>
 
 Gui::Gui(const HWND& hWnd, ID3D11Device* const device, ID3D11DeviceContext* const context)
@@ -88,6 +89,7 @@ void Gui::RenderControlWindow()
 			ImGui::Text(ss.str().c_str());
 
 			selectedComponent->RenderComponentDetails(*this);
+			selectedActor->RenderActorDetails(*this);
 		}
 		ImGui::End();
 	}
@@ -107,7 +109,6 @@ void Gui::RenderComponentDetails(SceneComponent* const component)
 
 void Gui::RenderComponentDetails(MeshComponent* const component)
 {
-	RenderComponentDetails(reinterpret_cast<SceneComponent*>(component));
 	ImGui::Text("Roughness");
 
 	ImGui::DragFloat("##Roughness", (float*)&component->GetMaterial()->roughnessBuffer.roughness, 0.01f, 0.01f, 1.0f);
@@ -123,4 +124,31 @@ void Gui::RenderComponentDetails(MeshComponent* const component)
 
 		ImGui::PopItemWidth();
 	}
+}
+
+void Gui::RenderActorDetails(Actor* const actor)
+{
+	ImGui::Text("Actor Details");
+	const std::string actorName = actor->GetActorFullName();
+	ImGui::Text(actorName.c_str());
+}
+
+void Gui::RenderActorDetails(PointLight* const actor)
+{
+	ImGui::Text("Diffuse");
+	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Ambient");
+	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Diffuse Intensity");
+	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Specular Intensity");
+	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Attenuation");
+	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
 }

@@ -58,6 +58,8 @@ protected:
 		}
 	}
 
+	virtual void RenderActorDetails(Gui& gui);
+
 protected:
 	std::string actorName;
 	std::unique_ptr<SceneComponent> rootComponent;

@@ -50,6 +50,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 void MeshComponent::RenderComponentDetails(Gui& gui)
 {
+	SceneComponent::RenderComponentDetails(gui);
 	gui.RenderComponentDetails(this);
 }
 

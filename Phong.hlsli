@@ -82,6 +82,9 @@ cbuffer LightCBuf : register(b0)
     const float3 ambient;
     const float specularIntensity;
     const float3 lightViewPos;
+    const float attenuationConst;
+    const float attenuationLin;
+    const float attenuationQuad;
 };
 
 cbuffer RoughnessCBuf : register(b1)
@@ -95,7 +98,7 @@ float3 CalulateFinalAmountOfLight(const float3 viewPos, const float3 realViewNor
     
     const float lighting = CalculateLighting(lightPerspectivePos, lightVector.directionToLight, realViewNormal);
  
-    const float attenuation = Attenuate(1.0f, 0.045f, 0.0075f, lightVector.distanceToLight);
+    const float attenuation = Attenuate(attenuationConst, attenuationLin, attenuationQuad, lightVector.distanceToLight);
 	
     const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
 	
