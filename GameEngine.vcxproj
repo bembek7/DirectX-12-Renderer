@@ -202,7 +202,6 @@
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
-    <ClCompile Include="WICTextureLoader.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="SceneComponent.cpp" />
@@ -249,7 +248,6 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
-    <ClInclude Include="WICTextureLoader.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="SceneComponent.h" />
   </ItemGroup>
