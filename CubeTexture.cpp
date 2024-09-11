@@ -13,7 +13,7 @@ CubeTexture::CubeTexture(Graphics& graphics, const UINT slot, const std::string&
 	DirectX::ScratchImage scratchImages[6];
 	for (int i = 0; i < 6; i++)
 	{
-		const std::wstring texPath = Utils::StringToWstring(path + "\\" + std::to_string(i) + ".png");
+		const std::wstring texPath = Utils::StringToWstring("Textures\\" + path + "\\" + std::to_string(i) + ".png");
 		CHECK_HR(DirectX::LoadFromWICFile(texPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImages[i]));
 		if (scratchImages[i].GetImage(0, 0, 0)->format != textureDesc.Format)
 		{

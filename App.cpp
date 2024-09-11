@@ -12,15 +12,16 @@ int App::Run()
 	std::vector<std::shared_ptr<Actor>> allActors;
 	std::vector<std::shared_ptr<PointLight>> lightActors;
 
-	auto skybox = Skybox(window.GetGraphics(), "skybox.obj");
-	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), "brick_wall.obj", "BrickWall");
-	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), "Sponza/sponza.obj", "Sponza");
+	const std::string meshesPath = "Meshes\\";
+	auto skybox = Skybox(window.GetGraphics(), meshesPath + "skybox.obj");
+	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
+	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 	sponza->SetActorScale(DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
-	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", "Sphere1");
-	auto sphere2 = std::make_shared<MeshActor>(window.GetGraphics(), "sphere.obj", "Sphere2");
+	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+	auto sphere2 = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
 
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), "lightSphere.obj", "Point Light");
+	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
 
 	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });

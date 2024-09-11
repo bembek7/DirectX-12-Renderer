@@ -8,7 +8,7 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 	slot(slot)
 {
 	DirectX::ScratchImage scratchImage;
-	CHECK_HR(DirectX::LoadFromWICFile(Utils::StringToWstring(fileName).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImage));
+	CHECK_HR(DirectX::LoadFromWICFile(Utils::StringToWstring("Textures\\" + fileName).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImage));
 
 	hasAlpha = !scratchImage.IsAlphaAllOpaque();
 
