@@ -85,26 +85,11 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shadowMap));
 
-	D3D11_SAMPLER_DESC comparisonSamplerDesc = {};
-	comparisonSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-	comparisonSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-	comparisonSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	comparisonSamplerDesc.BorderColor[0] = 1.0f;
-	comparisonSamplerDesc.BorderColor[1] = 1.0f;
-	comparisonSamplerDesc.BorderColor[2] = 1.0f;
-	comparisonSamplerDesc.BorderColor[3] = 1.0f;
-	comparisonSamplerDesc.MinLOD = 0.f;
-	comparisonSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	comparisonSamplerDesc.MipLODBias = 0.f;
-	comparisonSamplerDesc.MaxAnisotropy = 0u;
-	comparisonSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-	comparisonSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	auto& bindablesPool = BindablesPool::GetInstance();
 
-	comparisonSampler = std::make_unique<Sampler>(*this, 0u, comparisonSamplerDesc);
+	comparisonSampler = bindablesPool.GetBindable<Sampler>(*this, 0u, Sampler::Mode::Comparison);
 
 	comparisonSampler->Bind(*this);
-
-	auto& bindablesPool = BindablesPool::GetInstance();
 
 	shadowMapRasterizer = bindablesPool.GetBindable<ShadowRasterizer>(*this, D3D11_CULL_FRONT);
 

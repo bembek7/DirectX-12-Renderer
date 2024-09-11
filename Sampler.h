@@ -5,10 +5,16 @@
 class Sampler : public Bindable
 {
 public:
-	Sampler(Graphics& graphics, const UINT slot, const D3D11_SAMPLER_DESC& samplerDesc);
+	enum class Mode
+	{
+		Biliniear,
+		Anisotropic,
+		Comparison
+	};
+	Sampler(Graphics& graphics, const UINT slot, const Mode samplerMode);
 
 	void Bind(Graphics& graphics) noexcept override;
-
+	static std::string ResolveID(const UINT slot, const Mode samplerMode) noexcept;
 private:
 	UINT slot;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
