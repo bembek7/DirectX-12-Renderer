@@ -24,7 +24,9 @@ private:
 	struct Roughness
 	{
 		alignas(16) float roughness = 0.8f;
-	} roughnessBuffer;
+	};
+
+	std::unique_ptr<Roughness> roughnessBuffer = nullptr;
 
 	struct Color
 	{

@@ -156,6 +156,15 @@
     <ClCompile Include="ShadowRasterizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -281,6 +290,15 @@
     <ClInclude Include="ShadowRasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubeTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PhongTexVS.hlsl">
@@ -315,6 +333,12 @@
     </FxCompile>
     <FxCompile Include="PhongTexNMSMATPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

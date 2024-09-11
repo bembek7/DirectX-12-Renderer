@@ -53,10 +53,7 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
-	CHECK_HR(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
-
-	context->OMSetDepthStencilState(depthStencilState.Get(), 1u);
+	writeMaskDepthStencilState = std::make_unique<DepthStencilState>(*this, depthStencilDesc);
 
 	D3D11_TEXTURE2D_DESC depthTexDesc = {};
 	depthTexDesc.Width = windowWidth;
@@ -150,6 +147,7 @@ void Graphics::BeginFrame() noexcept
 
 void Graphics::SetRenderTargetForShadowMap()
 {
+	writeMaskDepthStencilState->Bind(*this);
 	context->OMSetRenderTargets(0u, nullptr, shadowMapDepthStencilView->Get());
 	shadowMapRasterizer->Bind(*this);
 	context->RSSetViewports(1u, &shadowViewport);
@@ -157,6 +155,7 @@ void Graphics::SetRenderTargetForShadowMap()
 
 void Graphics::SetNormalRenderTarget()
 {
+	writeMaskDepthStencilState->Bind(*this);
 	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView->Get());
 	context->PSSetShaderResources(0u, 1u, shadowMap.GetAddressOf());
 	context->RSSetViewports(1u, &viewport);

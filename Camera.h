@@ -17,6 +17,6 @@ public:
 protected:
 	using SceneComponent::SceneComponent;
 private:
-	const float movementSpeed = 0.3f;
+	const float movementSpeed = 0.6f;
 	const float rotationSpeed = 0.15f;
 };

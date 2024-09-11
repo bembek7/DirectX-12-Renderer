@@ -5,12 +5,14 @@
 #include <numbers>
 #include "Camera.h"
 #include "DirectXMath.h"
+#include "Skybox.h"
 
 int App::Run()
 {
 	std::vector<std::shared_ptr<Actor>> allActors;
 	std::vector<std::shared_ptr<PointLight>> lightActors;
 
+	auto skybox = Skybox(window.GetGraphics(), "skybox.obj");
 	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), "brick_wall.obj", "BrickWall");
 	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), "Sponza/sponza.obj", "Sponza");
 	sponza->SetActorScale(DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
@@ -111,6 +113,8 @@ int App::Run()
 		{
 			actor->Draw(window.GetGraphics());
 		}
+
+		skybox.Draw(window.GetGraphics());
 
 		for (auto& actor : allActors)
 		{

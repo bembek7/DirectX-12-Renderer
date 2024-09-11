@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "WICTextureLoader.h"
 #include "Utils.h"
 #include <wrl/client.h>
 #include "ThrowMacros.h"
@@ -8,7 +7,6 @@
 Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName) :
 	slot(slot)
 {
-	Microsoft::WRL::ComPtr<ID3D11Resource> texture;
 	DirectX::ScratchImage scratchImage;
 	CHECK_HR(DirectX::LoadFromWICFile(Utils::StringToWstring(fileName).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImage));
 

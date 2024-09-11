@@ -95,7 +95,7 @@ void MeshComponent::UpdateTransformBuffer(Graphics& graphics)
 	DirectX::XMMATRIX transformMatrix = GetTransformMatrix();
 	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera());
 	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera() * graphics.GetProjection());
-	transformBuffer = TransformBuffer(DirectX::XMMatrixTranspose(transformMatrix), std::move(transformView), std::move(transformViewProjection));
+	transformBuffer = TransformBuffer(std::move(DirectX::XMMatrixTranspose(transformMatrix)), std::move(transformView), std::move(transformViewProjection));
 }
 
 ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material)

@@ -7,9 +7,12 @@
 #include "Sampler.h"
 #include "Blender.h"
 #include "Rasterizer.h"
+#include "CubeTexture.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
+	{ ShaderSettings{}, L"SolidPS.cso"},
+	{ ShaderSettings::Skybox, L"SkyboxPS.cso" },
 	{ ShaderSettings::Color, L"SolidPS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexPS.cso" },
@@ -23,8 +26,16 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 {
 	auto& bindablesPool = BindablesPool::GetInstance();
 
-	bool usesAlphaTesting = false;
+	auto cullMode = D3D11_CULL_BACK;
 
+	if (static_cast<bool>(shaderSettings & ShaderSettings::Skybox))
+	{
+		aiString texesPath;
+		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texesPath);
+		sharedBindables.push_back(bindablesPool.GetBindable<CubeTexture>(graphics, 0u, texesPath.C_Str()));
+
+		cullMode = D3D11_CULL_FRONT;
+	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
 		aiString texFileName;
@@ -32,7 +43,11 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str()));
 
 		auto diffTex = reinterpret_cast<Texture*>(sharedBindables.back().get());
-		usesAlphaTesting = diffTex->HasAlpha();
+		if (diffTex->HasAlpha())
+		{
+			cullMode = D3D11_CULL_NONE;
+			shaderSettings |= ShaderSettings::AlphaTesting;
+		}
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::NormalMap))
 	{
@@ -48,24 +63,17 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
-		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, roughnessBuffer, BufferType::Pixel, 1u));
+		roughnessBuffer = std::make_unique<Roughness>();
+		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u));
 	}
-	if (!static_cast<bool>(shaderSettings & ShaderSettings::Texture))
+	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();
 		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u));
 		sharedBindables.push_back(bindablesPool.GetBindable<Blender>(graphics, false));
 	}
 
-	if (usesAlphaTesting)
-	{
-		sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, D3D11_CULL_NONE));
-		shaderSettings |= ShaderSettings::AlphaTesting;
-	}
-	else
-	{
-		sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, D3D11_CULL_BACK));
-	}
+	sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, cullMode));
 
 	std::wstring pixelShaderPath;
 
@@ -94,7 +102,20 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 
 		bindables.push_back(std::make_unique<Sampler>(graphics, 1u, samplerDesc));
 	}
+	if (static_cast<bool>(shaderSettings & (ShaderSettings::Skybox)))
+	{
+		D3D11_SAMPLER_DESC samplerDesc = {};
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		samplerDesc.MipLODBias = 0.0f;
+		samplerDesc.MinLOD = 0.0f;
+		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
+		bindables.push_back(std::make_unique<Sampler>(graphics, 1u, samplerDesc));
+	}
 	sharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, pixelShaderPath));
 }
 

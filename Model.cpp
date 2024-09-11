@@ -15,6 +15,7 @@
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model::vsPaths =
 {
 	{ ShaderSettings{}, L"SolidVS.cso"},
+	{ ShaderSettings::Skybox, L"SkyboxVS.cso" },
 	{ ShaderSettings::Color, L"SolidVS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorVS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexVS.cso" },
