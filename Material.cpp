@@ -11,7 +11,6 @@
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
-	{ ShaderSettings{}, L"SolidPS.cso"},
 	{ ShaderSettings::Skybox, L"SkyboxPS.cso" },
 	{ ShaderSettings::Color, L"SolidPS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
