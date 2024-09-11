@@ -202,6 +202,7 @@
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
+    <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="SceneComponent.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
+    <ClInclude Include="Viewport.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="SceneComponent.h" />
   </ItemGroup>

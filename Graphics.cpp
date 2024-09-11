@@ -93,23 +93,12 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	shadowMapRasterizer = bindablesPool.GetBindable<ShadowRasterizer>(*this, D3D11_CULL_FRONT);
 
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = (FLOAT)windowWidth;
-	viewport.Height = (FLOAT)windowHeight;
-	viewport.MaxDepth = 1.f;
-	viewport.MinDepth = 0.f;
-
-	shadowViewport.TopLeftX = 0;
-	shadowViewport.TopLeftY = 0;
-	shadowViewport.Width = (FLOAT)windowWidth;
-	shadowViewport.Height = (FLOAT)windowHeight;
-	shadowViewport.MaxDepth = 1.f;
-	shadowViewport.MinDepth = 0.f;
+	drawingViewport = std::make_unique<Viewport>(float(windowWidth), float(windowHeight));
+	shadowViewport = std::make_unique<Viewport>(float(windowWidth), float(windowHeight));
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	const float screenRatio = viewport.Height / viewport.Width;
+	const float screenRatio = float(windowHeight) / windowWidth;
 	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 400.0f));
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), context.Get());
@@ -135,7 +124,7 @@ void Graphics::SetRenderTargetForShadowMap()
 	writeMaskDepthStencilState->Bind(*this);
 	context->OMSetRenderTargets(0u, nullptr, shadowMapDepthStencilView->Get());
 	shadowMapRasterizer->Bind(*this);
-	context->RSSetViewports(1u, &shadowViewport);
+	shadowViewport->Bind(*this);
 }
 
 void Graphics::SetNormalRenderTarget()
@@ -143,7 +132,7 @@ void Graphics::SetNormalRenderTarget()
 	writeMaskDepthStencilState->Bind(*this);
 	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView->Get());
 	context->PSSetShaderResources(0u, 1u, shadowMap.GetAddressOf());
-	context->RSSetViewports(1u, &viewport);
+	drawingViewport->Bind(*this);
 }
 
 void Graphics::EndFrame()

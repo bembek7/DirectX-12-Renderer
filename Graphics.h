@@ -10,6 +10,7 @@
 #include "Sampler.h"
 #include "Rasterizer.h"
 #include "DepthStencilState.h"
+#include "Viewport.h"
 
 class Graphics
 {
@@ -44,8 +45,8 @@ private:
 	std::unique_ptr<DepthStencilState> writeMaskDepthStencilState;
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<DepthStencilView> shadowMapDepthStencilView;
-	D3D11_VIEWPORT viewport{};
-	D3D11_VIEWPORT shadowViewport{};
+	std::unique_ptr<Viewport> drawingViewport;
+	std::unique_ptr<Viewport> shadowViewport;
 
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
