@@ -109,9 +109,11 @@ void Gui::RenderComponentDetails(SceneComponent* const component)
 
 void Gui::RenderComponentDetails(MeshComponent* const component)
 {
-	ImGui::Text("Roughness");
-
-	ImGui::DragFloat("##Roughness", (float*)&component->GetMaterial()->roughnessBuffer.roughness, 0.01f, 0.01f, 1.0f);
+	if (component->GetMaterial()->roughnessBuffer)
+	{
+		ImGui::Text("Roughness");
+		ImGui::DragFloat("##Roughness", (float*)&component->GetMaterial()->roughnessBuffer->roughness, 0.01f, 0.01f, 1.0f);
+	}
 
 	if (component->GetMaterial()->colorBuffer)
 	{
