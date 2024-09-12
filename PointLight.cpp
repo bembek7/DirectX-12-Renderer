@@ -19,7 +19,7 @@ void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 new
 void PointLight::Bind(Graphics& graphics)
 {
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
-	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * graphics.GetProjection()));
+	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * graphics.GetShadowMappingProjection()));
 	constantLightBuffer->Update(graphics);
 	constantShadowMapBuffer->Update(graphics);
 	constantLightBuffer->Bind(graphics);

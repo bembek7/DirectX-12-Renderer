@@ -30,42 +30,23 @@ float3 Speculate(
     return attenuation * specularColor * specularIntensity * pow(max(0.0f, dot(-reflected, viewCamToPos)), specularPower);
 }
 
-Texture2D shadowMap : register(t0);
+TextureCube shadowMap : register(t0);
 SamplerComparisonState shadowSampler : register(s0);
 
-#define PCF_RANGE 2
+static const float zf = 200.0f;
+static const float zn = 0.5f;
+static const float c1 = zf / (zf - zn);
+static const float c0 = -zn * zf / (zf - zn);
 
-float CalculateLighting(float4 lightPerspectivePos, float3 directionToLight, float3 viewNormal)
+float CalculateLighting(float4 lightPerspectivePos)
 {
-    float2 shadowTexCoords;
-    shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
-    shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
-    const float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
-  
-    float lighting = 1.f;
-    
-    // Check if the pixel texture coordinate is in the view frustum of the light before doing any shadow work.
-    if (shadowTexCoords.x >= 0.f && shadowTexCoords.x <= 1.f &&
-    shadowTexCoords.y >= 0.f && shadowTexCoords.y <= 1.f &&
-    pixelDepth >= 0.f && pixelDepth <= 1.f)
-    {
-        lighting = 0.0f;
-        [unroll]
-        for (int x = -PCF_RANGE; x <= PCF_RANGE; x++)
-        {
-            [unroll]
-            for (int y = -PCF_RANGE; y <= PCF_RANGE; y++)
-            {
-                //const float margin = acos(saturate(max(0.f, min(dot(directionToLight, viewNormal), 0.95f))));
-                //float epsilon = 0.00005f / margin;
-                //epsilon = clamp(epsilon, 0.f, 0.1f);
-                lighting += shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth, int2(x, y));
-            }
-        }
-        lighting = lighting / ((PCF_RANGE * 2 + 1) * (PCF_RANGE * 2 + 1));
-    }
-    
-    return lighting;
+    // get magnitudes for each basis component
+    const float3 m = abs(lightPerspectivePos).xyz;
+    // get the length in the dominant axis
+    // (this correlates with shadow map face and derives comparison depth)
+    const float major = max(m.x, max(m.y, m.z));
+    // converting from distance in shadow light space to projected depth
+    return shadowMap.SampleCmpLevelZero(shadowSampler, lightPerspectivePos.xyz, (c1 * major + c0) / major);
 }
 
 struct LightVectorData
@@ -106,7 +87,7 @@ float3 CalulateFinalAmountOfLight(const float3 viewPos, const float3 realViewNor
 {
     const LightVectorData lightVector = CalculateLightVectorData(lightViewPos, viewPos);
     
-    const float lighting = CalculateLighting(lightPerspectivePos, lightVector.directionToLight, realViewNormal);
+    const float lighting = CalculateLighting(lightPerspectivePos);
  
     const float attenuation = Attenuate(attenuationConst, attenuationLin, attenuationQuad, lightVector.distanceToLight);
 	

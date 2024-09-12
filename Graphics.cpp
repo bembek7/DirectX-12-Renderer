@@ -4,6 +4,7 @@
 #include <d3dcommon.h>
 #include "BindablesPool.h"
 #include "ShadowRasterizer.h"
+#include <numbers>
 
 Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsigned int windowHeight)
 {
@@ -55,35 +56,18 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	writeMaskDepthStencilState = std::make_unique<DepthStencilState>(*this, depthStencilDesc);
 
-	D3D11_TEXTURE2D_DESC depthTexDesc = {};
-	depthTexDesc.Width = windowWidth;
-	depthTexDesc.Height = windowHeight;
-	depthTexDesc.MipLevels = 1u;
-	depthTexDesc.ArraySize = 1u;
-	depthTexDesc.SampleDesc.Count = 1u;
-	depthTexDesc.SampleDesc.Quality = 0u;
-	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilView = std::make_unique<DepthStencilView>(device.Get(), DepthStencilView::Usage::DepthStencil, windowWidth, windowHeight);
 
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Texture2D.MipSlice = 0u;
-
-	depthTexDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilView = std::make_unique<DepthStencilView>(device.Get(), depthTexDesc, depthStencilViewDesc);
-
-	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
-	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	shadowMapDepthStencilView = std::make_unique<DepthStencilView>(device.Get(), depthTexDesc, depthStencilViewDesc);
+	const float shadowMapCubeFaceSize = 1000.f;
+	shadowMapCube = std::make_unique<DepthCubeTexture>(*this, 0, (UINT)shadowMapCubeFaceSize);
+	/*shadowMapDepthStencilView = std::make_unique<DepthStencilView>(device.Get(), DepthStencilView::Usage::Depth, windowWidth, windowHeight);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
-	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shadowMap));
+	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shadowMap));*/
 
 	auto& bindablesPool = BindablesPool::GetInstance();
 
@@ -93,13 +77,13 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	shadowMapRasterizer = bindablesPool.GetBindable<ShadowRasterizer>(*this, D3D11_CULL_FRONT);
 
+	shadowViewport = std::make_unique<Viewport>(shadowMapCubeFaceSize, shadowMapCubeFaceSize);
 	drawingViewport = std::make_unique<Viewport>(float(windowWidth), float(windowHeight));
-	shadowViewport = std::make_unique<Viewport>(float(windowWidth), float(windowHeight));
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	const float screenRatio = float(windowHeight) / windowWidth;
-	SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, screenRatio, 0.5f, 400.0f));
+	DirectX::XMStoreFloat4x4(&drawingProjection, DirectX::XMMatrixPerspectiveLH(1.0f, float(windowHeight) / windowWidth, 0.5f, 200.0f));
+	DirectX::XMStoreFloat4x4(&shadowMappingProjection, DirectX::XMMatrixPerspectiveFovLH(float(std::numbers::pi) / 2.f, 1.0f, 0.5f, 200.0f));
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), context.Get());
 }
@@ -113,25 +97,30 @@ void Graphics::BeginFrame() noexcept
 {
 	const float color[] = { 0.04f, 0.02f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(renderTargetView.Get(), color);
-	context->ClearDepthStencilView(depthStencilView->Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
-	context->ClearDepthStencilView(shadowMapDepthStencilView->Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	depthStencilView->Clear(context.Get());
+	for (unsigned int i = 0; i < 6; i++)
+	{
+		shadowMapCube->GetDepthBuffer(i)->Clear(context.Get());
+	}
 
 	gui->BeginFrame();
 }
 
-void Graphics::SetRenderTargetForShadowMap()
+void Graphics::SetRenderTargetForShadowMap(const unsigned int face)
 {
+	projection = shadowMappingProjection;
 	writeMaskDepthStencilState->Bind(*this);
-	context->OMSetRenderTargets(0u, nullptr, shadowMapDepthStencilView->Get());
+	context->OMSetRenderTargets(0u, nullptr, shadowMapCube->GetDepthBuffer(face)->Get());
 	shadowMapRasterizer->Bind(*this);
 	shadowViewport->Bind(*this);
 }
 
 void Graphics::SetNormalRenderTarget()
 {
+	projection = drawingProjection;
 	writeMaskDepthStencilState->Bind(*this);
 	context->OMSetRenderTargets(1u, renderTargetView.GetAddressOf(), depthStencilView->Get());
-	context->PSSetShaderResources(0u, 1u, shadowMap.GetAddressOf());
+	shadowMapCube->Bind(*this);
 	drawingViewport->Bind(*this);
 }
 
@@ -157,6 +146,11 @@ void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return DirectX::XMLoadFloat4x4(&projection);
+}
+
+DirectX::XMMATRIX Graphics::GetShadowMappingProjection() const noexcept
+{
+	return DirectX::XMLoadFloat4x4(&shadowMappingProjection);
 }
 
 void Graphics::SetCamera(const DirectX::XMMATRIX cam) noexcept

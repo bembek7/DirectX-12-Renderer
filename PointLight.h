@@ -26,8 +26,8 @@ private:
 		float specularIntensity = 0.6f;
 		DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
 		const float attenuationConst = 1.0f;
-		const float attenuationLin = 0.045f;
-		const float attenuationQuad = 0.0075f;
+		const float attenuationLin = 0.015f;
+		const float attenuationQuad = 0.0020f;
 		char padding[8];
 	} lightBuffer;
 

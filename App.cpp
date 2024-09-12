@@ -95,14 +95,27 @@ int App::Run()
 
 		window.GetGraphics().BeginFrame();
 
-		// Shadow Map Rendering
-		window.GetGraphics().SetRenderTargetForShadowMap();
-		window.GetGraphics().SetCamera(pointLight->GetLightPerspective());
-		for (auto& actor : allActors)
+		std::vector<DirectX::XMFLOAT3> shadowCameraRotations =
 		{
-			actor->RenderShadowMap(window.GetGraphics());
+			{0.f, 90.f, 0.f},
+			{0.f, 270.f, 0.f},
+			{270.f, 0.0f, 0.f},
+			{90.f, 0.f, 0.f},
+			{0.f, 0.f, 0.f},
+			{0.f, 180.f, 0.f},
+		};
+		// Shadow Map Rendering
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			pointLight->SetActorRotation(shadowCameraRotations[i]);
+			window.GetGraphics().SetCamera(pointLight->GetLightPerspective());
+			window.GetGraphics().SetRenderTargetForShadowMap(i);
+			for (auto& actor : allActors)
+			{
+				actor->RenderShadowMap(window.GetGraphics());
+			}
 		}
-
+		pointLight->SetActorRotation(DirectX::XMFLOAT3{ 0.f, 0.f, 0.f });
 		// Regular drawing
 		window.GetGraphics().SetNormalRenderTarget();
 		window.GetGraphics().SetCamera(camera->GetMatrix());
