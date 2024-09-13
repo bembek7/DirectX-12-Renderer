@@ -58,16 +58,8 @@ Graphics::Graphics(const HWND& hWnd, const unsigned int windowWidth, const unsig
 
 	depthStencilView = std::make_unique<DepthStencilView>(device.Get(), DepthStencilView::Usage::DepthStencil, windowWidth, windowHeight);
 
-	const float shadowMapCubeFaceSize = 1000.f;
+	const float shadowMapCubeFaceSize = 1024.f;
 	shadowMapCube = std::make_unique<DepthCubeTexture>(*this, 0, (UINT)shadowMapCubeFaceSize);
-	/*shadowMapDepthStencilView = std::make_unique<DepthStencilView>(device.Get(), DepthStencilView::Usage::Depth, windowWidth, windowHeight);
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderResourceViewDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-	CHECK_HR(device->CreateShaderResourceView(shadowMapDepthStencilView->GetTexture(), &shaderResourceViewDesc, &shadowMap));*/
 
 	auto& bindablesPool = BindablesPool::GetInstance();
 

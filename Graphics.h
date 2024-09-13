@@ -41,12 +41,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-	//Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowMap;
 	std::shared_ptr<Bindable> comparisonSampler;
 	std::shared_ptr<Bindable> shadowMapRasterizer;
 	std::unique_ptr<DepthStencilState> writeMaskDepthStencilState;
 	std::unique_ptr<DepthStencilView> depthStencilView;
-	//std::unique_ptr<DepthStencilView> shadowMapDepthStencilView;
 	std::unique_ptr<DepthCubeTexture> shadowMapCube;
 	std::unique_ptr<Viewport> drawingViewport;
 	std::unique_ptr<Viewport> shadowViewport;

@@ -15,5 +15,6 @@ float CalculateLighting(float4 lightPerspectivePos)
     // (this correlates with shadow map face and derives comparison depth)
     const float major = max(m.x, max(m.y, m.z));
     // converting from distance in shadow light space to projected depth
-    return shadowMap.SampleCmpLevelZero(shadowSampler, lightPerspectivePos.xyz, (c1 * major + c0) / major);
+    const float depth = (c1 * major + c0) / major;
+    return shadowMap.SampleCmpLevelZero(shadowSampler, lightPerspectivePos.xyz, depth);
 }
