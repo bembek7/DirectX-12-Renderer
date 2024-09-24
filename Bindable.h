@@ -13,4 +13,5 @@ public:
 protected:
 	static ID3D11DeviceContext* GetContext(Graphics& graphics) noexcept;
 	static ID3D11Device* GetDevice(Graphics& graphics) noexcept;
+	static IDXGISwapChain* GetSwapChain(Graphics& graphics) noexcept;
 };

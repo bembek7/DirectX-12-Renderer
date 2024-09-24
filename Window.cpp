@@ -56,7 +56,7 @@ Window::Window(const unsigned int clientAreaWidth, const unsigned int clientArea
 		throw std::runtime_error("Could not register raw input device");
 	}
 
-	graphics = std::make_unique<Graphics>(hWnd, clientAreaWidth, clientAreaHeight);
+	graphics = std::make_unique<Graphics>(hWnd, float(clientAreaWidth), float(clientAreaHeight));
 	ShowWindow(hWnd, SW_SHOW);
 }
 

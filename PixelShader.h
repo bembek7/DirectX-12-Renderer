@@ -11,5 +11,10 @@ public:
 	static std::string ResolveID(const std::wstring& shaderPath) noexcept;
 private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	bool isNullPS = false;
+};
+
+class NullPixelShader : public Bindable
+{
+public:
+	virtual void Bind(Graphics& graphics) noexcept override;
 };

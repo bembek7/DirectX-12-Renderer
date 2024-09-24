@@ -26,12 +26,7 @@ Skybox::Skybox(Graphics& graphics, const std::string& fileName)
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
 
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
-	depthStencilDesc.DepthEnable = TRUE;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
-	skyDepthStencilState = std::make_unique<DepthStencilState>(graphics, depthStencilDesc);
+	skyDepthStencilState = std::make_unique<DepthStencilState>(graphics, DepthStencilState::Usage::Skybox);
 }
 
 void Skybox::Draw(Graphics& graphics)

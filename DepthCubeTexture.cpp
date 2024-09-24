@@ -1,12 +1,13 @@
 #include "DepthCubeTexture.h"
 #include "ThrowMacros.h"
 
-DepthCubeTexture::DepthCubeTexture(Graphics& graphics, const UINT slot, const UINT size)
+DepthCubeTexture::DepthCubeTexture(Graphics& graphics, const UINT slot, const UINT faceSize) :
+	faceSize(faceSize)
 {
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	textureDesc.Width = size;
-	textureDesc.Height = size;
+	textureDesc.Width = faceSize;
+	textureDesc.Height = faceSize;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
 	textureDesc.SampleDesc.Count = 1;
@@ -28,7 +29,7 @@ DepthCubeTexture::DepthCubeTexture(Graphics& graphics, const UINT slot, const UI
 
 	for (UINT face = 0; face < 6; face++)
 	{
-		depthBuffers.push_back(std::make_unique<DepthStencilView>(GetDevice(graphics), texture2D, face));
+		depthBuffers.push_back(std::make_unique<DepthStencilView>(graphics, texture2D, face));
 	}
 }
 
@@ -37,7 +38,20 @@ void DepthCubeTexture::Bind(Graphics& graphics) noexcept
 	GetContext(graphics)->PSSetShaderResources(slot, 1u, textureView.GetAddressOf());
 }
 
+void DepthCubeTexture::Clear(Graphics& graphics) noexcept
+{
+	for (const auto& depthBuffer : depthBuffers)
+	{
+		depthBuffer->Update(graphics);
+	}
+}
+
 DepthStencilView* DepthCubeTexture::GetDepthBuffer(const unsigned int face)
 {
 	return depthBuffers[face].get();
+}
+
+UINT DepthCubeTexture::GetFaceSize() const noexcept
+{
+	return faceSize;
 }

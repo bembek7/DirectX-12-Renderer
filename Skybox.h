@@ -3,6 +3,7 @@
 #include "Material.h"
 #include <memory>
 #include "ConstantBuffer.h"
+#include "DepthStencilState.h"
 
 class Graphics;
 

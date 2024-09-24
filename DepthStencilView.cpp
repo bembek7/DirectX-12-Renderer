@@ -1,10 +1,9 @@
 #include "Graphics.h"
 #include "DepthStencilView.h"
 #include <d3d11.h>
-#include <wrl\client.h>
 #include "ThrowMacros.h"
 
-DepthStencilView::DepthStencilView(ID3D11Device* const device, const Usage usage, const UINT width, const UINT height) :
+DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const UINT width, const UINT height) :
 	usage(usage)
 {
 	D3D11_TEXTURE2D_DESC texDesc = {};
@@ -36,12 +35,12 @@ DepthStencilView::DepthStencilView(ID3D11Device* const device, const Usage usage
 		break;
 	}
 
-	CHECK_HR(device->CreateTexture2D(&texDesc, nullptr, &texture));
+	CHECK_HR(GetDevice(graphics)->CreateTexture2D(&texDesc, nullptr, &texture));
 
-	CHECK_HR(device->CreateDepthStencilView(texture.Get(), &viewDesc, &depthStencilView));
+	CHECK_HR(GetDevice(graphics)->CreateDepthStencilView(texture.Get(), &viewDesc, &depthStencilView));
 }
 
-DepthStencilView::DepthStencilView(ID3D11Device* const device, Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, const UINT face) :
+DepthStencilView::DepthStencilView(Graphics& graphics, Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, const UINT face) :
 	texture(texture)
 {
 	D3D11_DEPTH_STENCIL_VIEW_DESC descView = {};
@@ -51,7 +50,17 @@ DepthStencilView::DepthStencilView(ID3D11Device* const device, Microsoft::WRL::C
 	descView.Texture2DArray.MipSlice = 0;
 	descView.Texture2DArray.ArraySize = 1;
 	descView.Texture2DArray.FirstArraySlice = face;
-	CHECK_HR(device->CreateDepthStencilView(texture.Get(), &descView, &depthStencilView));
+	CHECK_HR(GetDevice(graphics)->CreateDepthStencilView(texture.Get(), &descView, &depthStencilView));
+}
+
+void DepthStencilView::Bind(Graphics& graphics) noexcept
+{
+	graphics.SetCurrentDepthStenilView(depthStencilView);
+}
+
+void DepthStencilView::Update(Graphics& graphics)
+{
+	Clear(graphics);
 }
 
 ID3D11DepthStencilView* DepthStencilView::Get() noexcept
@@ -64,7 +73,7 @@ ID3D11Texture2D* DepthStencilView::GetTexture() noexcept
 	return texture.Get();
 }
 
-void DepthStencilView::Clear(ID3D11DeviceContext* const context)
+void DepthStencilView::Clear(Graphics& graphics)
 {
 	UINT clearFlags = 0;
 	switch (usage)
@@ -78,5 +87,5 @@ void DepthStencilView::Clear(ID3D11DeviceContext* const context)
 	default:
 		break;
 	}
-	context->ClearDepthStencilView(depthStencilView.Get(), clearFlags, 1.0f, 0u);
+	GetContext(graphics)->ClearDepthStencilView(depthStencilView.Get(), clearFlags, 1.0f, 0u);
 }

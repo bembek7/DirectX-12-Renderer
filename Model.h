@@ -7,10 +7,10 @@
 #include <unordered_map>
 #include <d3d11.h>
 #include "Bindable.h"
-#include "IndexBuffer.h"
 #include "ShaderSettings.h"
 
 struct aiMesh;
+class IndexBuffer;
 
 class Model
 {

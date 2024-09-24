@@ -1,6 +1,7 @@
 #include "PointLight.h"
 #include "ThrowMacros.h"
 #include "Graphics.h"
+#include "Camera.h"
 
 PointLight::PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
 	MeshActor(graphics, fileName, actorName)
@@ -19,7 +20,7 @@ void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 new
 void PointLight::Bind(Graphics& graphics)
 {
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
-	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() /** graphics.GetShadowMappingProjection()*/));
+	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
 	constantLightBuffer->Update(graphics);
 	constantShadowMapBuffer->Update(graphics);
 	constantLightBuffer->Bind(graphics);

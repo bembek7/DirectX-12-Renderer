@@ -57,16 +57,10 @@
     <ClCompile Include="BindablesPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModelsPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthStencilView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\backends\imgui_impl_dx11.cpp">
@@ -165,8 +159,23 @@
     <ClCompile Include="ShadowRasterizer.cpp">
       <Filter>Source Files\Bindables</Filter>
     </ClCompile>
-    <ClCompile Include="DepthCubeTexture.cpp">
+    <ClCompile Include="Pass.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMapPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegularDrawingPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilView.cpp">
+      <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthCubeTexture.cpp">
+      <Filter>Source Files\Bindables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,16 +197,10 @@
     <ClInclude Include="BindablesPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModelsPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_dx11.h">
@@ -303,6 +306,21 @@
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
     <ClInclude Include="DepthCubeTexture.h">
+      <Filter>Header Files\Bindables</Filter>
+    </ClInclude>
+    <ClInclude Include="Pass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegularDrawingPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilView.h">
+      <Filter>Header Files\Bindables</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTargetView.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
   </ItemGroup>

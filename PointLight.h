@@ -1,10 +1,10 @@
 #pragma once
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
-#include "Camera.h"
 #include "MeshActor.h"
 
 class Graphics;
+class Camera;
 
 class PointLight : public MeshActor
 {
