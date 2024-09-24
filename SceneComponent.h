@@ -14,7 +14,6 @@ class SceneComponent
 public:
 	virtual ~SceneComponent() = default;
 
-	static std::unique_ptr<SceneComponent> CreateComponent(const std::string& componentName = "Scene Component");
 	static std::unique_ptr<SceneComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 	static std::unique_ptr<SceneComponent> LoadComponent(Graphics& graphics, const std::string& fileName);
 
@@ -75,11 +74,6 @@ protected:
 	SceneComponent(const std::string& componentName);
 	SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
-	/*template <typename T, typename... Args>
-	static std::unique_ptr<T> CreateComponent(Args&&... args) {
-		static_assert(std::is_base_of<SceneComponent, T>::value, "T must be derived from SceneComponent");
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}*/
 	virtual void RenderComponentDetails(Gui& gui);
 
 private:

@@ -67,8 +67,6 @@ void Graphics::EndFrame()
 	gui->EndFrame();
 
 	CHECK_HR(swapChain->Present(1u, 0u));
-	ID3D11ShaderResourceView* const nullSRV = nullptr;
-	context->PSSetShaderResources(0, 1, &nullSRV);
 }
 
 Gui* const Graphics::GetGui() noexcept

@@ -37,7 +37,6 @@ private:
 private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
-	std::shared_ptr<Bindable> nullPixelShader;
 	std::unique_ptr<Model> modelForShadowMapping;
 
 	struct TransformBuffer

@@ -162,9 +162,6 @@
     <ClCompile Include="ShadowRasterizer.cpp">
       <Filter>Source Files\Bindables</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTargetView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DepthStencilView.cpp">
       <Filter>Source Files\Bindables</Filter>
     </ClCompile>
@@ -185,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetView.cpp">
+      <Filter>Source Files\Bindables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -68,11 +68,6 @@ void SceneComponent::RenderComponentDetails(Gui& gui)
 	gui.RenderComponentDetails(this);
 }
 
-std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)
-{
-	return std::unique_ptr<SceneComponent>(new SceneComponent(componentName));
-}
-
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {
 	return std::unique_ptr<SceneComponent>(new SceneComponent(graphics, node, scene));
