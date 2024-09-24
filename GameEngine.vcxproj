@@ -199,6 +199,7 @@
     <ClCompile Include="RegularDrawingPass.cpp" />
     <ClCompile Include="RenderTargetView.cpp" />
     <ClCompile Include="Sampler.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShadowMapPass.cpp" />
     <ClCompile Include="ShadowRasterizer.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="RegularDrawingPass.h" />
     <ClInclude Include="RenderTargetView.h" />
     <ClInclude Include="Sampler.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderSettings.h" />
     <ClInclude Include="ShadowMapPass.h" />
     <ClInclude Include="ShadowRasterizer.h" />

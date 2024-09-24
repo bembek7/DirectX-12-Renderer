@@ -40,6 +40,12 @@
     <Filter Include="Resource Files\VertexShaders">
       <UniqueIdentifier>{73481a05-aa0d-45a5-a63c-f282ecda2553}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Passes">
+      <UniqueIdentifier>{7a271fc9-2ed5-447e-8a81-7baa6aa77983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Passes">
+      <UniqueIdentifier>{1e0e3312-5a3d-44ea-9511-1ac431589bf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -153,20 +159,8 @@
     <ClCompile Include="DepthStencilState.cpp">
       <Filter>Source Files\Bindables</Filter>
     </ClCompile>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShadowRasterizer.cpp">
       <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Pass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMapPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RegularDrawingPass.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderTargetView.cpp">
       <Filter>Source Files</Filter>
@@ -176,6 +170,21 @@
     </ClCompile>
     <ClCompile Include="DepthCubeTexture.cpp">
       <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="RegularDrawingPass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMapPass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="Pass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,20 +317,23 @@
     <ClInclude Include="DepthCubeTexture.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="Pass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMapPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RegularDrawingPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
     <ClInclude Include="RenderTargetView.h">
       <Filter>Header Files\Bindables</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="RegularDrawingPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="Pass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

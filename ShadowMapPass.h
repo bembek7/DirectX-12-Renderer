@@ -8,9 +8,9 @@ class DepthCubeTexture;
 class ShadowMapPass : public Pass
 {
 public:
-	ShadowMapPass(Graphics& graphics, const float windowWidth, const float windowHeight, std::shared_ptr<DepthCubeTexture> shadowMapCubeTex);
+	ShadowMapPass(Graphics& graphics, std::shared_ptr<DepthCubeTexture> shadowMapCubeTex);
 
-	virtual void Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, const std::shared_ptr<PointLight>& pointLight);
+	virtual void Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight);
 
 private:
 	std::shared_ptr<DepthCubeTexture> shadowMapCube;

@@ -7,7 +7,7 @@
 class Pass
 {
 public:
-	virtual void Execute(Graphics& graphics);
+	void Execute(Graphics& graphics);
 	virtual ~Pass() = default;
 protected:
 	std::vector<std::unique_ptr<Bindable>> bindables;

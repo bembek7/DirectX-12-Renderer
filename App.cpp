@@ -7,11 +7,8 @@
 #include "DirectXMath.h"
 #include "Skybox.h"
 
-int App::Run()
+void App::InitializeScene()
 {
-	std::vector<std::shared_ptr<Actor>> allActors;
-	std::vector<std::shared_ptr<PointLight>> lightActors;
-
 	const std::string meshesPath = "Meshes\\";
 	auto skybox = Skybox(window.GetGraphics(), meshesPath + "skybox.obj");
 	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
@@ -29,15 +26,17 @@ int App::Run()
 	pointLight->SetActorTransform({ -5.f, 13.f, 13.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
 	brickWall->SetActorTransform(DirectX::XMFLOAT3{ 5.f, 5.f, 5.f }, zeroVec, { 2.f, 2.f, 2.f });
 
-	lightActors.push_back(pointLight);
+	scene = std::make_unique<Scene>(window.GetGraphics());
+	scene->AddLight(std::move(pointLight));
+	scene->AddActor(std::move(sphere));
+	scene->AddActor(std::move(sphere2));
+	scene->AddActor(std::move(sponza));
+	scene->AddActor(std::move(brickWall));
+}
 
-	allActors.push_back(sphere);
-	allActors.push_back(sphere2);
-	allActors.push_back(pointLight);
-	allActors.push_back(sponza);
-	allActors.push_back(brickWall);
-
-	auto camera = Camera::CreateComponent();
+int App::Run()
+{
+	InitializeScene();
 
 	while (true)
 	{
@@ -46,67 +45,68 @@ int App::Run()
 			return *ecode;
 		}
 
-		while (const auto keyPressed = window.ReadPressedKey())
-		{
-			if (keyPressed == VK_ESCAPE)
-			{
-				if (window.IsCursorEnabled())
-				{
-					window.DisableCursor();
-					window.EnableRawInput();
-				}
-				else
-				{
-					window.EnableCursor();
-					window.DisableRawInput();
-				}
-			}
-		}
-
-		DirectX::XMFLOAT2 cameraMoveInput = { 0.f, 0.f };
-		DirectX::XMFLOAT2 cameraLookInput = { 0.f, 0.f };
-
-		while (const auto rawDelta = window.ReadRawDelta())
-		{
-			cameraLookInput.x += rawDelta->first;
-			cameraLookInput.y += rawDelta->second;
-		}
-
-		if (window.IsKeyPressed('W'))
-		{
-			cameraMoveInput.y += 1.f;
-		}
-		if (window.IsKeyPressed('S'))
-		{
-			cameraMoveInput.y -= 1.f;
-		}
-		if (window.IsKeyPressed('D'))
-		{
-			cameraMoveInput.x += 1.f;
-		}
-		if (window.IsKeyPressed('A'))
-		{
-			cameraMoveInput.x -= 1.f;
-		}
-
-		camera->AddMovementInput(cameraMoveInput);
-		camera->AddYawInput(cameraLookInput.x);
-		camera->AddPitchInput(cameraLookInput.y);
+		HandleInput();
 
 		window.GetGraphics().BeginFrame();
 
-		window.GetGraphics().Draw(allActors, pointLight, camera.get());
+		scene->Draw(window.GetGraphics());
 
-		skybox.Draw(window.GetGraphics());
+		//skybox.Draw(window.GetGraphics());
 
-		for (auto& actor : allActors)
-		{
-			window.GetGraphics().GetGui()->RenderActorTree(actor.get());
-		}
-		window.GetGraphics().GetGui()->RenderControlWindow();
+		scene->RenderControls(window.GetGraphics());
 
 		window.GetGraphics().EndFrame();
 	}
 
 	return 0;
+}
+
+void App::HandleInput()
+{
+	while (const auto keyPressed = window.ReadPressedKey())
+	{
+		if (keyPressed == VK_ESCAPE)
+		{
+			if (window.IsCursorEnabled())
+			{
+				window.DisableCursor();
+				window.EnableRawInput();
+			}
+			else
+			{
+				window.EnableCursor();
+				window.DisableRawInput();
+			}
+		}
+	}
+
+	DirectX::XMFLOAT2 cameraMoveInput = { 0.f, 0.f };
+	DirectX::XMFLOAT2 cameraLookInput = { 0.f, 0.f };
+
+	while (const auto rawDelta = window.ReadRawDelta())
+	{
+		cameraLookInput.x += rawDelta->first;
+		cameraLookInput.y += rawDelta->second;
+	}
+
+	if (window.IsKeyPressed('W'))
+	{
+		cameraMoveInput.y += 1.f;
+	}
+	if (window.IsKeyPressed('S'))
+	{
+		cameraMoveInput.y -= 1.f;
+	}
+	if (window.IsKeyPressed('D'))
+	{
+		cameraMoveInput.x += 1.f;
+	}
+	if (window.IsKeyPressed('A'))
+	{
+		cameraMoveInput.x -= 1.f;
+	}
+
+	scene->GetMainCamera()->AddMovementInput(cameraMoveInput);
+	scene->GetMainCamera()->AddYawInput(cameraLookInput.x);
+	scene->GetMainCamera()->AddPitchInput(cameraLookInput.y);
 }

@@ -6,7 +6,9 @@
 #include "Camera.h"
 #include "DepthCubeTexture.h"
 
-Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight)
+Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight) :
+	windowWidth(windowWidth),
+	windowHeight(windowHeight)
 {
 	DXGI_SWAP_CHAIN_DESC scd = {};
 	scd.BufferDesc.Width = 0u;
@@ -45,12 +47,6 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 		&context
 	));
 
-	const float shadowMapCubeFaceSize = 1024.f;
-	auto shadowMapCube = std::make_shared<DepthCubeTexture>(*this, 0, (UINT)shadowMapCubeFaceSize);
-
-	shadowPass = std::make_unique<ShadowMapPass>(*this, windowWidth, windowHeight, shadowMapCube);
-	drawingPass = std::make_unique<RegularDrawingPass>(*this, windowWidth, windowHeight, shadowMapCube);
-
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), context.Get());
@@ -64,12 +60,6 @@ void Graphics::DrawIndexed(const size_t numIndices) noexcept
 void Graphics::BeginFrame() noexcept
 {
 	gui->BeginFrame();
-}
-
-void Graphics::Draw(const std::vector<std::shared_ptr<Actor>>& actors, const std::shared_ptr<PointLight>& pointLight, const Camera* const mainCamera)
-{
-	shadowPass->Execute(*this, actors, pointLight);
-	drawingPass->Execute(*this, actors, pointLight, mainCamera);
 }
 
 void Graphics::EndFrame()
@@ -109,6 +99,16 @@ void Graphics::BindCurrentRenderTarget()
 void Graphics::ClearRenderTargetBinds()
 {
 	context->OMSetRenderTargets(0, nullptr, nullptr);
+}
+
+float Graphics::GetWindowWidth() const noexcept
+{
+	return windowWidth;
+}
+
+float Graphics::GetWindowHeight() const noexcept
+{
+	return windowHeight;
 }
 
 void Graphics::SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept

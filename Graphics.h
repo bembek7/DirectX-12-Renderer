@@ -20,9 +20,7 @@ public:
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 
-	void BeginFrame() noexcept;
-	void Draw(const std::vector<std::shared_ptr<Actor>>& actors, const std::shared_ptr<PointLight>& pointLight, const Camera* const mainCamera);
-	void EndFrame();
+	void BeginFrame() noexcept;	void EndFrame();
 	Gui* const GetGui() noexcept;
 
 	void SetCurrentRenderTargetView(Microsoft::WRL::ComPtr<ID3D11RenderTargetView> newCurrRTV) noexcept;
@@ -30,6 +28,9 @@ public:
 
 	void BindCurrentRenderTarget();
 	void ClearRenderTargetBinds();
+
+	float GetWindowWidth() const noexcept;
+	float GetWindowHeight() const noexcept;
 
 	void SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
@@ -44,9 +45,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> currentRenderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> currentDepthStencilView;
-	std::unique_ptr<ShadowMapPass> shadowPass;
-	std::unique_ptr<RegularDrawingPass> drawingPass;
 
+	float windowWidth;
+	float windowHeight;
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
 	std::unique_ptr<Gui> gui;

@@ -12,7 +12,7 @@
 #include "PointLight.h"
 #include "DepthCubeTexture.h"
 
-ShadowMapPass::ShadowMapPass(Graphics& graphics, const float windowWidth, const float windowHeight, std::shared_ptr<DepthCubeTexture> shadowMapCubeTex) :
+ShadowMapPass::ShadowMapPass(Graphics& graphics, std::shared_ptr<DepthCubeTexture> shadowMapCubeTex) :
 	shadowMapCube(std::move(shadowMapCubeTex))
 {
 	const float shadowMapCubeFaceSize = float(shadowMapCube->GetFaceSize());
@@ -26,7 +26,7 @@ ShadowMapPass::ShadowMapPass(Graphics& graphics, const float windowWidth, const 
 	DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixPerspectiveFovLH(float(std::numbers::pi) / 2.f, 1.0f, 0.5f, 200.0f));
 }
 
-void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, const std::shared_ptr<PointLight>& pointLight)
+void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight)
 {
 	Pass::Execute(graphics);
 
