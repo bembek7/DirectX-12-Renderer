@@ -121,11 +121,6 @@ void Actor::RenderShadowMap(Graphics& graphics)
 	}
 }
 
-void Actor::CreateDefaultRoot()
-{
-	rootComponent = SceneComponent::CreateComponent();
-}
-
 std::string Actor::GetActorFullName()
 {
 	std::stringstream ss;

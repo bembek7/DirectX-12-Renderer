@@ -36,8 +36,6 @@ public:
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
-	void CreateDefaultRoot(); // added just for testing purposes will be deleted later
-
 	std::string GetActorFullName();
 
 protected:
