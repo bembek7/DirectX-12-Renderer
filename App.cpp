@@ -10,7 +10,6 @@
 void App::InitializeScene()
 {
 	const std::string meshesPath = "Meshes\\";
-	auto skybox = Skybox(window.GetGraphics(), meshesPath + "skybox.obj");
 	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
 	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 	sponza->SetActorScale(DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
@@ -32,6 +31,7 @@ void App::InitializeScene()
 	scene->AddActor(std::move(sphere2));
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(brickWall));
+	scene->AddSkybox(std::make_unique<Skybox>(window.GetGraphics(), meshesPath + "skybox.obj"));
 }
 
 int App::Run()
@@ -50,8 +50,6 @@ int App::Run()
 		window.GetGraphics().BeginFrame();
 
 		scene->Draw(window.GetGraphics());
-
-		//skybox.Draw(window.GetGraphics());
 
 		scene->RenderControls(window.GetGraphics());
 

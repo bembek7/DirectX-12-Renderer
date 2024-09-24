@@ -35,10 +35,22 @@ void Scene::AddLight(std::shared_ptr<PointLight> lightToAdd)
 	actors.push_back(std::move(lightToAdd));
 }
 
+void Scene::AddSkybox(std::unique_ptr<Skybox> skyboxToAdd)
+{
+	if (skybox)
+	{
+		throw std::runtime_error("Only one skyubox should be added to scene");
+	}
+	skybox = std::move(skyboxToAdd);
+}
+
 void Scene::Draw(Graphics& graphics)
 {
 	shadowMapPass->Execute(graphics, actors, light.get());
 	drawingPass->Execute(graphics, actors, light.get(), mainCamera.get());
+
+	// Skybox should be drawn last
+	skybox->Draw(graphics);
 }
 
 void Scene::RenderControls(Graphics& graphics)
