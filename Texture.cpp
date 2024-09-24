@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "Utils.h"
-#include <wrl/client.h>
 #include "ThrowMacros.h"
 #include "dxtex\DirectXTex.h"
 

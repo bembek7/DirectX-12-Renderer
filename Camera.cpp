@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "algorithm"
+#include <algorithm>
 
 std::unique_ptr<Camera> Camera::CreateComponent(const std::string& componentName)
 {

@@ -1,5 +1,4 @@
 #pragma once
-#include "ThrowMacros.h"
 #include <vector>
 #include "Bindable.h"
 #include <wrl\client.h>

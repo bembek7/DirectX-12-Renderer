@@ -1,9 +1,8 @@
 #include "BetterWindows.h"
 #include "Actor.h"
-#include "imgui.h"
 #include <sstream>
 #include <numbers>
-#include "MeshComponent.h"
+#include "Gui.h"
 
 Actor::Actor(const std::string& actorName) :
 	actorName(actorName)

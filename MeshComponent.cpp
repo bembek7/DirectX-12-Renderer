@@ -4,17 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <cassert>
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "InputLayout.h"
-#include "PixelShader.h"
-#include "VertexShader.h"
-#include "ConstantBuffer.h"
-#include "ModelsPool.h"
-#include "BindablesPool.h"
-#include "Utils.h"
-#include "SceneComponent.h"
-
+#include "Bindable.h"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
@@ -43,8 +33,6 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	if (generatesShadow)
 	{
 		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
-		auto& bindablesPool = BindablesPool::GetInstance();
-		nullPixelShader = bindablesPool.GetBindable<PixelShader>(graphics, L"");
 	}
 }
 
@@ -77,7 +65,7 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 	{
 		UpdateTransformBuffer(graphics);
 		modelForShadowMapping->Bind(graphics);
-		nullPixelShader->Bind(graphics);
+
 		transformConstantBuffer->Update(graphics);
 		transformConstantBuffer->Bind(graphics);
 

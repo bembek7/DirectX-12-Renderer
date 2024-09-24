@@ -1,6 +1,7 @@
 #include "IndexBuffer.h"
 #include "Bindable.h"
 #include "Graphics.h"
+#include "ThrowMacros.h"
 
 IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices)
 {

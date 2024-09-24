@@ -3,7 +3,6 @@
 #include <vector>
 #include <DirectXMath.h>
 #include <memory>
-#include "Bindable.h"
 #include "Model.h"
 #include "SceneComponent.h"
 #include "Material.h"
@@ -11,6 +10,7 @@
 #include "ShaderSettings.h"
 
 class Graphics;
+class Bindable;
 
 struct aiMaterial;
 
