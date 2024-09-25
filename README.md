@@ -56,7 +56,11 @@ Just clone the solution and run it in x64.
 
 ## Overview
 
-This project is a aimple rendering engine done in DirectX 11. The engine suppports phong lighting and dynamic shadows(currently with only one light source). Below is a brief description of used classes and their more complicated methods or members. You can find demo video at: [video_link].
+This project is a simple rendering engine done in DirectX 11. The engine suppports phong lighting and dynamic shadows(currently with only one light source). Below is a brief description of used classes and their more complicated methods or members.
+
+Demo video:
+
+[![Alt text](https://img.youtube.com/vi/nv6an-7eBww/0.jpg)](https://youtu.be/nv6an-7eBww).
 
 ## Technology used
 
