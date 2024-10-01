@@ -16,35 +16,14 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{175d7a0c-9634-4fdf-a05d-e4c84333e085}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Bindables">
-      <UniqueIdentifier>{9c4adb0c-0c00-4c5a-acb2-e13e583dc2e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Bindables">
-      <UniqueIdentifier>{967999dc-9782-40d8-8da8-555ed7346ab7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Actors">
-      <UniqueIdentifier>{75c0199a-7ed8-4a0e-9821-c3027815746f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Actors">
-      <UniqueIdentifier>{ba6da699-b170-4223-a612-079663ceb803}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Components">
-      <UniqueIdentifier>{513c4a27-24df-4d16-a270-e588fd2627a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Components">
-      <UniqueIdentifier>{b845fd7d-2bb5-4869-9201-b40f06fafa44}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\PixelShaders">
       <UniqueIdentifier>{898dc0da-500f-49da-b5da-6d72e64297d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\VertexShaders">
       <UniqueIdentifier>{73481a05-aa0d-45a5-a63c-f282ecda2553}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Passes">
-      <UniqueIdentifier>{7a271fc9-2ed5-447e-8a81-7baa6aa77983}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Passes">
-      <UniqueIdentifier>{1e0e3312-5a3d-44ea-9511-1ac431589bf4}</UniqueIdentifier>
+    <Filter Include="d3dx12">
+      <UniqueIdentifier>{b1266b4d-0a34-48c4-b8af-f92d32d491bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,12 +37,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BindablesPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
@@ -96,96 +69,6 @@
     <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Gui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Source Files\Actors</Filter>
-    </ClCompile>
-    <ClCompile Include="Bindable.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshActor.cpp">
-      <Filter>Source Files\Actors</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files\Actors</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexShader.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="InputLayout.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Blender.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Rasterizer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeTexture.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthStencilState.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowRasterizer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthStencilView.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthCubeTexture.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="RegularDrawingPass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMapPass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
-    <ClCompile Include="Pass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderTargetView.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -201,12 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BetterWindows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BindablesPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
@@ -239,101 +116,41 @@
     <ClInclude Include="imgui\imstb_textedit.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshActor.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files\Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Bindable.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="InputLayout.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelShader.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sampler.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Blender.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_root_signature.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="Rasterizer.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_state_object.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="Skybox.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="d3dx12\d3dx12.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="CubeTexture.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_barriers.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="DepthStencilState.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_check_feature_support.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="Viewport.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_core.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowRasterizer.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_default.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="DepthCubeTexture.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_pipeline_state_stream.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="DepthStencilView.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_property_format_table.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTargetView.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="d3dx12\d3dx12_render_pass.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMapPass.h">
-      <Filter>Header Files\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="RegularDrawingPass.h">
-      <Filter>Header Files\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="Pass.h">
-      <Filter>Header Files\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="d3dx12\d3dx12_resource_helpers.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -375,6 +192,12 @@
     </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

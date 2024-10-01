@@ -41,5 +41,5 @@ private:
 	std::vector<BYTE> rawBuffer;
 	bool cursorEnabled = true;
 	bool rawInputEnabled = false;
-	static constexpr char winClassName[] = "RythmWindow";
+	static constexpr char winClassName[] = "GameEngineWindow";
 };

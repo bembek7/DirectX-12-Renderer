@@ -97,7 +97,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxguid.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;d3d12.lib;dxguid.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -117,7 +117,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;d3d12.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -134,7 +134,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxguid.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;DirectXTex.lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;d3d12.lib;dxguid.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;DirectXTex.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -159,24 +159,17 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;dxguid.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;DirectXTex.lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;d3d12.lib;dxguid.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;DirectXTex.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="Bindable.cpp" />
-    <ClCompile Include="BindablesPool.cpp" />
-    <ClCompile Include="Blender.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CubeTexture.cpp" />
-    <ClCompile Include="DepthCubeTexture.cpp" />
-    <ClCompile Include="DepthStencilState.cpp" />
-    <ClCompile Include="DepthStencilView.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="Gui.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -186,47 +179,25 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp" />
-    <ClCompile Include="IndexBuffer.cpp" />
-    <ClCompile Include="InputLayout.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="MeshComponent.cpp" />
-    <ClCompile Include="MeshActor.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Pass.cpp" />
-    <ClCompile Include="PixelShader.cpp" />
-    <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="Rasterizer.cpp" />
-    <ClCompile Include="RegularDrawingPass.cpp" />
-    <ClCompile Include="RenderTargetView.cpp" />
-    <ClCompile Include="Sampler.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="ShadowMapPass.cpp" />
-    <ClCompile Include="ShadowRasterizer.cpp" />
-    <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
-    <ClCompile Include="VertexShader.cpp" />
-    <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="SceneComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="BetterWindows.h" />
-    <ClInclude Include="Bindable.h" />
-    <ClInclude Include="BindablesPool.h" />
-    <ClInclude Include="Blender.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="CubeTexture.h" />
-    <ClInclude Include="DepthCubeTexture.h" />
-    <ClInclude Include="DepthStencilState.h" />
-    <ClInclude Include="DepthStencilView.h" />
+    <ClInclude Include="d3dx12\d3dx12.h" />
+    <ClInclude Include="d3dx12\d3dx12_barriers.h" />
+    <ClInclude Include="d3dx12\d3dx12_check_feature_support.h" />
+    <ClInclude Include="d3dx12\d3dx12_core.h" />
+    <ClInclude Include="d3dx12\d3dx12_default.h" />
+    <ClInclude Include="d3dx12\d3dx12_pipeline_state_stream.h" />
+    <ClInclude Include="d3dx12\d3dx12_property_format_table.h" />
+    <ClInclude Include="d3dx12\d3dx12_render_pass.h" />
+    <ClInclude Include="d3dx12\d3dx12_resource_helpers.h" />
+    <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
+    <ClInclude Include="d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Gui.h" />
     <ClInclude Include="imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -236,32 +207,10 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="IndexBuffer.h" />
-    <ClInclude Include="InputLayout.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="MeshComponent.h" />
-    <ClInclude Include="MeshActor.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Pass.h" />
-    <ClInclude Include="PixelShader.h" />
-    <ClInclude Include="PointLight.h" />
-    <ClInclude Include="Rasterizer.h" />
-    <ClInclude Include="RegularDrawingPass.h" />
-    <ClInclude Include="RenderTargetView.h" />
-    <ClInclude Include="Sampler.h" />
-    <ClInclude Include="Scene.h" />
     <ClInclude Include="ShaderSettings.h" />
-    <ClInclude Include="ShadowMapPass.h" />
-    <ClInclude Include="ShadowRasterizer.h" />
-    <ClInclude Include="Skybox.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="ThrowMacros.h" />
     <ClInclude Include="Utils.h" />
-    <ClInclude Include="VertexBuffer.h" />
-    <ClInclude Include="VertexShader.h" />
-    <ClInclude Include="Viewport.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="SceneComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PhongColorPS.hlsl">
@@ -352,6 +301,12 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="SkyboxPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -385,6 +340,12 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -57,9 +57,9 @@ void Scene::RenderControls(Graphics& graphics)
 {
 	for (auto& actor : actors)
 	{
-		graphics.GetGui()->RenderActorTree(actor.get());
+		//graphics.GetGui()->RenderActorTree(actor.get());
 	}
-	graphics.GetGui()->RenderControlWindow();
+	//graphics.GetGui()->RenderControlWindow();
 }
 
 Camera* Scene::GetMainCamera()

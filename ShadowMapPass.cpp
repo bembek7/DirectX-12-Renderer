@@ -45,8 +45,8 @@ void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::shared_pt
 	{
 		pointLight->SetActorRotation(shadowCameraRotations[faceIndex]);
 		graphics.SetCamera(pointLight->GetLightPerspective());
-		graphics.SetCurrentDepthStenilView(shadowMapCube->GetDepthBuffer(faceIndex)->Get());
-		graphics.BindCurrentRenderTarget();
+		//graphics.SetCurrentDepthStenilView(shadowMapCube->GetDepthBuffer(faceIndex)->Get());
+		//graphics.BindCurrentRenderTarget();
 
 		for (auto& actor : actors)
 		{
@@ -54,5 +54,5 @@ void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::shared_pt
 		}
 	}
 	pointLight->SetActorRotation(DirectX::XMFLOAT3{ 0.f, 0.f, 0.f });
-	graphics.ClearRenderTargetBinds();
+	//graphics.ClearRenderTargetBinds();
 }

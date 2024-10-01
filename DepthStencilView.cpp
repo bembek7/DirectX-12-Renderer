@@ -55,7 +55,7 @@ DepthStencilView::DepthStencilView(Graphics& graphics, Microsoft::WRL::ComPtr<ID
 
 void DepthStencilView::Bind(Graphics& graphics) noexcept
 {
-	graphics.SetCurrentDepthStenilView(depthStencilView);
+	//graphics.SetCurrentDepthStenilView(depthStencilView);
 }
 
 void DepthStencilView::Update(Graphics& graphics)

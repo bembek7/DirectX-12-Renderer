@@ -30,7 +30,7 @@ RegularDrawingPass::RegularDrawingPass(Graphics& graphics, std::shared_ptr<Depth
 void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight, const Camera* const mainCamera)
 {
 	Pass::Execute(graphics);
-	graphics.BindCurrentRenderTarget();
+	//graphics.BindCurrentRenderTarget();
 	graphics.SetCamera(mainCamera->GetMatrix());
 	pointLight->Bind(graphics);
 	for (auto& actor : actors)

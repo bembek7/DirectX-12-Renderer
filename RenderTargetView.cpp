@@ -11,7 +11,7 @@ RenderTargetView::RenderTargetView(Graphics& graphics)
 
 void RenderTargetView::Bind(Graphics& graphics) noexcept
 {
-	graphics.SetCurrentRenderTargetView(renderTargetView);
+	//graphics.SetCurrentRenderTargetView(renderTargetView);
 }
 
 void RenderTargetView::Update(Graphics& graphics)
@@ -27,5 +27,5 @@ void RenderTargetView::Clear(Graphics& graphics, const FLOAT color[4])
 
 void NullRenderTargetView::Bind(Graphics& graphics) noexcept
 {
-	graphics.SetCurrentRenderTargetView(nullptr);
+	//graphics.SetCurrentRenderTargetView(nullptr);
 }
