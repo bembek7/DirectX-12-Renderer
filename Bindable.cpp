@@ -4,17 +4,17 @@
 void Bindable::Update(Graphics& graphics)
 {}
 
-ID3D11DeviceContext* Bindable::GetContext(Graphics& graphics) noexcept
+void Bindable::WaitForQueueFinish(Graphics& graphics)
 {
-	//return graphics.context.Get();
+	graphics.fence->WaitForQueueFinish(graphics, INFINITE);
 }
 
-ID3D11Device* Bindable::GetDevice(Graphics& graphics) noexcept
+ID3D12Device2* Bindable::GetDevice(Graphics& graphics) noexcept
 {
-	//return graphics.device.Get();
+	return graphics.device.Get();
 }
 
-IDXGISwapChain* Bindable::GetSwapChain(Graphics& graphics) noexcept
+ID3D12GraphicsCommandList* Bindable::GetCommandList(Graphics& graphics) noexcept
 {
-	//return graphics.swapChain.Get();
+	return graphics.commandList.Get();
 }

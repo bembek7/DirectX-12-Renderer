@@ -2,10 +2,9 @@
 #include "ThrowMacros.h"
 #include <d3dcommon.h>
 #include <numbers>
-#include "Camera.h"
-#include "DepthCubeTexture.h"
 #include <d3dcompiler.h>
 #include "Utils.h"
+#include "RootSignature.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
@@ -34,19 +33,17 @@ void Graphics::OnRender()
 	// Present the frame.
 	CHECK_HR(swapChain->Present(1, 0));
 
-	WaitForPreviousFrame();
+	// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
+	// This is code implemented as such for simplicity. More advanced samples
+	// illustrate how to use fences for efficient resource usage.
+	fence->WaitForQueueFinish(*this, INFINITE);
 }
 
 void Graphics::OnDestroy()
 {
-	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValue));
-	CHECK_HR(fence->SetEventOnCompletion(fenceValue, fenceEvent));
-	if (WaitForSingleObject(fenceEvent, 2000) == WAIT_FAILED)
-	{
-		CHECK_HR(GetLastError());
-	}
+	fence->WaitForQueueFinish(*this, 2000);
 
-	CloseHandle(fenceEvent);
+	fence->CloseEventHandle();
 }
 
 void Graphics::LoadPipeline(const HWND& hWnd)
@@ -118,8 +115,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		};
 		CHECK_HR(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&rtvHeap)));
 	}
-	rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(
-		D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	// Create frame resources.
 	{
@@ -144,124 +140,10 @@ void Graphics::LoadAssets()
 	// to record yet. The main loop expects it to be closed, so close it now.
 	CHECK_HR(commandList->Close());
 
-	// Create synchronization objects and wait until assets have been uploaded to the GPU.
-	{
-		fenceValue = 0;
-		CHECK_HR(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
+	fence = std::make_unique<Fence>(*this);
 
-		// fence signalling event
-		HANDLE fenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-		if (!fenceEvent)
-		{
-			CHECK_HR(GetLastError());
-			throw std::runtime_error{ "Failed to create fence event" };
-		}
-	}
-
-	// Create the vertex buffer.
-	{
-		const Vertex vertexData[] =
-		{
-				{ {  0.00f,  0.50f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } }, // top
-				{ {  0.43f, -0.25f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }, // right
-				{ { -0.43f, -0.25f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } }, // left
-		};
-
-		nVertices = (UINT)std::size(vertexData);
-
-		// Note: using upload heaps to transfer static data like vert buffers is not
-		// recommended. Every time the GPU needs it, the upload heap will be marshalled
-		// over. Please read up on Default Heap usage. An upload heap is used here for
-		// code simplicity and because there are very few verts to actually transfer.
-		{
-			const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_DEFAULT };
-			const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertexData));
-			CHECK_HR(device->CreateCommittedResource(
-				&heapProps,
-				D3D12_HEAP_FLAG_NONE,
-				&resourceDesc,
-				D3D12_RESOURCE_STATE_COMMON, // if created with copy_dest raises warning
-				nullptr, IID_PPV_ARGS(&vertexBuffer)
-			));
-		}
-		// create committed resource for cpu upload of vertex data
-		Wrl::ComPtr<ID3D12Resource> vertexUploadBuffer;
-		{
-			const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_UPLOAD };
-			const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertexData));
-			CHECK_HR(device->CreateCommittedResource(
-				&heapProps,
-				D3D12_HEAP_FLAG_NONE,
-				&resourceDesc,
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr, IID_PPV_ARGS(&vertexUploadBuffer)
-			));
-		}
-
-		// copy array of vertex data to upload buffer
-		{
-			Vertex* mappedVertexData = nullptr;
-			CHECK_HR(vertexUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertexData)));
-			std::ranges::copy(vertexData, mappedVertexData);
-			vertexUploadBuffer->Unmap(0, nullptr);
-		}
-
-		// reset command list and allocator
-		CHECK_HR(commandAllocator->Reset());
-		CHECK_HR(commandList->Reset(commandAllocator.Get(), nullptr));
-		// copy upload buffer to vertex buffer
-		commandList->CopyResource(vertexBuffer.Get(), vertexUploadBuffer.Get());
-		// transition vertex buffer to vertex buffer state
-		{
-			const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-				vertexBuffer.Get(),
-				D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			commandList->ResourceBarrier(1, &barrier);
-		}
-		// close command list
-		CHECK_HR(commandList->Close());
-		// submit command list to queue as array with single element
-		ID3D12CommandList* const commandLists[] = { commandList.Get() };
-		commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
-		// insert fence to detect when upload is complete
-		CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValue));
-		CHECK_HR(fence->SetEventOnCompletion(fenceValue, fenceEvent));
-		if (WaitForSingleObject(fenceEvent, INFINITE) == WAIT_FAILED)
-		{
-			CHECK_HR(GetLastError());
-		}
-	}
-
-	vertexBufferView =
-	{
-		.BufferLocation = vertexBuffer->GetGPUVirtualAddress(),
-		.SizeInBytes = nVertices * (UINT)sizeof(Vertex),
-		.StrideInBytes = sizeof(Vertex)
-	};
-
-	// create root signature
-	{
-		// define empty root signature
-		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-		// serialize root signature
-		Wrl::ComPtr<ID3DBlob> signatureBlob;
-		Wrl::ComPtr<ID3DBlob> errorBlob;
-		if (const auto hr = D3D12SerializeRootSignature(
-			&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-			&signatureBlob, &errorBlob); FAILED(hr))
-		{
-			if (errorBlob)
-			{
-				auto errorBufferPtr = static_cast<const char*>(errorBlob->GetBufferPointer());
-				throw std::runtime_error(errorBufferPtr);
-			}
-			CHECK_HR(hr);
-		}
-		// Create the root signature.
-		CHECK_HR(device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-			signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
-	}
+	vertexBuffer = std::make_unique<VertexBuffer>(*this);
+	rootSignature = std::make_unique<RootSignature>(*this);
 
 	// creating pipeline state object
 	{
@@ -292,7 +174,7 @@ void Graphics::LoadAssets()
 		CHECK_HR(D3DReadFileToBlob(L"PixelShader.cso", &pixelShaderBlob));
 
 		// filling pso structure
-		pipelineStateStream.RootSignature = rootSignature.Get();
+		pipelineStateStream.RootSignature = rootSignature->Get();
 		pipelineStateStream.InputLayout = { inputLayout, (UINT)std::size(inputLayout) };
 		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
@@ -323,69 +205,48 @@ void Graphics::PopulateCommandList()
 	auto& backBuffer = renderTargets[curBackBufferIndex];
 
 	// reset command list and allocator
-	CHECK_HR(commandAllocator->Reset());
-	CHECK_HR(commandList->Reset(commandAllocator.Get(), nullptr));
+	ResetCommandListAndAllocator();
+
 	// get rtv handle for the buffer used in this frame
 	const CD3DX12_CPU_DESCRIPTOR_HANDLE rtv
 	{
 		rtvHeap->GetCPUDescriptorHandleForHeapStart(),
 		(INT)curBackBufferIndex, rtvDescriptorSize
 	};
-	// clear the render target
-	{
-		// transition buffer resource to render target state
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			backBuffer.Get(),
-			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		commandList->ResourceBarrier(1, &barrier);
-		// calculate clear color
-		const FLOAT clearColor[] =
-		{
-			0.13f,
-			0.05f,
-			0.05f,
-			1.0f
-		};
-		// clear rtv
-		commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-	}
+
+	ClearRenderTarget(backBuffer.Get(), rtv);
+
 	// set pipeline state
 	commandList->SetPipelineState(pipelineState.Get());
-	commandList->SetGraphicsRootSignature(rootSignature.Get());
+	rootSignature->Bind(*this);
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	vertexBuffer->Bind(*this);
 	// configure RS
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
 	// draw the geometry
-	commandList->DrawInstanced(nVertices, 1, 0, 0);
+	commandList->DrawInstanced(vertexBuffer->GetVerticesNumber(), 1, 0, 0);
 	// prepare buffer for presentation by transitioning to present state
 	{
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			backBuffer.Get(),
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		commandList->ResourceBarrier(1, &barrier);
 	}
 
 	CHECK_HR(commandList->Close());
 }
 
-void Graphics::WaitForPreviousFrame()
+void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv)
 {
-	// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
-	// This is code implemented as such for simplicity. More advanced samples
-	// illustrate how to use fences for efficient resource usage.
-
-	// Signal and increment the fence value.
-	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValue));
-	CHECK_HR(fence->SetEventOnCompletion(fenceValue, fenceEvent));
-	if (WaitForSingleObject(fenceEvent, INFINITE) == WAIT_FAILED)
-	{
-		CHECK_HR(GetLastError());
-	}
+	// transition buffer resource to render target state
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	commandList->ResourceBarrier(1, &barrier);
+	// calculate clear color
+	const FLOAT clearColor[] = { 0.13f, 0.05f, 0.05f, 1.0f };
+	// clear rtv
+	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 }
 
 float Graphics::GetWindowWidth() const noexcept
@@ -416,4 +277,18 @@ void Graphics::SetCamera(const DirectX::XMMATRIX cam) noexcept
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept
 {
 	return DirectX::XMLoadFloat4x4(&camera);
+}
+
+void Graphics::ResetCommandListAndAllocator()
+{
+	// reset command list and allocator
+	CHECK_HR(commandAllocator->Reset());
+	CHECK_HR(commandList->Reset(commandAllocator.Get(), nullptr));
+}
+
+void Graphics::ExecuteCommandList()
+{
+	// submit command list to queue as array with single element
+	ID3D12CommandList* const commandLists[] = { commandList.Get() };
+	commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
 }

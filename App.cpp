@@ -1,11 +1,6 @@
 #include "App.h"
 #include <chrono>
-#include "MeshActor.h"
-#include "PointLight.h"
 #include <numbers>
-#include "Camera.h"
-#include "DirectXMath.h"
-#include "Skybox.h"
 
 void App::InitializeScene()
 {
