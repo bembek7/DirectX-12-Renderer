@@ -53,8 +53,8 @@ private:
 	std::unique_ptr<RootSignature> rootSignature;
 
 	// Pipeline objects.
-	D3D12_VIEWPORT viewport;
-	D3D12_RECT scissorRect;
+	std::unique_ptr<Bindable> viewport;
+	std::unique_ptr<Bindable> scissorRect;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device2> device;
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];

@@ -5,6 +5,8 @@
 #include <d3dcompiler.h>
 #include "Utils.h"
 #include "RootSignature.h"
+#include "Viewport.h"
+#include "ScissorRectangle.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
@@ -192,10 +194,9 @@ void Graphics::LoadAssets()
 	}
 
 	// define scissor rect
-	scissorRect = { 0, 0, LONG_MAX, LONG_MAX };
-
+	scissorRect = std::make_unique<ScissorRectangle>();
 	// define viewport
-	viewport = { 0.0f, 0.0f, windowWidth, windowHeight };
+	viewport = std::make_unique<Viewport>(windowWidth, windowHeight);
 }
 
 void Graphics::PopulateCommandList()
@@ -223,10 +224,28 @@ void Graphics::PopulateCommandList()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	vertexBuffer->Bind(*this);
 	// configure RS
-	commandList->RSSetViewports(1, &viewport);
-	commandList->RSSetScissorRects(1, &scissorRect);
+	viewport->Bind(*this);
+	scissorRect->Bind(*this);
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
+
+	// set view projection matrix
+	Dx::XMMATRIX viewProjection;
+	{
+		// setup view (camera) matrix
+		const auto eyePosition = Dx::XMVectorSet(0, 0, -1, 1);
+		const auto focusPoint = Dx::XMVectorSet(0, 0, 0, 1);
+		const auto upDirection = Dx::XMVectorSet(0, 1, 0, 0);
+		const auto view = Dx::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+		// setup perspective projection matrix
+		const auto aspectRatio = float(windowWidth) / float(windowHeight);
+		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(65.f), aspectRatio, 0.1f, 100.0f);
+		// combine matrices
+		viewProjection = XMMatrixMultiply(view, projection);
+	}
+	// bind the transformation matrix
+	const auto transformViewProjection = Dx::XMMatrixTranspose(Dx::XMMatrixRotationZ(1.f) * viewProjection);
+	commandList->SetGraphicsRoot32BitConstants(0, sizeof(transformViewProjection) / 4, &transformViewProjection, 0);
 	// draw the geometry
 	commandList->DrawInstanced(vertexBuffer->GetVerticesNumber(), 1, 0, 0);
 	// prepare buffer for presentation by transitioning to present state
