@@ -8,5 +8,5 @@ public:
 	void Bind(Graphics& graphics) noexcept override;
 
 private:
-	D3D11_VIEWPORT viewport{};
+	D3D12_VIEWPORT viewport{};
 };
