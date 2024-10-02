@@ -140,7 +140,7 @@
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(WorkDir)%(Filename).cso</ObjectFileOutput>
-      <ShaderModel>5.0</ShaderModel>
+      <ShaderModel>4.0_level_9_3</ShaderModel>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,6 +163,10 @@
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
+    <FxCompile>
+      <ShaderModel>4.0_level_9_3</ShaderModel>
+      <ObjectFileOutput>$(WorkDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
