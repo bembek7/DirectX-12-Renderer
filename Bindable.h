@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <d3d12.h>
+#include "d3dx12\d3dx12.h"
 
 class Graphics;
 
@@ -11,7 +11,9 @@ public:
 	virtual void Update(Graphics& graphics);
 	virtual ~Bindable() = default;
 	void WaitForQueueFinish(Graphics& graphics);
+
 protected:
 	static ID3D12Device2* GetDevice(Graphics& graphics) noexcept;
 	static ID3D12GraphicsCommandList* GetCommandList(Graphics& graphics) noexcept;
+	static std::vector<CD3DX12_ROOT_PARAMETER>& GetRootParameters(Graphics& graphics) noexcept;
 };

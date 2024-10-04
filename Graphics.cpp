@@ -19,12 +19,15 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	LoadAssets();
 }
 
-void Graphics::OnUpdate()
+void Graphics::OnUpdate(const float time)
 {
+	mesh->OnUpdate(time);
 }
 
 void Graphics::OnRender()
 {
+	rootParameters.clear(); // TEMPORARY
+
 	// Record all the commands we need to render the scene into the command list.
 	PopulateCommandList();
 
@@ -144,7 +147,7 @@ void Graphics::LoadAssets()
 
 	fence = std::make_unique<Fence>(*this);
 
-	vertexBuffer = std::make_unique<VertexBuffer>(*this);
+	mesh = std::make_unique<Mesh>(*this);
 	rootSignature = std::make_unique<RootSignature>(*this);
 
 	// creating pipeline state object
@@ -164,7 +167,7 @@ void Graphics::LoadAssets()
 		const D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		};
 
 		// Load the vertex shader.
@@ -222,32 +225,18 @@ void Graphics::PopulateCommandList()
 	rootSignature->Bind(*this);
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	vertexBuffer->Bind(*this);
+	/*vertexBuffer->Bind(*this);
+	indexBuffer->Bind(*this);*/
+	mesh->Bind(*this);
+
 	// configure RS
 	viewport->Bind(*this);
 	scissorRect->Bind(*this);
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
 
-	// set view projection matrix
-	Dx::XMMATRIX viewProjection;
-	{
-		// setup view (camera) matrix
-		const auto eyePosition = Dx::XMVectorSet(0, 0, -1, 1);
-		const auto focusPoint = Dx::XMVectorSet(0, 0, 0, 1);
-		const auto upDirection = Dx::XMVectorSet(0, 1, 0, 0);
-		const auto view = Dx::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-		// setup perspective projection matrix
-		const auto aspectRatio = float(windowWidth) / float(windowHeight);
-		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(65.f), aspectRatio, 0.1f, 100.0f);
-		// combine matrices
-		viewProjection = XMMatrixMultiply(view, projection);
-	}
-	// bind the transformation matrix
-	const auto transformViewProjection = Dx::XMMatrixTranspose(Dx::XMMatrixRotationZ(1.f) * viewProjection);
-	commandList->SetGraphicsRoot32BitConstants(0, sizeof(transformViewProjection) / 4, &transformViewProjection, 0);
 	// draw the geometry
-	commandList->DrawInstanced(vertexBuffer->GetVerticesNumber(), 1, 0, 0);
+	commandList->DrawIndexedInstanced(mesh->GetIndicesNumber(), 1, 0, 0, 0);
 	// prepare buffer for presentation by transitioning to present state
 	{
 		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

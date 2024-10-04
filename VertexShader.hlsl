@@ -11,11 +11,11 @@ struct Rotation
 
 ConstantBuffer<Rotation> rot : register(b0);
 
-Output main(float3 pos : POSITION, float4 color : COLOR)
+Output main(float3 pos : POSITION, float3 color : COLOR)
 {
     Output vertexOut;
 
     vertexOut.Position = mul(float4(pos, 1.0f), rot.transform);
-    vertexOut.Color = color;
+    vertexOut.Color = float4(color, 1.0f);
     return vertexOut;
 }

@@ -29,54 +29,14 @@ namespace Wrl = Microsoft::WRL;
 //	GetContext(graphics)->IASetVertexBuffers(0u, 1u, vertexBuffer.GetAddressOf(), &stride, &offset);
 //}
 
-VertexBuffer::VertexBuffer(Graphics& graphics)
+VertexBuffer::VertexBuffer(Graphics& graphics, const std::vector<Vertex>& vertices)
 {
-	const Vertex vertexData[] =
-	{
-			{ {  0.00f,  0.50f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } }, // top
-			{ {  0.43f, -0.25f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }, // right
-			{ { -0.43f, -0.25f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } }, // left
-	};
+	verticesNum = (UINT)vertices.size();
 
-	nVertices = (UINT)std::size(vertexData);
-
-	{
-		const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_DEFAULT };
-		const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertexData));
-		CHECK_HR(GetDevice(graphics)->CreateCommittedResource(
-			&heapProps,
-			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
-			D3D12_RESOURCE_STATE_COMMON, // if created with copy_dest raises warning
-			nullptr, IID_PPV_ARGS(&vertexBuffer)
-		));
-	}
-
-	// create committed resource for cpu upload of vertex data
-	Wrl::ComPtr<ID3D12Resource> vertexUploadBuffer;
-	{
-		const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_UPLOAD };
-		const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertexData));
-		CHECK_HR(GetDevice(graphics)->CreateCommittedResource(
-			&heapProps,
-			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&vertexUploadBuffer)
-		));
-	}
-
-	// copy array of vertex data to upload buffer
-	{
-		Vertex* mappedVertexData = nullptr;
-		CHECK_HR(vertexUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedVertexData)));
-		std::ranges::copy(vertexData, mappedVertexData);
-		vertexUploadBuffer->Unmap(0, nullptr);
-	}
+	vertexBuffer = std::move(graphics.GenerateBufferFromData(vertices));
 
 	graphics.ResetCommandListAndAllocator();
-	// copy upload buffer to vertex buffer
-	GetCommandList(graphics)->CopyResource(vertexBuffer.Get(), vertexUploadBuffer.Get());
+
 	// transition vertex buffer to vertex buffer state
 	{
 		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -95,7 +55,7 @@ VertexBuffer::VertexBuffer(Graphics& graphics)
 	vertexBufferView =
 	{
 		.BufferLocation = vertexBuffer->GetGPUVirtualAddress(),
-		.SizeInBytes = nVertices * (UINT)sizeof(Vertex),
+		.SizeInBytes = verticesNum * (UINT)sizeof(Vertex),
 		.StrideInBytes = sizeof(Vertex)
 	};
 }
@@ -107,5 +67,5 @@ void VertexBuffer::Bind(Graphics& graphics) noexcept
 
 UINT VertexBuffer::GetVerticesNumber() const noexcept
 {
-	return nVertices;
+	return verticesNum;
 }

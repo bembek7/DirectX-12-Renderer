@@ -10,6 +10,8 @@ int App::Run()
 {
 	// InitializeScene();
 
+	float t = 0.f;
+	constexpr float step = 0.01f;
 	while (true)
 	{
 		if (const auto ecode = Window::ProcessMessages())
@@ -19,8 +21,10 @@ int App::Run()
 
 		// HandleInput();
 
-		window.GetGraphics().OnUpdate();
+		window.GetGraphics().OnUpdate(t);
 		window.GetGraphics().OnRender();
+
+		t += step;
 	}
 
 	window.GetGraphics().OnDestroy();

@@ -6,9 +6,10 @@
 #include <DirectXMath.h>
 #include <memory>
 #include <dxgi1_6.h>
-#include "VertexBuffer.h"
 #include "Fence.h"
 #include "RootSignature.h"
+#include "Mesh.h"
+#include "ThrowMacros.h"
 
 class Graphics
 {
@@ -20,7 +21,7 @@ public:
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 
-	void OnUpdate();
+	void OnUpdate(const float time);
 	void OnRender();
 	void OnDestroy();
 
@@ -34,6 +35,58 @@ public:
 
 	void ResetCommandListAndAllocator();
 	void ExecuteCommandList();
+
+	template<typename T>
+	Microsoft::WRL::ComPtr<ID3D12Resource> GenerateBufferFromData(const std::vector<T>& data)
+	{
+		namespace Wrl = Microsoft::WRL;
+		UINT dataNum = UINT(data.size());
+		Wrl::ComPtr<ID3D12Resource> finalBuffer;
+		{
+			const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_DEFAULT };
+			const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataNum * sizeof(T));
+			CHECK_HR(device->CreateCommittedResource(
+				&heapProps,
+				D3D12_HEAP_FLAG_NONE,
+				&resourceDesc,
+				D3D12_RESOURCE_STATE_COMMON,
+				nullptr, IID_PPV_ARGS(&finalBuffer)
+			));
+		}
+
+		Wrl::ComPtr<ID3D12Resource> uploadBuffer;
+		{
+			const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_UPLOAD };
+			const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(dataNum * sizeof(T));
+			CHECK_HR(device->CreateCommittedResource(
+				&heapProps,
+				D3D12_HEAP_FLAG_NONE,
+				&resourceDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr, IID_PPV_ARGS(&uploadBuffer)
+			));
+		}
+		// copy vector of data to upload buffer
+		{
+			T* mappedData = nullptr;
+			CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
+			std::memcpy(mappedData, data.data(), dataNum * sizeof(T));
+			uploadBuffer->Unmap(0, nullptr);
+		}
+
+		ResetCommandListAndAllocator();
+		// copy upload buffer to buffer
+		commandList->CopyResource(finalBuffer.Get(), uploadBuffer.Get());
+
+		// close command list
+		CHECK_HR(commandList->Close());
+
+		ExecuteCommandList();
+
+		fence->WaitForQueueFinish(*this, INFINITE);
+
+		return finalBuffer;
+	}
 
 private:
 	void LoadPipeline(const HWND& hWnd);
@@ -49,9 +102,9 @@ private:
 
 	static constexpr UINT bufferCount = 2;
 
-	std::unique_ptr<VertexBuffer> vertexBuffer;
+	std::unique_ptr<Mesh> mesh;
 	std::unique_ptr<RootSignature> rootSignature;
-
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
 	// Pipeline objects.
 	std::unique_ptr<Bindable> viewport;
 	std::unique_ptr<Bindable> scissorRect;
