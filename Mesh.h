@@ -1,6 +1,8 @@
 #pragma once
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class Graphcis;
 
@@ -15,12 +17,15 @@ public:
 private:
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	std::unique_ptr<IndexBuffer> indexBuffer;
+	std::unique_ptr<RootSignature> rootSignature;
+
+	std::unique_ptr<PipelineState> pipelineState;
 
 	struct TransformBuffer
 	{
 		DirectX::XMFLOAT4X4 transformViewProj;
 	} transformBuffer;
 
-	DirectX::XMFLOAT4X4 transform;
+	DirectX::XMFLOAT4X4 transform = {};
 	std::unique_ptr<Bindable> constantTransformBuffer;
 };

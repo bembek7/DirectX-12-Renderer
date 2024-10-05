@@ -5,7 +5,7 @@
 class RootSignature : public Bindable
 {
 public:
-	RootSignature(Graphics& graphics);
+	RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
 	ID3D12RootSignature* Get() noexcept;
 	virtual void Bind(Graphics& graphics) noexcept override;
 private:

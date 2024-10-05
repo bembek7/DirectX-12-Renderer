@@ -25,6 +25,8 @@ public:
 	void OnRender();
 	void OnDestroy();
 
+	void DrawIndexed(const UINT indicesNumber);
+
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
 
@@ -103,8 +105,7 @@ private:
 	static constexpr UINT bufferCount = 2;
 
 	std::unique_ptr<Mesh> mesh;
-	std::unique_ptr<RootSignature> rootSignature;
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
+
 	// Pipeline objects.
 	std::unique_ptr<Bindable> viewport;
 	std::unique_ptr<Bindable> scissorRect;
@@ -115,7 +116,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 

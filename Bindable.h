@@ -15,5 +15,6 @@ public:
 protected:
 	static ID3D12Device2* GetDevice(Graphics& graphics) noexcept;
 	static ID3D12GraphicsCommandList* GetCommandList(Graphics& graphics) noexcept;
-	static std::vector<CD3DX12_ROOT_PARAMETER>& GetRootParameters(Graphics& graphics) noexcept;
+	//static std::vector<CD3DX12_ROOT_PARAMETER>& GetRootParameters(Graphics& graphics) noexcept;
+	//static Graphics::PipelineStateStream& GetPipelineStateStream(Graphics& graphics) noexcept;
 };

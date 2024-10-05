@@ -14,12 +14,12 @@ template<typename Structure>
 class ConstantBuffer : public Bindable
 {
 public:
-	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot) :
+	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) :
 		bufferData(&data),
 		bufferType(bufferType),
 		slot(slot)
 	{
-		D3D12_SHADER_VISIBILITY shaderVisibility;
+		D3D12_SHADER_VISIBILITY shaderVisibility{};
 		switch (bufferType)
 		{
 		case BufferType::Pixel:
@@ -28,11 +28,13 @@ public:
 		case BufferType::Vertex:
 			shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 			break;
+		default:
+			break;
 		}
 		CD3DX12_ROOT_PARAMETER rootParameter{};
 		rootParameter.InitAsConstants(sizeof(data) / 4, slot, 0, shaderVisibility);
-		GetRootParameters(graphics).push_back(std::move(rootParameter));
-		rootParameterIndex = (UINT)GetRootParameters(graphics).size() - 1;
+		rootParameters.push_back(std::move(rootParameter));
+		rootParameterIndex = (UINT)rootParameters.size() - 1;
 	}
 	virtual void Update(Graphics& graphics) override
 	{

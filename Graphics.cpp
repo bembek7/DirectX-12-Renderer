@@ -4,7 +4,7 @@
 #include <numbers>
 #include <d3dcompiler.h>
 #include "Utils.h"
-#include "RootSignature.h"
+
 #include "Viewport.h"
 #include "ScissorRectangle.h"
 
@@ -34,8 +34,6 @@ void Graphics::OnUpdate(const float time)
 
 void Graphics::OnRender()
 {
-	rootParameters.clear(); // TEMPORARY
-
 	// Record all the commands we need to render the scene into the command list.
 	PopulateCommandList();
 
@@ -57,6 +55,11 @@ void Graphics::OnDestroy()
 	fence->WaitForQueueFinish(*this, 2000);
 
 	fence->CloseEventHandle();
+}
+
+void Graphics::DrawIndexed(const UINT indicesNumber)
+{
+	commandList->DrawIndexedInstanced(indicesNumber, 1, 0, 0, 0);
 }
 
 void Graphics::LoadPipeline(const HWND& hWnd)
@@ -147,7 +150,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 void Graphics::LoadAssets()
 {
 	// Create the command list.
-	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), pipelineState.Get(), IID_PPV_ARGS(&commandList)));
+	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList)));
 
 	// Command lists are created in the recording state, but there is nothing
 	// to record yet. The main loop expects it to be closed, so close it now.
@@ -156,53 +159,6 @@ void Graphics::LoadAssets()
 	fence = std::make_unique<Fence>(*this);
 
 	mesh = std::make_unique<Mesh>(*this);
-	rootSignature = std::make_unique<RootSignature>(*this);
-
-	// creating pipeline state object
-	{
-		// static declaration of pso stream structure
-		struct PipelineStateStream
-		{
-			CD3DX12_PIPELINE_STATE_STREAM_ROOT_SIGNATURE RootSignature;
-			CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT InputLayout;
-			CD3DX12_PIPELINE_STATE_STREAM_PRIMITIVE_TOPOLOGY PrimitiveTopologyType;
-			CD3DX12_PIPELINE_STATE_STREAM_VS VS;
-			CD3DX12_PIPELINE_STATE_STREAM_PS PS;
-			CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
-		} pipelineStateStream;
-
-		// define the Vertex input layout
-		const D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		};
-
-		// Load the vertex shader.
-		Wrl::ComPtr<ID3DBlob> vertexShaderBlob;
-		CHECK_HR(D3DReadFileToBlob(L"VertexShader.cso", &vertexShaderBlob));
-
-		// Load the pixel shader.
-		Wrl::ComPtr<ID3DBlob> pixelShaderBlob;
-		CHECK_HR(D3DReadFileToBlob(L"PixelShader.cso", &pixelShaderBlob));
-
-		// filling pso structure
-		pipelineStateStream.RootSignature = rootSignature->Get();
-		pipelineStateStream.InputLayout = { inputLayout, (UINT)std::size(inputLayout) };
-		pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
-		pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(pixelShaderBlob.Get());
-		pipelineStateStream.RTVFormats = {
-			.RTFormats{ DXGI_FORMAT_R8G8B8A8_UNORM },
-			.NumRenderTargets = 1,
-		};
-
-		// building the pipeline state object
-		const D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
-			sizeof(PipelineStateStream), &pipelineStateStream
-		};
-		CHECK_HR(device->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&pipelineState)));
-	}
 
 	// define scissor rect
 	scissorRect = std::make_unique<ScissorRectangle>();
@@ -228,9 +184,6 @@ void Graphics::PopulateCommandList()
 
 	ClearRenderTarget(backBuffer.Get(), rtv);
 
-	// set pipeline state
-	commandList->SetPipelineState(pipelineState.Get());
-	rootSignature->Bind(*this);
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	/*vertexBuffer->Bind(*this);

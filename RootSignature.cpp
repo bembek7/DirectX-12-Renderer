@@ -7,7 +7,7 @@
 namespace Wrl = Microsoft::WRL;
 namespace Dx = DirectX;
 
-RootSignature::RootSignature(Graphics& graphics)
+RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters)
 {
 	// define root signature with a matrix of 16 32-bit floats used by the vertex shader (mvp matrix)
 	//CD3DX12_ROOT_PARAMETER rootParameters[1]{};
@@ -24,7 +24,6 @@ RootSignature::RootSignature(Graphics& graphics)
 	// define empty root signature
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
-	const auto& rootParameters = GetRootParameters(graphics);
 	rootSignatureDesc.Init((UINT)std::size(rootParameters), rootParameters.data(), 0, nullptr, rootSignatureFlags);
 	// serialize root signature
 	Wrl::ComPtr<ID3DBlob> signatureBlob;
