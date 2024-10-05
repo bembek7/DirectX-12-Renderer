@@ -34,22 +34,7 @@ Mesh::Mesh(Graphics& graphics)
 
 void Mesh::Bind(Graphics& graphics)
 {
-	Dx::XMMATRIX viewProjection;
-	{
-		// setup view (camera) matrix
-		const auto eyePosition = Dx::XMVectorSet(0, 0, -6, 1);
-		const auto focusPoint = Dx::XMVectorSet(0, 0, 0, 1);
-		const auto upDirection = Dx::XMVectorSet(0, 1, 0, 0);
-		const auto view = Dx::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-		// setup perspective projection matrix
-		const auto aspectRatio = graphics.GetWindowWidth() / graphics.GetWindowHeight();
-		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(65.f), aspectRatio, 0.1f, 100.0f);
-		// combine matrices
-		viewProjection = XMMatrixMultiply(view, projection);
-	}
-	// bind the transformation matrix
-
-	Dx::XMStoreFloat4x4(&transformBuffer.transformViewProj, Dx::XMMatrixTranspose(Dx::XMLoadFloat4x4(&transform) * viewProjection));
+	Dx::XMStoreFloat4x4(&transformBuffer.transformViewProj, Dx::XMMatrixTranspose(Dx::XMLoadFloat4x4(&transform) * graphics.GetCamera() * graphics.GetProjection()));
 
 	vertexBuffer->Bind(graphics);
 	indexBuffer->Bind(graphics);

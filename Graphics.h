@@ -28,7 +28,7 @@ public:
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
 
-	void SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept;
+	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	void SetCamera(const DirectX::XMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;

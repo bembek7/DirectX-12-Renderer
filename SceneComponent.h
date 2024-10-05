@@ -74,7 +74,7 @@ protected:
 	SceneComponent(const std::string& componentName);
 	SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
-	virtual void RenderComponentDetails(Gui& gui);
+	//virtual void RenderComponentDetails(Gui& gui);
 
 private:
 	void DeattachFromParent();

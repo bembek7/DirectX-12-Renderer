@@ -15,6 +15,14 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	windowWidth(windowWidth),
 	windowHeight(windowHeight)
 {
+	{
+		// setup perspective projection matrix
+		const auto aspectRatio = windowWidth / windowHeight;
+		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(65.f), aspectRatio, 0.1f, 100.0f);
+
+		SetProjection(projection);
+	}
+
 	LoadPipeline(hWnd);
 	LoadAssets();
 }
@@ -267,9 +275,9 @@ float Graphics::GetWindowHeight() const noexcept
 	return windowHeight;
 }
 
-void Graphics::SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept
+void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 {
-	projection = proj;
+	DirectX::XMStoreFloat4x4(&projection, proj);
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept

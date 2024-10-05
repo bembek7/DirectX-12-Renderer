@@ -4,11 +4,12 @@
 
 void App::InitializeScene()
 {
+	scene = std::make_unique<Scene>(window.GetGraphics());
 }
 
 int App::Run()
 {
-	// InitializeScene();
+	InitializeScene();
 
 	float t = 0.f;
 	constexpr float step = 0.01f;
@@ -19,8 +20,8 @@ int App::Run()
 			return *ecode;
 		}
 
-		// HandleInput();
-
+		HandleInput();
+		window.GetGraphics().SetCamera(scene->GetMainCamera()->GetMatrix());
 		window.GetGraphics().OnUpdate(t);
 		window.GetGraphics().OnRender();
 
@@ -76,4 +77,8 @@ void App::HandleInput()
 	{
 		cameraMoveInput.x -= 1.f;
 	}
+
+	scene->GetMainCamera()->AddMovementInput(cameraMoveInput);
+	scene->GetMainCamera()->AddYawInput(cameraLookInput.x);
+	scene->GetMainCamera()->AddPitchInput(cameraLookInput.y);
 }
