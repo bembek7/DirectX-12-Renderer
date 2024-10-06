@@ -21,7 +21,8 @@ public:
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 
-	void OnUpdate(const float time);
+	void RenderBegin();
+	void RenderEnd();
 	void OnRender();
 	void OnDestroy();
 
@@ -103,8 +104,6 @@ private:
 	DirectX::XMFLOAT4X4 projection;
 
 	static constexpr UINT bufferCount = 2;
-
-	std::unique_ptr<Mesh> mesh;
 
 	// Pipeline objects.
 	std::unique_ptr<Bindable> viewport;

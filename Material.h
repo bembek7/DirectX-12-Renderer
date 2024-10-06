@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include "ShaderSettings.h"
+#include "PipelineState.h"
 
 struct aiMaterial;
 
@@ -14,13 +15,13 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings);
+	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings);
 	void Bind(Graphics& graphics) noexcept;
 
 private:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;
-
+	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;
 	struct Roughness
 	{
 		alignas(16) float roughness = 0.8f;

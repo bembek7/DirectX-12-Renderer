@@ -25,22 +25,36 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	generatesShadow = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	model = std::make_unique<Model>(graphics, assignedMesh, shaderSettings);
-	material = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
+	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u, rootParameters);
 
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
+	rootSignature = std::make_unique<RootSignature>(graphics, rootParameters);
+
+	// filling pso structure
+	PipelineState::PipelineStateStream pipelineStateStream;
+	pipelineStateStream.rootSignature = rootSignature->Get();
+	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	pipelineStateStream.renderTargetFormats = {
+		.RTFormats{ DXGI_FORMAT_R8G8B8A8_UNORM },
+		.NumRenderTargets = 1,
+	};
+
+	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, ShaderSettings{}, nullptr);
+	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, ShaderSettings{});
 
 	if (generatesShadow)
 	{
-		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
+		//modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
 	}
-}
 
-void MeshComponent::RenderComponentDetails(Gui& gui)
-{
-	SceneComponent::RenderComponentDetails(gui);
-	gui.RenderComponentDetails(this);
+	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
 }
+//
+//void MeshComponent::RenderComponentDetails(Gui& gui)
+//{
+//	SceneComponent::RenderComponentDetails(gui);
+//	gui.RenderComponentDetails(this);
+//}
 
 std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {
@@ -53,6 +67,8 @@ void MeshComponent::Draw(Graphics& graphics)
 
 	model->Bind(graphics);
 	material->Bind(graphics);
+	pipelineState->Bind(graphics);
+	rootSignature->Bind(graphics);
 	transformConstantBuffer->Update(graphics);
 	transformConstantBuffer->Bind(graphics);
 

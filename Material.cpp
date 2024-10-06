@@ -1,16 +1,20 @@
 #include "Material.h"
 #include <assimp\material.h>
-#include "ConstantBuffer.h"
-#include "PixelShader.h"
+//#include "ConstantBuffer.h"
 #include "BindablesPool.h"
-#include "Texture.h"
-#include "Sampler.h"
-#include "Blender.h"
-#include "Rasterizer.h"
-#include "CubeTexture.h"
+#include <d3d12.h>
+#include <stdexcept>
+#include "ThrowMacros.h"
+#include <d3dcompiler.h>
+//#include "Texture.h"
+//#include "Sampler.h"
+//#include "Blender.h"
+//#include "Rasterizer.h"
+//#include "CubeTexture.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
+	{ ShaderSettings{}, L"PixelShader.cso"},
 	{ ShaderSettings::Skybox, L"SkyboxPS.cso" },
 	{ ShaderSettings::Color, L"SolidPS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
@@ -21,11 +25,12 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"PhongTexNMSMATPS.cso" },
 };
 
-Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings)
+Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings)
 {
+	/*
 	auto& bindablesPool = BindablesPool::GetInstance();
 
-	auto cullMode = D3D11_CULL_BACK;
+	auto cullMode = D3D12_CULL_BACK;
 
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Skybox))
 	{
@@ -33,7 +38,7 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texesPath);
 		sharedBindables.push_back(bindablesPool.GetBindable<CubeTexture>(graphics, 0u, texesPath.C_Str()));
 
-		cullMode = D3D11_CULL_FRONT;
+		cullMode = D3D12_CULL_FRONT;
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
@@ -44,7 +49,7 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		auto diffTex = reinterpret_cast<Texture*>(sharedBindables.back().get());
 		if (diffTex->HasAlpha())
 		{
-			cullMode = D3D11_CULL_NONE;
+			cullMode = D3D12_CULL_NONE;
 			shaderSettings |= ShaderSettings::AlphaTesting;
 		}
 	}
@@ -74,6 +79,15 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 
 	sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, cullMode));
 
+	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))
+	{
+		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Anisotropic));
+	}
+	if (static_cast<bool>(shaderSettings & (ShaderSettings::Skybox)))
+	{
+		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Biliniear));
+	}*/
+
 	std::wstring pixelShaderPath;
 
 	auto it = Material::psPaths.find(shaderSettings);
@@ -86,15 +100,10 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		throw std::runtime_error("Pixel shader path not found for given flags");
 	}
 
-	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))
-	{
-		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Anisotropic));
-	}
-	if (static_cast<bool>(shaderSettings & (ShaderSettings::Skybox)))
-	{
-		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Biliniear));
-	}
-	sharedBindables.push_back(bindablesPool.GetBindable<PixelShader>(graphics, pixelShaderPath));
+	// Load the pixel shader.
+	CHECK_HR(D3DReadFileToBlob(pixelShaderPath.c_str(), &pixelShaderBlob));
+
+	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob.Get());
 }
 
 void Material::Bind(Graphics& graphics) noexcept

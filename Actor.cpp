@@ -2,7 +2,7 @@
 #include "Actor.h"
 #include <sstream>
 #include <numbers>
-#include "Gui.h"
+//#include "Gui.h"
 
 Actor::Actor(const std::string& actorName) :
 	actorName(actorName)
@@ -127,8 +127,8 @@ std::string Actor::GetActorFullName()
 	ss << actorName << " " << typeid(*this).name() << "##" << this;
 	return ss.str();
 }
-
-void Actor::RenderActorDetails(Gui& gui)
-{
-	gui.RenderActorDetails(this);
-}
+//
+//void Actor::RenderActorDetails(Gui& gui)
+//{
+//	gui.RenderActorDetails(this);
+//}

@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Bindables">
       <UniqueIdentifier>{731723db-7ee2-4ea2-909a-f007590dc7f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Actor">
+      <UniqueIdentifier>{14ffc659-dc4a-4889-bde6-0e446f55feb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor">
+      <UniqueIdentifier>{927e111c-7ee4-4d1a-b4e3-d77cc9c79266}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -119,6 +125,21 @@
     </ClCompile>
     <ClCompile Include="PipelineState.cpp">
       <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshActor.cpp">
+      <Filter>Source Files\Actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +266,21 @@
     <ClInclude Include="PipelineState.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshActor.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PhongTexVS.hlsl">
@@ -284,9 +320,6 @@
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">

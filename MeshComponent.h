@@ -8,6 +8,8 @@
 #include "Material.h"
 #include "ConstantBuffer.h"
 #include "ShaderSettings.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class Graphics;
 class Bindable;
@@ -27,7 +29,7 @@ public:
 protected:
 	MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
-	virtual void RenderComponentDetails(Gui& gui) override;
+	//virtual void RenderComponentDetails(Gui& gui) override;
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
@@ -38,6 +40,8 @@ private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
 	std::unique_ptr<Model> modelForShadowMapping;
+	std::unique_ptr<RootSignature> rootSignature;
+	std::unique_ptr<PipelineState> pipelineState;
 
 	struct TransformBuffer
 	{

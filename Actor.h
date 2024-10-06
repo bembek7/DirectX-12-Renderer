@@ -7,7 +7,7 @@ class Graphics;
 
 class Actor
 {
-	friend class Gui;
+	//friend class Gui;
 public:
 	Actor(const std::string& actorName = "Actor");
 
@@ -56,7 +56,7 @@ protected:
 		}
 	}
 
-	virtual void RenderActorDetails(Gui& gui);
+	//virtual void RenderActorDetails(Gui& gui);
 
 protected:
 	std::string actorName;

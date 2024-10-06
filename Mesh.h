@@ -3,6 +3,8 @@
 #include "VertexBuffer.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "Model.h"
+#include "Material.h"
 
 class Graphcis;
 
@@ -15,10 +17,9 @@ public:
 
 	UINT GetIndicesNumber() const noexcept;
 private:
-	std::unique_ptr<VertexBuffer> vertexBuffer;
-	std::unique_ptr<IndexBuffer> indexBuffer;
+	std::unique_ptr<Model> model;
+	std::unique_ptr<Material> material;
 	std::unique_ptr<RootSignature> rootSignature;
-
 	std::unique_ptr<PipelineState> pipelineState;
 
 	struct TransformBuffer

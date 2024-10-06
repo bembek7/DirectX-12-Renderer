@@ -4,7 +4,7 @@
 #include <numbers>
 #include "BetterWindows.h"
 #include <assimp\scene.h>
-//#include "MeshComponent.h"
+#include "MeshComponent.h"
 #include <assimp\Importer.hpp>
 #include <stdexcept>
 #include <assimp\postprocess.h>
@@ -42,7 +42,7 @@ SceneComponent::SceneComponent(Graphics& graphics, const aiNode* const node, con
 			}
 			else
 			{
-				//childComponent = std::move(MeshComponent::CreateComponent(graphics, node->mChildren[i], scene));
+				childComponent = std::move(MeshComponent::CreateComponent(graphics, node->mChildren[i], scene));
 			}
 			SC::AttachComponents<SC>(std::move(childComponent), this);
 		}
@@ -100,7 +100,7 @@ std::unique_ptr<SceneComponent> SceneComponent::LoadComponent(Graphics& graphics
 		}
 		else
 		{
-			//newRootComponent = std::move(MeshComponent::CreateComponent(graphics, scene->mRootNode, scene));
+			newRootComponent = std::move(MeshComponent::CreateComponent(graphics, scene->mRootNode, scene));
 		}
 		return newRootComponent;
 	}

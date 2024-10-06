@@ -2,32 +2,20 @@
 #include "BetterWindows.h"
 #include <string>
 #include <vector>
-#include <DirectXMath.h>
 #include <memory>
 #include <unordered_map>
-#include <d3d11.h>
-#include "Bindable.h"
+#include "d3dx12\d3dx12.h"
+#include "IndexBuffer.h"
 #include "ShaderSettings.h"
+#include "PipelineState.h"
+#include "VertexBuffer.h"
 
 struct aiMesh;
 class IndexBuffer;
 
 class Model
 {
-public:
-	Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
-	void Bind(Graphics& graphics) noexcept;
-	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
-	size_t GetIndicesNumber() const noexcept;
 private:
-	std::vector<float> verticesData;
-	unsigned int vertexSize = 0;
-	std::vector<unsigned int> indices;
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElementDescs;
-	std::vector<std::unique_ptr<Bindable>> bindables;
-	std::vector<std::shared_ptr<Bindable>> sharedBindables;
-	std::shared_ptr<IndexBuffer> indexBuffer; // we share index buffer so not to recreate it for shadow mapping
-
 	enum class VertexElement
 	{
 		Position,
@@ -36,7 +24,31 @@ private:
 		Tangent,
 		Bitangent
 	};
-	std::unordered_map<VertexElement, unsigned int> elementOffset;
+
+	struct VertexLayout
+	{
+		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+		std::unordered_map<VertexElement, UINT> elementOffset;
+		UINT vertexSize = 0U;
+	};
+
+public:
+	Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
+	void Bind(Graphics& graphics) noexcept;
+
+	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
+	UINT GetIndicesNumber() const noexcept;
+private:
+	VertexLayout GenerateVertexLayout(const aiMesh* const assignedMesh, const ShaderSettings shaderSettings) const;
+	std::shared_ptr<IndexBuffer> GenerateIndexBuffer(Graphics& graphics, const aiMesh* const assignedMesh) const;
+	std::unique_ptr<VertexBuffer> GenerateVertexBuffer(Graphics& graphics, const aiMesh* const assignedMesh, const VertexLayout& vertexLayout) const;
+
+private:
+	Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
+
+	VertexLayout vertexLayout;
+	std::vector<std::unique_ptr<Bindable>> bindables;
+	std::shared_ptr<IndexBuffer> indexBuffer; // we share index buffer so not to recreate it for shadow mapping
 
 	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> vsPaths;
 };

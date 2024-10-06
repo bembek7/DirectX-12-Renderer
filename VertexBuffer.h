@@ -7,17 +7,8 @@
 class VertexBuffer : public Bindable
 {
 public:
-	struct Vertex
-	{
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT3 color;
-	};
-
-	//VertexBuffer(Graphics& graphics, const std::vector<float>& vertices, const unsigned int vertexSize);
-	VertexBuffer(Graphics& graphics, const std::vector<Vertex>& vertices);
+	VertexBuffer(Graphics& graphics, const std::vector<float>& verticesData, const UINT vertexSize, const UINT verticesNum);
 	virtual void Bind(Graphics& graphics) noexcept override;
-
-	UINT GetVerticesNumber() const noexcept;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer;

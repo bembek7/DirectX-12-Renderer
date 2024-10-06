@@ -1,15 +1,26 @@
 #include "App.h"
 #include <chrono>
 #include <numbers>
+#include "MeshActor.h"
 
 void App::InitializeScene()
 {
+	const std::string meshesPath = "Meshes\\";
+
 	scene = std::make_unique<Scene>(window.GetGraphics());
+
+	//scene->AddActor(std::move(sphere));
 }
 
 int App::Run()
 {
 	InitializeScene();
+
+	const std::string meshesPath = "Meshes\\";
+	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+
+	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
+	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 
 	float t = 0.f;
 	constexpr float step = 0.01f;
@@ -22,8 +33,10 @@ int App::Run()
 
 		HandleInput();
 		window.GetGraphics().SetCamera(scene->GetMainCamera()->GetMatrix());
-		window.GetGraphics().OnUpdate(t);
-		window.GetGraphics().OnRender();
+		window.GetGraphics().RenderBegin();
+		sphere->Draw(window.GetGraphics());
+		// drawing here
+		window.GetGraphics().RenderEnd();
 
 		t += step;
 	}

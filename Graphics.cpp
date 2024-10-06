@@ -27,15 +27,25 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	LoadAssets();
 }
 
-void Graphics::OnUpdate(const float time)
-{
-	mesh->OnUpdate(time);
-}
-
-void Graphics::OnRender()
+void Graphics::RenderBegin()
 {
 	// Record all the commands we need to render the scene into the command list.
 	PopulateCommandList();
+}
+
+void Graphics::RenderEnd()
+{
+	curBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	// select current buffer to render to
+	auto& backBuffer = renderTargets[curBackBufferIndex];
+
+	// prepare buffer for presentation by transitioning to present state
+	{
+		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		commandList->ResourceBarrier(1, &barrier);
+	}
+
+	CHECK_HR(commandList->Close());
 
 	// Execute the command list.
 	ID3D12CommandList* const commandLists[] = { commandList.Get() };
@@ -157,12 +167,7 @@ void Graphics::LoadAssets()
 	CHECK_HR(commandList->Close());
 
 	fence = std::make_unique<Fence>(*this);
-
-	mesh = std::make_unique<Mesh>(*this);
-
-	// define scissor rect
 	scissorRect = std::make_unique<ScissorRectangle>();
-	// define viewport
 	viewport = std::make_unique<Viewport>(windowWidth, windowHeight);
 }
 
@@ -186,25 +191,12 @@ void Graphics::PopulateCommandList()
 
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	/*vertexBuffer->Bind(*this);
-	indexBuffer->Bind(*this);*/
-	mesh->Bind(*this);
 
 	// configure RS
 	viewport->Bind(*this);
 	scissorRect->Bind(*this);
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
-
-	// draw the geometry
-	commandList->DrawIndexedInstanced(mesh->GetIndicesNumber(), 1, 0, 0, 0);
-	// prepare buffer for presentation by transitioning to present state
-	{
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		commandList->ResourceBarrier(1, &barrier);
-	}
-
-	CHECK_HR(commandList->Close());
 }
 
 void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv)
