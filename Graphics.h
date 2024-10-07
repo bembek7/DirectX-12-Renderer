@@ -10,6 +10,7 @@
 #include "RootSignature.h"
 #include "Mesh.h"
 #include "ThrowMacros.h"
+#include "Gui.h"
 
 class Graphics
 {
@@ -23,7 +24,6 @@ public:
 
 	void RenderBegin();
 	void RenderEnd();
-	void OnRender();
 	void OnDestroy();
 
 	void DrawIndexed(const UINT indicesNumber);
@@ -38,6 +38,8 @@ public:
 
 	void ResetCommandListAndAllocator();
 	void ExecuteCommandList();
+
+	Gui* const GetGui() noexcept;
 
 	template<typename T>
 	Microsoft::WRL::ComPtr<ID3D12Resource> GenerateBufferFromData(const std::vector<T>& data)
@@ -104,6 +106,9 @@ private:
 	DirectX::XMFLOAT4X4 projection;
 
 	static constexpr UINT bufferCount = 2;
+	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	std::unique_ptr<Gui> gui;
 
 	// Pipeline objects.
 	std::unique_ptr<Bindable> viewport;
@@ -115,7 +120,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
-
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 

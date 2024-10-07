@@ -29,7 +29,7 @@ public:
 protected:
 	MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
-	//virtual void RenderComponentDetails(Gui& gui) override;
+	virtual void RenderComponentDetails(Gui& gui) override;
 
 private:
 	void UpdateTransformBuffer(Graphics& graphics);

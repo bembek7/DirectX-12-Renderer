@@ -62,11 +62,11 @@ void SceneComponent::DeattachFromParent()
 		parent = nullptr;
 	}
 }
-//
-//void SceneComponent::RenderComponentDetails(Gui& gui)
-//{
-//	gui.RenderComponentDetails(this);
-//}
+
+void SceneComponent::RenderComponentDetails(Gui& gui)
+{
+	gui.RenderComponentDetails(this);
+}
 
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {

@@ -49,12 +49,12 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
 }
-//
-//void MeshComponent::RenderComponentDetails(Gui& gui)
-//{
-//	SceneComponent::RenderComponentDetails(gui);
-//	gui.RenderComponentDetails(this);
-//}
+
+void MeshComponent::RenderComponentDetails(Gui& gui)
+{
+	SceneComponent::RenderComponentDetails(gui);
+	gui.RenderComponentDetails(this);
+}
 
 std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {

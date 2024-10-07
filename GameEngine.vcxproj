@@ -185,7 +185,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Fence.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Gui.cpp" />
+    <ClCompile Include="imgui\backends\imgui_impl_dx12.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -232,7 +233,8 @@
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="Fence.h" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="Gui.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_dx12.h" />
     <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

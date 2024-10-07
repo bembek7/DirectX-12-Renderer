@@ -106,7 +106,7 @@ Graphics& Window::GetGraphics() noexcept
 void Window::EnableCursor() noexcept
 {
 	cursorEnabled = true;
-	//ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 	while (ShowCursor(TRUE) < 0);
 	FreeCursor();
 }
@@ -114,7 +114,7 @@ void Window::EnableCursor() noexcept
 void Window::DisableCursor() noexcept
 {
 	cursorEnabled = false;
-	//ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
 	while (ShowCursor(FALSE) >= 0);
 	LockCursorToClientArea();
 }

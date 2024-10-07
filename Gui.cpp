@@ -1,15 +1,15 @@
 #include "Gui.h"
 #include "imgui.h"
 #include "backends/imgui_impl_win32.h"
-#include "backends/imgui_impl_dx11.h"
-#include <d3d11.h>
+#include "backends/imgui_impl_dx12.h"
 #include "Actor.h"
 #include "SceneComponent.h"
 #include "MeshComponent.h"
 #include "PointLight.h"
 #include <sstream>
 
-Gui::Gui(const HWND& hWnd, ID3D11Device* const device, ID3D11DeviceContext* const context)
+Gui::Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat, ID3D12DescriptorHeap* const srvDescHeap,
+	const D3D12_CPU_DESCRIPTOR_HANDLE& cpuDescHandle, const D3D12_GPU_DESCRIPTOR_HANDLE& gpuDescHandle)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -17,27 +17,27 @@ Gui::Gui(const HWND& hWnd, ID3D11Device* const device, ID3D11DeviceContext* cons
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX11_Init(device, context);
+	ImGui_ImplDX12_Init(device, framesInFlightNum, rtFormat, srvDescHeap, cpuDescHandle, gpuDescHandle);
 }
 
 Gui::~Gui()
 {
-	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
 
 void Gui::BeginFrame()
 {
-	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 }
 
-void Gui::EndFrame()
+void Gui::EndFrame(ID3D12GraphicsCommandList* const commandList)
 {
 	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }
 
 void Gui::RenderActorTree(Actor* const actor)
@@ -133,23 +133,23 @@ void Gui::RenderActorDetails(Actor* const actor)
 	const std::string actorName = actor->GetActorFullName();
 	ImGui::Text(actorName.c_str());
 }
-
-void Gui::RenderActorDetails(PointLight* const actor)
-{
-	ImGui::Text("Diffuse");
-	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
-
-	ImGui::Text("Ambient");
-	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
-
-	ImGui::Text("Diffuse Intensity");
-	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
-
-	ImGui::Text("Specular Intensity");
-	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
-
-	ImGui::Text("Attenuation");
-	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
-	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
-	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
-}
+//
+//void Gui::RenderActorDetails(PointLight* const actor)
+//{
+//	ImGui::Text("Diffuse");
+//	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
+//
+//	ImGui::Text("Ambient");
+//	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
+//
+//	ImGui::Text("Diffuse Intensity");
+//	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
+//
+//	ImGui::Text("Specular Intensity");
+//	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
+//
+//	ImGui::Text("Attenuation");
+//	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
+//	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
+//	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
+//}

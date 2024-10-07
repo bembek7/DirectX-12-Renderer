@@ -25,16 +25,26 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 
 	LoadPipeline(hWnd);
 	LoadAssets();
+
+	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount,
+		renderTargetDxgiFormat,
+		srvHeap.Get(),
+		srvHeap->GetCPUDescriptorHandleForHeapStart(),
+		srvHeap->GetGPUDescriptorHandleForHeapStart()
+	);
 }
 
 void Graphics::RenderBegin()
 {
 	// Record all the commands we need to render the scene into the command list.
+	gui->BeginFrame();
 	PopulateCommandList();
 }
 
 void Graphics::RenderEnd()
 {
+	gui->EndFrame(commandList.Get());
+
 	curBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	// select current buffer to render to
 	auto& backBuffer = renderTargets[curBackBufferIndex];
@@ -109,7 +119,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {
 			.Width = (UINT)windowWidth,
 			.Height = (UINT)windowHeight,
-			.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+			.Format = renderTargetDxgiFormat,
 			.Stereo = FALSE,
 			.SampleDesc = {
 				.Count = 1,
@@ -154,6 +164,16 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		}
 	}
 
+	// descriptor heap for the shader resource view
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			.NumDescriptors = 1,
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+		};
+		CHECK_HR(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
+	}
+
 	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
 }
 
@@ -191,6 +211,7 @@ void Graphics::PopulateCommandList()
 
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
 
 	// configure RS
 	viewport->Bind(*this);
@@ -252,4 +273,9 @@ void Graphics::ExecuteCommandList()
 	// submit command list to queue as array with single element
 	ID3D12CommandList* const commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
+}
+
+Gui* const Graphics::GetGui() noexcept
+{
+	return gui.get();
 }

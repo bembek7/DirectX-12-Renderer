@@ -36,6 +36,8 @@ int App::Run()
 		window.GetGraphics().RenderBegin();
 		sphere->Draw(window.GetGraphics());
 		// drawing here
+		window.GetGraphics().GetGui()->RenderActorTree(sphere.get());
+		window.GetGraphics().GetGui()->RenderControlWindow();
 		window.GetGraphics().RenderEnd();
 
 		t += step;
