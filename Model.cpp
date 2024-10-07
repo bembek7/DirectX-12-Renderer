@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "InputLayout.h"
 #include "Utils.h"
 #include "ThrowMacros.h"
 #include <d3dcompiler.h>

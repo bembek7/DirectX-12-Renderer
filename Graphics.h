@@ -30,6 +30,7 @@ public:
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
+	DXGI_FORMAT GetRTFormat() const noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;

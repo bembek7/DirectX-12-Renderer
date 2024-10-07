@@ -1,9 +1,11 @@
-cbuffer CBuf : register(b2)
+struct Color
 {
     float4 color;
 };
 
+ConstantBuffer<Color> ColorCBuf : register(b2);
+
 float4 main() : SV_TARGET
 {
-    return color;
+    return ColorCBuf.color;
 }

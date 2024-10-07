@@ -241,6 +241,11 @@ float Graphics::GetWindowHeight() const noexcept
 	return windowHeight;
 }
 
+DXGI_FORMAT Graphics::GetRTFormat() const noexcept
+{
+	return renderTargetDxgiFormat;
+}
+
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 {
 	DirectX::XMStoreFloat4x4(&projection, proj);

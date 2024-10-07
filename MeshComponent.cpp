@@ -28,19 +28,20 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u, rootParameters);
 
+	PipelineState::PipelineStateStream pipelineStateStream;
+
+	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, ShaderSettings::Color, nullptr);
+	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, ShaderSettings::Color, rootParameters);
+
 	rootSignature = std::make_unique<RootSignature>(graphics, rootParameters);
 
 	// filling pso structure
-	PipelineState::PipelineStateStream pipelineStateStream;
 	pipelineStateStream.rootSignature = rootSignature->Get();
 	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateStream.renderTargetFormats = {
-		.RTFormats{ DXGI_FORMAT_R8G8B8A8_UNORM },
+		.RTFormats{ graphics.GetRTFormat() },
 		.NumRenderTargets = 1,
 	};
-
-	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, ShaderSettings{}, nullptr);
-	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, ShaderSettings{});
 
 	if (generatesShadow)
 	{
@@ -65,12 +66,12 @@ void MeshComponent::Draw(Graphics& graphics)
 {
 	UpdateTransformBuffer(graphics);
 
-	model->Bind(graphics);
-	material->Bind(graphics);
 	pipelineState->Bind(graphics);
 	rootSignature->Bind(graphics);
 	transformConstantBuffer->Update(graphics);
 	transformConstantBuffer->Bind(graphics);
+	model->Bind(graphics);
+	material->Bind(graphics);
 
 	graphics.DrawIndexed(model->GetIndicesNumber());
 }

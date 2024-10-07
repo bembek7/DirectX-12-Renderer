@@ -15,7 +15,8 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings);
+	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
+		ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
 	void Bind(Graphics& graphics) noexcept;
 
 private:

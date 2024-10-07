@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "ThrowMacros.h"
 #include <d3dcompiler.h>
+#include "ConstantBuffer.h"
 //#include "Texture.h"
 //#include "Sampler.h"
 //#include "Blender.h"
@@ -14,7 +15,6 @@
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
-	{ ShaderSettings{}, L"PixelShader.cso"},
 	{ ShaderSettings::Skybox, L"SkyboxPS.cso" },
 	{ ShaderSettings::Color, L"SolidPS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
@@ -25,7 +25,8 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"PhongTexNMSMATPS.cso" },
 };
 
-Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings shaderSettings)
+Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
+	ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters)
 {
 	/*
 	auto& bindablesPool = BindablesPool::GetInstance();
@@ -70,13 +71,13 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		roughnessBuffer = std::make_unique<Roughness>();
 		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u));
 	}
+	*/
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();
-		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u));
-		sharedBindables.push_back(bindablesPool.GetBindable<Blender>(graphics, false));
+		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u, rootParameters));
 	}
-
+	/*
 	sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, cullMode));
 
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))
