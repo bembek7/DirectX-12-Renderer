@@ -2,14 +2,17 @@
 #include "ThrowMacros.h"
 #include "Graphics.h"
 #include "Camera.h"
+#include "MeshComponent.h"
 
 PointLight::PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
 	MeshActor(graphics, fileName, actorName)
 {
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
-	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 0u);
-	constantShadowMapBuffer = std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, BufferType::Vertex, 1u);
+	auto& rootParams = graphics.GetCommonRootParametersRef();
+	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 0u, rootParams);
+
+	constantShadowMapBuffer = std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, BufferType::Vertex, 1u, rootParams);
 }
 
 void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor)

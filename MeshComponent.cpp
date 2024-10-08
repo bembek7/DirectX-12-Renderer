@@ -7,6 +7,7 @@
 #include "Bindable.h"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "PointLight.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -25,13 +26,13 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	generatesShadow = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters = graphics.GetCommonRootParametersRef();
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u, rootParameters);
 
 	PipelineState::PipelineStateStream pipelineStateStream;
 
-	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, ShaderSettings::Color, nullptr);
-	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, ShaderSettings::Color, rootParameters);
+	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, shaderSettings, nullptr);
+	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, shaderSettings, rootParameters);
 
 	rootSignature = std::make_unique<RootSignature>(graphics, rootParameters);
 
@@ -72,6 +73,11 @@ void MeshComponent::Draw(Graphics& graphics)
 	transformConstantBuffer->Bind(graphics);
 	model->Bind(graphics);
 	material->Bind(graphics);
+
+	if (generatesShadow)
+	{
+		graphics.BindLighting();
+	}
 
 	graphics.DrawIndexed(model->GetIndicesNumber());
 }

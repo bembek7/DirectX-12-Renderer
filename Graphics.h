@@ -8,7 +8,6 @@
 #include <dxgi1_6.h>
 #include "Fence.h"
 #include "RootSignature.h"
-#include "Mesh.h"
 #include "ThrowMacros.h"
 #include "Gui.h"
 
@@ -27,10 +26,13 @@ public:
 	void OnDestroy();
 
 	void DrawIndexed(const UINT indicesNumber);
+	void BindLighting();
+	void SetLight(PointLight* const pointLight) noexcept;
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
 	DXGI_FORMAT GetRTFormat() const noexcept;
+	std::vector<CD3DX12_ROOT_PARAMETER>& GetCommonRootParametersRef() noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
@@ -110,6 +112,10 @@ private:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	std::unique_ptr<Gui> gui;
+
+	std::vector<CD3DX12_ROOT_PARAMETER> commonRootParameters;
+
+	PointLight* light = nullptr;
 
 	// Pipeline objects.
 	std::unique_ptr<Bindable> viewport;

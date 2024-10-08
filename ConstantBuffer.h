@@ -32,19 +32,42 @@ public:
 			break;
 		}
 		CD3DX12_ROOT_PARAMETER rootParameter{};
-		rootParameter.InitAsConstants(sizeof(data) / 4, slot, 0, shaderVisibility);
+		rootParameter.InitAsConstantBufferView(slot, 0u, shaderVisibility);
 		rootParameters.push_back(std::move(rootParameter));
 		rootParameterIndex = (UINT)rootParameters.size() - 1;
+
+		const CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(data));
+		CHECK_HR(GetDevice(graphics)->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&uploadBuffer)));
+
+		CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
+	}
+	~ConstantBuffer()
+	{
+		if (uploadBuffer)
+		{
+			uploadBuffer->Unmap(0, nullptr);
+		}
+
+		mappedData = nullptr;
 	}
 	virtual void Update(Graphics& graphics) override
 	{
-		;
+		memcpy(mappedData, bufferData, sizeof(Structure));
 	}
 	virtual void Bind(Graphics& graphics) noexcept override
 	{
-		GetCommandList(graphics)->SetGraphicsRoot32BitConstants(rootParameterIndex, sizeof(*bufferData) / 4, bufferData, 0);
+		GetCommandList(graphics)->SetGraphicsRootConstantBufferView(rootParameterIndex, uploadBuffer->GetGPUVirtualAddress());
 	}
 private:
+	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
+	BYTE* mappedData = nullptr;
 	const Structure* const bufferData;
 	UINT slot;
 	UINT rootParameterIndex;

@@ -4,7 +4,7 @@
 #include <numbers>
 #include <d3dcompiler.h>
 #include "Utils.h"
-
+#include "PointLight.h"
 #include "Viewport.h"
 #include "ScissorRectangle.h"
 
@@ -80,6 +80,19 @@ void Graphics::OnDestroy()
 void Graphics::DrawIndexed(const UINT indicesNumber)
 {
 	commandList->DrawIndexedInstanced(indicesNumber, 1, 0, 0, 0);
+}
+
+void Graphics::BindLighting()
+{
+	if (light)
+	{
+		light->Bind(*this);
+	}
+}
+
+void Graphics::SetLight(PointLight* const pointLight) noexcept
+{
+	light = pointLight;
 }
 
 void Graphics::LoadPipeline(const HWND& hWnd)
@@ -244,6 +257,11 @@ float Graphics::GetWindowHeight() const noexcept
 DXGI_FORMAT Graphics::GetRTFormat() const noexcept
 {
 	return renderTargetDxgiFormat;
+}
+
+std::vector<CD3DX12_ROOT_PARAMETER>& Graphics::GetCommonRootParametersRef() noexcept
+{
+	return commonRootParameters;
 }
 
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept

@@ -65,13 +65,13 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
 		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
-	}
+	}*/
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
-		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u));
+		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u, rootParameters));
 	}
-	*/
+
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();

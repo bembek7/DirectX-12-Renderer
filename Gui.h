@@ -27,7 +27,7 @@ public:
 	void RenderComponentDetails(MeshComponent* const component);
 
 	void RenderActorDetails(Actor* const actor);
-	//void RenderActorDetails(PointLight* const actor);
+	void RenderActorDetails(PointLight* const actor);
 private:
 	void RenderComponentTree(SceneComponent* const component, Actor* const actor);
 

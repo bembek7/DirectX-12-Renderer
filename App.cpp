@@ -2,6 +2,9 @@
 #include <chrono>
 #include <numbers>
 #include "MeshActor.h"
+#include "PointLight.h"
+
+namespace Dx = DirectX;
 
 void App::InitializeScene()
 {
@@ -17,13 +20,19 @@ int App::Run()
 	InitializeScene();
 
 	const std::string meshesPath = "Meshes\\";
+	auto light = std::make_shared<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
 	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
 
-	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
+	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 
 	float t = 0.f;
 	constexpr float step = 0.01f;
+
+	auto& graphics = window.GetGraphics();
+	auto const gui = graphics.GetGui();
+
 	while (true)
 	{
 		if (const auto ecode = Window::ProcessMessages())
@@ -32,18 +41,23 @@ int App::Run()
 		}
 
 		HandleInput();
-		window.GetGraphics().SetCamera(scene->GetMainCamera()->GetMatrix());
-		window.GetGraphics().RenderBegin();
-		sphere->Draw(window.GetGraphics());
+		graphics.SetCamera(scene->GetMainCamera()->GetMatrix());
+		graphics.RenderBegin();
+
+		light->Draw(graphics);
+		graphics.SetLight(light.get());
+		sphere->Draw(graphics);
+
 		// drawing here
-		window.GetGraphics().GetGui()->RenderActorTree(sphere.get());
-		window.GetGraphics().GetGui()->RenderControlWindow();
-		window.GetGraphics().RenderEnd();
+		gui->RenderActorTree(sphere.get());
+		gui->RenderActorTree(light.get());
+		gui->RenderControlWindow();
+		graphics.RenderEnd();
 
 		t += step;
 	}
 
-	window.GetGraphics().OnDestroy();
+	graphics.OnDestroy();
 
 	return 0;
 }

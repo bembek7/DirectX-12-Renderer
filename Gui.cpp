@@ -133,23 +133,23 @@ void Gui::RenderActorDetails(Actor* const actor)
 	const std::string actorName = actor->GetActorFullName();
 	ImGui::Text(actorName.c_str());
 }
-//
-//void Gui::RenderActorDetails(PointLight* const actor)
-//{
-//	ImGui::Text("Diffuse");
-//	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
-//
-//	ImGui::Text("Ambient");
-//	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
-//
-//	ImGui::Text("Diffuse Intensity");
-//	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
-//
-//	ImGui::Text("Specular Intensity");
-//	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
-//
-//	ImGui::Text("Attenuation");
-//	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
-//	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
-//	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
-//}
+
+void Gui::RenderActorDetails(PointLight* const actor)
+{
+	ImGui::Text("Diffuse");
+	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Ambient");
+	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Diffuse Intensity");
+	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Specular Intensity");
+	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Attenuation");
+	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
+}
