@@ -28,6 +28,8 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
 	ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters)
 {
+	CD3DX12_RASTERIZER_DESC rasterizerDesc(D3D12_DEFAULT);
+
 	/*
 	auto& bindablesPool = BindablesPool::GetInstance();
 
@@ -39,7 +41,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texesPath);
 		sharedBindables.push_back(bindablesPool.GetBindable<CubeTexture>(graphics, 0u, texesPath.C_Str()));
 
-		cullMode = D3D12_CULL_FRONT;
+		rsDesc.CullMode = D3D12_CULL_FRONT;
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
@@ -50,7 +52,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		auto diffTex = reinterpret_cast<Texture*>(sharedBindables.back().get());
 		if (diffTex->HasAlpha())
 		{
-			cullMode = D3D12_CULL_NONE;
+			rsDesc.CullMode = D3D12_CULL_NONE;
 			shaderSettings |= ShaderSettings::AlphaTesting;
 		}
 	}
@@ -105,6 +107,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	CHECK_HR(D3DReadFileToBlob(pixelShaderPath.c_str(), &pixelShaderBlob));
 
 	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob.Get());
+	pipelineStateStream.rasterizer = rasterizerDesc;
 }
 
 void Material::Bind(Graphics& graphics) noexcept

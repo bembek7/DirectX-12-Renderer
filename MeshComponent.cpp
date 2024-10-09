@@ -7,7 +7,6 @@
 #include "Bindable.h"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "PointLight.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)

@@ -12,6 +12,7 @@ public:
 		CD3DX12_PIPELINE_STATE_STREAM_VS vertexShader;
 		CD3DX12_PIPELINE_STATE_STREAM_PS pixelShader;
 		CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS renderTargetFormats;
+		CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER rasterizer;
 	};
 
 	PipelineState(Graphics& graphics, PipelineStateStream& pipelineStateStream);

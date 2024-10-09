@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Actor">
       <UniqueIdentifier>{927e111c-7ee4-4d1a-b4e3-d77cc9c79266}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Passes">
+      <UniqueIdentifier>{bb14b90b-a685-44bd-8eb9-5e044cb32a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Passes">
+      <UniqueIdentifier>{1634c20d-28d8-4b41-8222-4cbfdc6a855d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
