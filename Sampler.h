@@ -17,5 +17,5 @@ public:
 	static std::string ResolveID(const UINT slot, const Mode samplerMode) noexcept;
 private:
 	UINT slot;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
+	//Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 };

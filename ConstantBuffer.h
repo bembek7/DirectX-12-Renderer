@@ -45,21 +45,18 @@ public:
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&uploadBuffer)));
-
-		CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 	}
-	~ConstantBuffer()
+
+	virtual void Update(Graphics& graphics) override
 	{
+		CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
+		memcpy(mappedData, bufferData, sizeof(Structure));
 		if (uploadBuffer)
 		{
 			uploadBuffer->Unmap(0, nullptr);
 		}
 
 		mappedData = nullptr;
-	}
-	virtual void Update(Graphics& graphics) override
-	{
-		memcpy(mappedData, bufferData, sizeof(Structure));
 	}
 	virtual void Bind(Graphics& graphics) noexcept override
 	{

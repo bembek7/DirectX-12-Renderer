@@ -21,9 +21,11 @@ int App::Run()
 
 	const std::string meshesPath = "Meshes\\";
 	auto light = std::make_shared<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
+	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
 	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
+	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 
@@ -47,10 +49,12 @@ int App::Run()
 		light->Draw(graphics);
 		graphics.SetLight(light.get());
 		sphere->Draw(graphics);
-
+		brickWall->Draw(graphics);
 		// drawing here
+
 		gui->RenderActorTree(sphere.get());
 		gui->RenderActorTree(light.get());
+		gui->RenderActorTree(brickWall.get());
 		gui->RenderControlWindow();
 		graphics.RenderEnd();
 

@@ -26,12 +26,15 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	LoadPipeline(hWnd);
 	LoadAssets();
 
+	cbvSrvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount,
 		renderTargetDxgiFormat,
 		srvHeap.Get(),
 		srvHeap->GetCPUDescriptorHandleForHeapStart(),
 		srvHeap->GetGPUDescriptorHandleForHeapStart()
 	);
+	OffsetCbvSrvCpuHandle(1);
 }
 
 void Graphics::RenderBegin()
@@ -181,11 +184,13 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 	{
 		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 1,
+			.NumDescriptors = 100000,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 		};
 		CHECK_HR(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
 	}
+
+	srvCpuHandle = { srvHeap->GetCPUDescriptorHandleForHeapStart() };
 
 	// depth buffer
 	{
@@ -285,6 +290,28 @@ void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12
 	const FLOAT clearColor[] = { 0.13f, 0.05f, 0.05f, 1.0f };
 	// clear rtv
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+}
+
+CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvCpuHandle() const noexcept
+{
+	return srvCpuHandle;
+}
+
+CD3DX12_GPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvGpuHeapStartHandle() const noexcept
+{
+	auto srvGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE{ srvHeap->GetGPUDescriptorHandleForHeapStart() };
+	srvGpuHandle.Offset(1u, cbvSrvDescriptorSize); // offsetting because of imgui taking one
+	return srvGpuHandle;
+}
+
+UINT Graphics::GetCbvSrvDescriptorSize() const noexcept
+{
+	return cbvSrvDescriptorSize;
+}
+
+void Graphics::OffsetCbvSrvCpuHandle(INT descNum)
+{
+	srvCpuHandle.Offset(descNum, cbvSrvDescriptorSize);
 }
 
 float Graphics::GetWindowWidth() const noexcept

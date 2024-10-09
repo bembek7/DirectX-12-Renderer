@@ -20,7 +20,10 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 	// define empty root signature
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
-	rootSignatureDesc.Init((UINT)std::size(rootParameters), rootParameters.data(), 0, nullptr, rootSignatureFlags);
+	// define static sampler
+	CD3DX12_STATIC_SAMPLER_DESC staticSampler{ 1u, D3D12_FILTER_MIN_MAG_MIP_LINEAR };
+	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootSignatureDesc.Init((UINT)std::size(rootParameters), rootParameters.data(), 1u, &staticSampler, rootSignatureFlags);
 	// serialize root signature
 	Wrl::ComPtr<ID3DBlob> signatureBlob;
 	Wrl::ComPtr<ID3DBlob> errorBlob;

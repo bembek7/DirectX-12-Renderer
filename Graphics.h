@@ -15,6 +15,8 @@ class Graphics
 {
 	friend class Bindable;
 	friend class Fence;
+	friend class TexLoader;
+	friend class Texture;
 public:
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
@@ -29,6 +31,10 @@ public:
 	void BindLighting();
 	void SetLight(PointLight* const pointLight) noexcept;
 
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
+	UINT GetCbvSrvDescriptorSize() const noexcept;
+	void OffsetCbvSrvCpuHandle(INT descNum);
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
 	DXGI_FORMAT GetRTFormat() const noexcept;
@@ -107,7 +113,7 @@ private:
 	float windowHeight;
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
-
+	UINT cbvSrvDescriptorSize = 0;
 	static constexpr UINT bufferCount = 2;
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
@@ -130,6 +136,7 @@ private:
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 

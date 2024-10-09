@@ -10,6 +10,7 @@
 #include "PipelineState.h"
 
 struct aiMaterial;
+class Texture;
 
 class Material
 {
@@ -21,7 +22,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<Bindable>> bindables;
-	std::vector<std::shared_ptr<Bindable>> sharedBindables;
+	std::vector<std::shared_ptr<Texture>> textures;
 	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;
 	struct Roughness
 	{

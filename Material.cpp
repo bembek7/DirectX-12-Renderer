@@ -1,16 +1,14 @@
 #include "Material.h"
 #include <assimp\material.h>
-//#include "ConstantBuffer.h"
 #include "BindablesPool.h"
 #include <d3d12.h>
 #include <stdexcept>
 #include "ThrowMacros.h"
 #include <d3dcompiler.h>
 #include "ConstantBuffer.h"
-//#include "Texture.h"
+#include "Texture.h"
 //#include "Sampler.h"
 //#include "Blender.h"
-//#include "Rasterizer.h"
 //#include "CubeTexture.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
@@ -30,11 +28,8 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 {
 	CD3DX12_RASTERIZER_DESC rasterizerDesc(D3D12_DEFAULT);
 
-	/*
 	auto& bindablesPool = BindablesPool::GetInstance();
-
-	auto cullMode = D3D12_CULL_BACK;
-
+	/*
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Skybox))
 	{
 		aiString texesPath;
@@ -42,32 +37,34 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		sharedBindables.push_back(bindablesPool.GetBindable<CubeTexture>(graphics, 0u, texesPath.C_Str()));
 
 		rsDesc.CullMode = D3D12_CULL_FRONT;
-	}
+	}*/
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str()));
-
-		auto diffTex = reinterpret_cast<Texture*>(sharedBindables.back().get());
+		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str(), rootParameters));
+		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str(), rootParameters);
 		if (diffTex->HasAlpha())
 		{
-			rsDesc.CullMode = D3D12_CULL_NONE;
+			rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 			shaderSettings |= ShaderSettings::AlphaTesting;
 		}
+		textures.push_back(std::move(diffTex));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::NormalMap))
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str()));
+		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str(), rootParameters));
+		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str(), rootParameters));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
-	}*/
+		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
+		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str(), rootParameters));
+	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
@@ -80,11 +77,9 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u, rootParameters));
 	}
 	/*
-	sharedBindables.push_back(bindablesPool.GetBindable<Rasterizer>(graphics, cullMode));
-
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))
 	{
-		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Anisotropic));
+		//sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Anisotropic));
 	}
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Skybox)))
 	{
@@ -118,9 +113,10 @@ void Material::Bind(Graphics& graphics) noexcept
 		bindable->Bind(graphics);
 	}
 
-	for (auto& sharedBindable : sharedBindables)
+	auto srvGpuHandle = graphics.GetCbvSrvGpuHeapStartHandle();
+	for (auto& texture : textures)
 	{
-		sharedBindable->Update(graphics);
-		sharedBindable->Bind(graphics);
+		texture->Bind(graphics, srvGpuHandle);
+		srvGpuHandle.Offset(1u, graphics.GetCbvSrvDescriptorSize());
 	}
 }

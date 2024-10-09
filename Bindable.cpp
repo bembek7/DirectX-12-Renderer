@@ -19,6 +19,11 @@ ID3D12GraphicsCommandList* Bindable::GetCommandList(Graphics& graphics) noexcept
 	return graphics.commandList.Get();
 }
 
+ID3D12DescriptorHeap* Bindable::GetSrvHeap(Graphics& graphics) noexcept
+{
+	return graphics.srvHeap.Get();
+}
+
 //std::vector<CD3DX12_ROOT_PARAMETER>& Bindable::GetRootParameters(Graphics& graphics) noexcept
 //{
 //	return graphics.rootParameters;

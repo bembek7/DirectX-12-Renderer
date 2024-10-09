@@ -206,6 +206,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
+    <ClCompile Include="TexLoader.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Viewport.cpp" />
@@ -255,6 +257,8 @@
     <ClInclude Include="SceneComponent.h" />
     <ClInclude Include="ScissorRectangle.h" />
     <ClInclude Include="ShaderSettings.h" />
+    <ClInclude Include="TexLoader.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="ThrowMacros.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexBuffer.h" />

@@ -1,64 +1,42 @@
 #include "Texture.h"
-#include "Utils.h"
-#include "ThrowMacros.h"
-#include "dxtex\DirectXTex.h"
+#include "TexLoader.h"
+#include "Graphics.h"
 
-Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName) :
+Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) :
 	slot(slot)
 {
-	DirectX::ScratchImage scratchImage;
-	CHECK_HR(DirectX::LoadFromWICFile(Utils::StringToWstring("Textures\\" + fileName).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, scratchImage));
+	texture = std::move(TexLoader::LoadTextureFromFile(graphics, fileName));
 
-	hasAlpha = !scratchImage.IsAlphaAllOpaque();
+	// create the descriptor in the heap
+	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
+		.Format = texture->GetDesc().Format,
+		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+		.Texture2D{.MipLevels = texture->GetDesc().MipLevels },
+	};
+	graphics.device->CreateShaderResourceView(texture.Get(), &srvDesc, graphics.GetCbvSrvCpuHandle());
+	graphics.OffsetCbvSrvCpuHandle(1);
 
-	D3D11_TEXTURE2D_DESC textureDesc = {};
-	textureDesc.Width = (UINT)scratchImage.GetMetadata().width;
-	textureDesc.Height = (UINT)scratchImage.GetMetadata().height;
-	textureDesc.MipLevels = 0;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-
-	if (scratchImage.GetImage(0, 0, 0)->format != textureDesc.Format)
-	{
-		DirectX::ScratchImage converted;
-		CHECK_HR(DirectX::Convert(*scratchImage.GetImage(0, 0, 0), textureDesc.Format, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, converted));
-		scratchImage = std::move(converted);
-	}
-
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2D;
-	CHECK_HR(GetDevice(graphics)->CreateTexture2D(&textureDesc, nullptr, &texture2D));
-
-	GetContext(graphics)->UpdateSubresource(texture2D.Get(), 0u, nullptr, scratchImage.GetPixels(), (UINT)scratchImage.GetMetadata().width * sizeof(unsigned int), 0u);
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = -1;
-	CHECK_HR(GetDevice(graphics)->CreateShaderResourceView(texture2D.Get(), &srvDesc, &textureView));
-
-	GetContext(graphics)->GenerateMips(textureView.Get());
+	CD3DX12_ROOT_PARAMETER rootParameter{};
+	descRange = { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, slot };
+	rootParameter.InitAsDescriptorTable(1, &descRange, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters.push_back(std::move(rootParameter));
+	rootParameterIndex = (UINT)rootParameters.size() - 1;
 }
 
-void Texture::Bind(Graphics& graphics) noexcept
+void Texture::Bind(Graphics& graphics, const CD3DX12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle) noexcept
 {
-	GetContext(graphics)->PSSetShaderResources(slot, 1u, textureView.GetAddressOf());
+	graphics.commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, srvGpuHandle);
 }
 
 bool Texture::HasAlpha() const noexcept
 {
 	return hasAlpha;
 }
-
-std::string Texture::ResolveID(const UINT slot, const std::string& fileName) noexcept
-{
-	std::stringstream ss;
-	ss << slot << fileName;
-	return ss.str();
-}
+//
+//std::string Texture::ResolveID(const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) noexcept
+//{
+//	std::stringstream ss;
+//	ss << slot << fileName;
+//	return ss.str();
+//}
