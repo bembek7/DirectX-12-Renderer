@@ -395,6 +395,8 @@
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
     <None Include="Shadow.hlsli" />
+    <None Include="ShadowMapCB.hlsli" />
+    <None Include="TransformCB.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

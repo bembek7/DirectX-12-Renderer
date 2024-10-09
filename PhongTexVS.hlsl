@@ -1,14 +1,5 @@
-cbuffer TransformCBuf : register(b0)
-{
-    matrix model;
-    matrix modelView;
-    matrix modelViewProj;
-};
-
-cbuffer ShadowMapCBuf : register(b1)
-{
-    matrix lightPerspective;
-};
+#include "TransformCB.hlsli"
+#include "ShadowMapCB.hlsli"
 
 struct VSOut
 {
@@ -22,14 +13,14 @@ struct VSOut
 VSOut main(float3 position : POSITION, float3 normal : NORMAL, float2 texCoord : TEX_COORD)
 {
     VSOut vsout;
-    vsout.viewPos = (float3) mul(float4(position, 1.0f), modelView);
-    vsout.viewNormal = mul(normal, (float3x3) modelView);
+    vsout.viewPos = (float3) mul(float4(position, 1.0f), TransformCB.modelView);
+    vsout.viewNormal = mul(normal, (float3x3) TransformCB.modelView);
     vsout.texCoord = texCoord;
-    vsout.pos = mul(float4(position, 1.0f), modelViewProj);
+    vsout.pos = mul(float4(position, 1.0f), TransformCB.modelViewProj);
     
     // Transform the vertex position into projected space from the POV of the light.
-    const float4 modelPos = mul(float4(position, 1.0f), model);
-    vsout.lightPerspectivePos = mul(modelPos, lightPerspective);
+    const float4 modelPos = mul(float4(position, 1.0f), TransformCB.model);
+    vsout.lightPerspectivePos = mul(modelPos, ShadowMapCB.lightPerspective);
     
     return vsout;
 }

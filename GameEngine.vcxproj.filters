@@ -348,5 +348,11 @@
     <None Include="Shadow.hlsli">
       <Filter>Resource Files\PixelShaders</Filter>
     </None>
+    <None Include="TransformCB.hlsli">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </None>
+    <None Include="ShadowMapCB.hlsli">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

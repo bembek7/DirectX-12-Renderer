@@ -1,14 +1,5 @@
-struct Transform
-{
-    matrix model;
-    matrix modelView;
-    matrix modelViewProj;
-};
-
-struct ShadowMap
-{
-    matrix lightPerspective;
-};
+#include "TransformCB.hlsli"
+#include "ShadowMapCB.hlsli"
 
 struct VSOut
 {
@@ -17,9 +8,6 @@ struct VSOut
     float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION;
     float4 pos : SV_Position;
 };
-
-ConstantBuffer<Transform> TransformCB : register(b0);
-ConstantBuffer<ShadowMap> ShadowMapCB : register(b1);
 
 VSOut main(float3 position : POSITION, float3 normal : NORMAL)
 {
