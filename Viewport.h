@@ -1,5 +1,6 @@
 #pragma once
 #include "Bindable.h"
+#include "d3dx12\d3dx12.h"
 
 class Viewport : public Bindable
 {
@@ -8,5 +9,5 @@ public:
 	void Bind(Graphics& graphics) noexcept override;
 
 private:
-	D3D12_VIEWPORT viewport{};
+	CD3DX12_VIEWPORT viewport;
 };

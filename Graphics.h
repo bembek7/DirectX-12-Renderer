@@ -125,7 +125,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;

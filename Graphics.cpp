@@ -18,7 +18,7 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	{
 		// setup perspective projection matrix
 		const auto aspectRatio = windowWidth / windowHeight;
-		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(65.f), aspectRatio, 0.1f, 100.0f);
+		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(90.f), aspectRatio, 0.1f, 100.0f);
 
 		SetProjection(projection);
 	}
@@ -187,6 +187,46 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		CHECK_HR(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
 	}
 
+	// depth buffer
+	{
+		const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
+		const CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Tex2D(
+			DXGI_FORMAT_D32_FLOAT,
+			(UINT)windowWidth, (UINT)windowHeight,
+			1, 0, 1, 0,
+			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+		const D3D12_CLEAR_VALUE clearValue = {
+			.Format = DXGI_FORMAT_D32_FLOAT,
+			.DepthStencil = { 1.0f, 0 },
+		};
+		CHECK_HR(device->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&desc,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&clearValue,
+			IID_PPV_ARGS(&depthBuffer)));
+	}
+
+	// dsv descriptor heap
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC desc = {
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+			.NumDescriptors = 1,
+		};
+		CHECK_HR(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&dsvHeap)));
+	}
+
+	const D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesk =
+	{
+		.Format = DXGI_FORMAT_D32_FLOAT,
+		.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D
+	};
+
+	// dsv and handle
+	dsvHandle = { dsvHeap->GetCPUDescriptorHandleForHeapStart() };
+	device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesk, dsvHandle);
+
 	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
 }
 
@@ -222,6 +262,9 @@ void Graphics::PopulateCommandList()
 
 	ClearRenderTarget(backBuffer.Get(), rtv);
 
+	// clear the depth buffer
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
+
 	// configure IA
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
@@ -230,7 +273,7 @@ void Graphics::PopulateCommandList()
 	viewport->Bind(*this);
 	scissorRect->Bind(*this);
 	// bind render target
-	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
+	commandList->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
 }
 
 void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv)

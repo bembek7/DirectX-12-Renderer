@@ -2,8 +2,7 @@
 
 Viewport::Viewport(const float width, const float height)
 {
-	viewport.Width = width;
-	viewport.Height = height;
+	viewport = CD3DX12_VIEWPORT{ 0.f, 0.f, width, height };
 }
 
 void Viewport::Bind(Graphics& graphics) noexcept

@@ -42,6 +42,10 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		.RTFormats{ graphics.GetRTFormat() },
 		.NumRenderTargets = 1,
 	};
+	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
+	const CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(CD3DX12_DEFAULT{});
+
+	pipelineStateStream.depthStencil = depthStencilDesc;
 
 	if (generatesShadow)
 	{
