@@ -16,17 +16,11 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 	};
 	graphics.device->CreateShaderResourceView(texture.Get(), &srvDesc, graphics.GetCbvSrvCpuHandle());
 	graphics.OffsetCbvSrvCpuHandle(1);
-
-	CD3DX12_ROOT_PARAMETER rootParameter{};
-	descRange = { D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, slot };
-	rootParameter.InitAsDescriptorTable(1, &descRange, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters.push_back(std::move(rootParameter));
-	rootParameterIndex = (UINT)rootParameters.size() - 1;
 }
 
-void Texture::Bind(Graphics& graphics, const CD3DX12_GPU_DESCRIPTOR_HANDLE& srvGpuHandle) noexcept
+UINT Texture::GetSlot() const noexcept
 {
-	graphics.commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, srvGpuHandle);
+	return slot;
 }
 
 bool Texture::HasAlpha() const noexcept

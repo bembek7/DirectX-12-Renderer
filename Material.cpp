@@ -86,6 +86,21 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 1u, Sampler::Mode::Biliniear));
 	}*/
 
+	if (textures.size() > 0)
+	{
+		CD3DX12_ROOT_PARAMETER rootParameter{};
+		texesDescRanges = {};
+		UINT i = 0;
+		for (const auto& tex : textures)
+		{
+			texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, tex->GetSlot(), 0u, i });
+			i++;
+		}
+		rootParameter.InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters.push_back(std::move(rootParameter));
+		desciptorTableRootIndex = (UINT)rootParameters.size() - 1;
+	}
+
 	std::wstring pixelShaderPath;
 
 	auto it = Material::psPaths.find(shaderSettings);
@@ -113,10 +128,9 @@ void Material::Bind(Graphics& graphics) noexcept
 		bindable->Bind(graphics);
 	}
 
-	auto srvGpuHandle = graphics.GetCbvSrvGpuHeapStartHandle();
-	for (auto& texture : textures)
+	if (texesDescRanges.size() > 0)
 	{
-		texture->Bind(graphics, srvGpuHandle);
-		srvGpuHandle.Offset(1u, graphics.GetCbvSrvDescriptorSize());
+		auto srvGpuHandle = graphics.GetCbvSrvGpuHeapStartHandle();
+		graphics.commandList->SetGraphicsRootDescriptorTable(desciptorTableRootIndex, srvGpuHandle);
 	}
 }

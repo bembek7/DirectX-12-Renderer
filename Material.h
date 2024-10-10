@@ -23,6 +23,8 @@ public:
 private:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Texture>> textures;
+	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
+	UINT desciptorTableRootIndex;
 	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;
 	struct Roughness
 	{

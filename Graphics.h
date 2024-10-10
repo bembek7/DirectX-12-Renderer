@@ -17,6 +17,7 @@ class Graphics
 	friend class Fence;
 	friend class TexLoader;
 	friend class Texture;
+	friend class Material;
 public:
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
