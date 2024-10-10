@@ -7,7 +7,7 @@ class Graphics;
 class Texture
 {
 public:
-	Texture(Graphics& graphics, const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
+	Texture(Graphics& graphics, const UINT slot, const std::string& fileName);
 	UINT GetSlot() const noexcept;
 
 	bool HasAlpha() const noexcept;
@@ -15,6 +15,6 @@ public:
 private:
 	bool hasAlpha = false;
 	UINT slot;
-	Microsoft::WRL::ComPtr<ID3D12Resource> texture;
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> texture;
 	CD3DX12_DESCRIPTOR_RANGE descRange;
 };

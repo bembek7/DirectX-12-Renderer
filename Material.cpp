@@ -43,7 +43,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
 		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str(), rootParameters));
-		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str(), rootParameters);
+		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str());
 		if (diffTex->HasAlpha())
 		{
 			rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
@@ -56,14 +56,14 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
 		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str(), rootParameters));
-		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str(), rootParameters));
+		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str()));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
 		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
-		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str(), rootParameters));
+		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str()));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
@@ -100,7 +100,6 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		rootParameters.push_back(std::move(rootParameter));
 		desciptorTableRootIndex = (UINT)rootParameters.size() - 1;
 	}
-
 	std::wstring pixelShaderPath;
 
 	auto it = Material::psPaths.find(shaderSettings);

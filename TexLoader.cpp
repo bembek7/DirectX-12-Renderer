@@ -10,6 +10,34 @@ namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
 namespace views = std::ranges::views;
 
+TexLoader& TexLoader::GetInstance()
+{
+	static TexLoader instance;
+	return instance;
+}
+
+std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> TexLoader::GetTexture(Graphics& graphics, const std::string& fileName)
+{
+	using TexRes = Wrl::ComPtr<ID3D12Resource>;
+	auto texIt = texturesMap.find(fileName);
+	std::shared_ptr<TexRes> sharedTex;
+	if (texIt != texturesMap.end())
+	{
+		sharedTex = texIt->second.lock();
+		if (!sharedTex)
+		{
+			sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName));
+			texIt->second = sharedTex;
+		}
+	}
+	else
+	{
+		sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName));
+		texturesMap[fileName] = sharedTex;
+	}
+	return sharedTex;
+}
+
 Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName)
 {
 	Dx::ScratchImage scratchImage;
