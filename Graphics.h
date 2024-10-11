@@ -54,6 +54,7 @@ public:
 
 	void ResetCommandListAndAllocator();
 	void ExecuteCommandList();
+	void WaitForQueueFinish();
 
 	Gui* const GetGui() noexcept;
 
@@ -104,7 +105,7 @@ public:
 
 		ExecuteCommandList();
 
-		fence->WaitForQueueFinish(*this, INFINITE);
+		WaitForQueueFinish();
 
 		return finalBuffer;
 	}
@@ -121,7 +122,7 @@ private:
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
 	UINT cbvSrvDescriptorSize = 0;
-	static constexpr UINT bufferCount = 2;
+	static constexpr UINT bufferCount = 3;
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	std::unique_ptr<Gui> gui;
@@ -136,7 +137,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device2> device;
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocators[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> bundleAllocator;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
@@ -149,6 +150,8 @@ private:
 	UINT rtvDescriptorSize;
 
 	// Synchronization objects.
-	UINT curBackBufferIndex;
-	std::unique_ptr<Fence> fence;
+	UINT curBufferIndex = 0;
+	HANDLE fenceEvent;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
+	UINT64 fenceValues[bufferCount] = { 0 };
 };

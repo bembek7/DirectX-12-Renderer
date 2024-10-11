@@ -26,7 +26,7 @@ VertexBuffer::VertexBuffer(Graphics& graphics, const std::vector<float>& vertice
 
 	graphics.ExecuteCommandList();
 
-	WaitForQueueFinish(graphics);
+	graphics.WaitForQueueFinish();
 
 	vertexBufferView =
 	{

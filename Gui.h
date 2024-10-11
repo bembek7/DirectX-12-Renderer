@@ -21,7 +21,7 @@ public:
 	void EndFrame(ID3D12GraphicsCommandList* const commandList);
 
 	void RenderActorTree(Actor* const actor);
-
+	void RenderPerformanceInfo(const unsigned int fps, const float delayBetweenFrames);
 	void RenderControlWindow();
 	void RenderComponentDetails(SceneComponent* const component);
 	void RenderComponentDetails(MeshComponent* const component);

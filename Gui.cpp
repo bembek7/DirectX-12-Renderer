@@ -53,6 +53,17 @@ void Gui::RenderActorTree(Actor* const actor)
 	}
 }
 
+void Gui::RenderPerformanceInfo(const unsigned int fps, const float delayBetweenFrames)
+{
+	if (ImGui::Begin("Performance Info"))
+	{
+		std::stringstream ss;
+		ss << "FPS:" << fps << " " << delayBetweenFrames << "ms";
+		ImGui::Text(ss.str().c_str());
+	}
+	ImGui::End();
+}
+
 void Gui::RenderComponentTree(SceneComponent* const component, Actor* const actor)
 {
 	if (component)

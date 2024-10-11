@@ -39,9 +39,8 @@ void Graphics::RenderEnd()
 {
 	gui->EndFrame(commandList.Get());
 
-	curBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	// select current buffer to render to
-	auto& backBuffer = renderTargets[curBackBufferIndex];
+	auto& backBuffer = renderTargets[curBufferIndex];
 
 	// prepare buffer for presentation by transitioning to present state
 	{
@@ -56,17 +55,31 @@ void Graphics::RenderEnd()
 
 	CHECK_HR(swapChain->Present(1, 0));
 
-	// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
-	// This is code implemented as such for simplicity. More advanced samples
-	// illustrate how to use fences for efficient resource usage.
-	fence->WaitForQueueFinish(*this, INFINITE);
+	const UINT64 currentFenceValue = fenceValues[curBufferIndex];
+	CHECK_HR(commandQueue->Signal(fence.Get(), currentFenceValue));
+
+	curBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+	if (fence->GetCompletedValue() < fenceValues[curBufferIndex])
+	{
+		CHECK_HR(fence->SetEventOnCompletion(fenceValues[curBufferIndex], fenceEvent));
+		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+	}
+
+	// Set the fence value for the next frame.
+	fenceValues[curBufferIndex] = currentFenceValue + 1;
 }
 
 void Graphics::OnDestroy()
 {
-	fence->WaitForQueueFinish(*this, 2000);
+	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValues[curBufferIndex]));
+	CHECK_HR(fence->SetEventOnCompletion(fenceValues[curBufferIndex], fenceEvent));
+	if (WaitForSingleObject(fenceEvent, 2000) == WAIT_FAILED)
+	{
+		CHECK_HR(GetLastError());
+	}
 
-	fence->CloseEventHandle();
+	CloseHandle(fenceEvent);
 }
 
 void Graphics::BindLighting(ID3D12GraphicsCommandList* const commandList)
@@ -165,11 +178,14 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 	// Create frame resources.
 	{
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(rtvHeap->GetCPUDescriptorHandleForHeapStart());
-		for (int i = 0; i < bufferCount; i++)
+
+		for (UINT i = 0; i < bufferCount; i++)
 		{
 			CHECK_HR(swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargets[i])));
 			device->CreateRenderTargetView(renderTargets[i].Get(), nullptr, rtvHandle);
 			rtvHandle.Offset(rtvDescriptorSize);
+
+			CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocators[i])));
 		}
 	}
 
@@ -225,24 +241,32 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 	dsvHandle = { dsvHeap->GetCPUDescriptorHandleForHeapStart() };
 	device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesk, dsvHandle);
 
-	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
 	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&bundleAllocator)));
 }
 
 void Graphics::LoadAssets()
 {
 	// Create the command list.
-	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList)));
+	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocators[curBufferIndex].Get(), nullptr, IID_PPV_ARGS(&commandList)));
 	CHECK_HR(commandList->Close());
 
-	fence = std::make_unique<Fence>(*this);
+	CHECK_HR(device->CreateFence(fenceValues[curBufferIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
+
+	// fence signalling event
+	fenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	if (!fenceEvent)
+	{
+		CHECK_HR(GetLastError());
+		throw std::runtime_error{ "Failed to create fence event" };
+	}
+
+	WaitForQueueFinish();
 }
 
 void Graphics::PopulateCommandList()
 {
-	curBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	// select current buffer to render to
-	auto& backBuffer = renderTargets[curBackBufferIndex];
+	auto& backBuffer = renderTargets[curBufferIndex];
 
 	// reset command list and allocator
 	ResetCommandListAndAllocator();
@@ -251,7 +275,7 @@ void Graphics::PopulateCommandList()
 	const CD3DX12_CPU_DESCRIPTOR_HANDLE rtv
 	{
 		rtvHeap->GetCPUDescriptorHandleForHeapStart(),
-		(INT)curBackBufferIndex, rtvDescriptorSize
+		(INT)curBufferIndex, rtvDescriptorSize
 	};
 
 	ClearRenderTarget(backBuffer.Get(), rtv);
@@ -361,8 +385,8 @@ DirectX::XMMATRIX Graphics::GetCamera() const noexcept
 void Graphics::ResetCommandListAndAllocator()
 {
 	// reset command list and allocator
-	CHECK_HR(commandAllocator->Reset());
-	CHECK_HR(commandList->Reset(commandAllocator.Get(), nullptr));
+	CHECK_HR(commandAllocators[curBufferIndex]->Reset());
+	CHECK_HR(commandList->Reset(commandAllocators[curBufferIndex].Get(), nullptr));
 }
 
 void Graphics::ExecuteCommandList()
@@ -370,6 +394,16 @@ void Graphics::ExecuteCommandList()
 	// submit command list to queue as array with single element
 	ID3D12CommandList* const commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
+}
+
+void Graphics::WaitForQueueFinish()
+{
+	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValues[curBufferIndex]));
+	CHECK_HR(fence->SetEventOnCompletion(fenceValues[curBufferIndex], fenceEvent));
+	if (WaitForSingleObject(fenceEvent, INFINITE) == WAIT_FAILED)
+	{
+		CHECK_HR(GetLastError());
+	}
 }
 
 Gui* const Graphics::GetGui() noexcept
