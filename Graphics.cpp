@@ -15,13 +15,6 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	windowWidth(windowWidth),
 	windowHeight(windowHeight)
 {
-	{
-		const auto aspectRatio = windowWidth / windowHeight;
-		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(90.f), aspectRatio, 0.1f, 100.0f);
-
-		SetProjection(projection);
-	}
-
 	LoadPipeline(hWnd);
 	LoadAssets();
 
@@ -243,8 +236,6 @@ void Graphics::LoadAssets()
 	CHECK_HR(commandList->Close());
 
 	fence = std::make_unique<Fence>(*this);
-	scissorRect = std::make_unique<ScissorRectangle>();
-	viewport = std::make_unique<Viewport>(windowWidth, windowHeight);
 }
 
 void Graphics::PopulateCommandList()
@@ -268,9 +259,6 @@ void Graphics::PopulateCommandList()
 	// clear the depth buffer
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 
-	// configure RS
-	viewport->Bind(commandList.Get());
-	scissorRect->Bind(commandList.Get());
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
 }
@@ -284,6 +272,11 @@ void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12
 	const FLOAT clearColor[] = { 0.13f, 0.05f, 0.05f, 1.0f };
 	// clear rtv
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+}
+
+ID3D12GraphicsCommandList* Graphics::GetMainCommandList()
+{
+	return commandList.Get();
 }
 
 Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Graphics::CreateBundle()
@@ -343,6 +336,11 @@ std::vector<CD3DX12_ROOT_PARAMETER>& Graphics::GetCommonRootParametersRef() noex
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 {
 	DirectX::XMStoreFloat4x4(&projection, proj);
+}
+
+void Graphics::SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept
+{
+	projection = proj;
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept

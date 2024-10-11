@@ -2,6 +2,7 @@
 #include "PointLight.h"
 #include <stdexcept>
 #include "Graphics.h"
+#include "RegularDrawingPass.h"
 //#include "DepthCubeTexture.h"
 
 namespace Dx = DirectX;
@@ -13,8 +14,8 @@ Scene::Scene(Graphics& graphics)
 	/*const float shadowMapCubeFaceSize = 1024.f;
 	auto shadowMapCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)shadowMapCubeFaceSize);
 
-	shadowMapPass = std::make_unique<ShadowMapPass>(graphics, shadowMapCube);
-	drawingPass = std::make_unique<RegularDrawingPass>(graphics, shadowMapCube);*/
+	shadowMapPass = std::make_unique<ShadowMapPass>(graphics, shadowMapCube);*/
+	drawingPass = std::make_unique<RegularDrawingPass>(graphics);
 }
 
 void Scene::AddActor(std::unique_ptr<Actor> actorToAdd)
@@ -48,18 +49,13 @@ void Scene::AddLight(std::unique_ptr<PointLight> lightToAdd)
 void Scene::Draw(Graphics& graphics)
 {
 	//shadowMapPass->Execute(graphics, actors, light.get());
-	//drawingPass->Execute(graphics, actors, light.get(), mainCamera.get());
 
 	// Skybox should be drawn last
 	//skybox->Draw(graphics);
 	light->Update(graphics);
-	graphics.SetCamera(mainCamera->GetMatrix());
-
 	graphics.RenderBegin();
-	for (auto& actor : actors)
-	{
-		actor->Draw(graphics);
-	}
+	drawingPass->Execute(graphics, actors, mainCamera.get());
+
 	RenderControls(graphics);
 	graphics.RenderEnd();
 }

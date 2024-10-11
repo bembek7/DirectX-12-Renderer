@@ -201,8 +201,10 @@
     <ClCompile Include="MeshActor.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Pass.cpp" />
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="RegularDrawingPass.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneComponent.cpp" />
@@ -251,8 +253,10 @@
     <ClInclude Include="MeshActor.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Pass.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="RegularDrawingPass.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneComponent.h" />

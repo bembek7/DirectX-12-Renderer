@@ -10,7 +10,7 @@ class DepthCubeTexture;
 class RegularDrawingPass : public Pass
 {
 public:
-	RegularDrawingPass(Graphics& graphics, std::shared_ptr<DepthCubeTexture> shadowMapCube);
+	RegularDrawingPass(Graphics& graphics);
 
-	virtual void Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight, const Camera* const mainCamera);
+	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const Camera* const mainCamera);
 };

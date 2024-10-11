@@ -1,38 +1,25 @@
 #include "RegularDrawingPass.h"
 #include "Graphics.h"
-#include "RenderTargetView.h"
-#include "BindablesPool.h"
-#include "Actor.h"
 #include "Camera.h"
-#include "PointLight.h"
+#include "Actor.h"
+#include "ScissorRectangle.h"
 #include "Viewport.h"
-#include "DepthStencilState.h"
-#include "DepthStencilView.h"
-#include "Sampler.h"
-#include "DepthCubeTexture.h"
 
-RegularDrawingPass::RegularDrawingPass(Graphics& graphics, std::shared_ptr<DepthCubeTexture> shadowMapCube)
+RegularDrawingPass::RegularDrawingPass(Graphics& graphics)
 {
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
-	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
-	bindables.push_back(std::make_unique<RenderTargetView>(graphics));
-	bindables.push_back(std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::DepthStencil, UINT(windowWidth), UINT(windowHeight)));
-	bindables.push_back(std::make_unique<DepthStencilState>(graphics, DepthStencilState::Usage::Regular));
-	sharedBindables.push_back(std::move(shadowMapCube));
 
-	auto& bindablesPool = BindablesPool::GetInstance();
-	sharedBindables.push_back(bindablesPool.GetBindable<Sampler>(graphics, 0u, Sampler::Mode::Comparison));
+	bindables.push_back(std::make_unique<ScissorRectangle>());
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
 	DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f));
 }
 
-void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight, const Camera* const mainCamera)
+void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const Camera* const mainCamera)
 {
 	Pass::Execute(graphics);
-	//graphics.BindCurrentRenderTarget();
 	graphics.SetCamera(mainCamera->GetMatrix());
-	pointLight->Bind(graphics);
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics);

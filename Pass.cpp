@@ -7,12 +7,10 @@ void Pass::Execute(Graphics& graphics)
 
 	for (const auto& bindable : bindables)
 	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
+		bindable->Bind(graphics.GetMainCommandList());
 	}
 	for (const auto& sharedBindable : sharedBindables)
 	{
-		sharedBindable->Update(graphics);
-		sharedBindable->Bind(graphics);
+		sharedBindable->Bind(graphics.GetMainCommandList());
 	}
 }

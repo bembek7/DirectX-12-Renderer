@@ -17,7 +17,6 @@ class Graphics
 	friend class Fence;
 	friend class TexLoader;
 	friend class Texture;
-	friend class Material;
 public:
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
@@ -32,18 +31,23 @@ public:
 	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
 	void SetLight(PointLight* const pointLight) noexcept;
 
+	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
+
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
 	ID3D12DescriptorHeap* GetSrvHeap() const noexcept;
 	UINT GetCbvSrvDescriptorSize() const noexcept;
 	void OffsetCbvSrvCpuHandle(INT descNum);
+
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
+
 	DXGI_FORMAT GetRTFormat() const noexcept;
 	std::vector<CD3DX12_ROOT_PARAMETER>& GetCommonRootParametersRef() noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
+	void SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	void SetCamera(const DirectX::XMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
