@@ -28,12 +28,14 @@ public:
 	void RenderEnd();
 	void OnDestroy();
 
-	void DrawIndexed(const UINT indicesNumber);
-	void BindLighting();
+	void BindLighting(ID3D12GraphicsCommandList* const commandList);
+	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
 	void SetLight(PointLight* const pointLight) noexcept;
 
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
+	ID3D12DescriptorHeap* GetSrvHeap() const noexcept;
 	UINT GetCbvSrvDescriptorSize() const noexcept;
 	void OffsetCbvSrvCpuHandle(INT descNum);
 	float GetWindowWidth() const noexcept;
@@ -131,6 +133,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device2> device;
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> bundleAllocator;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;

@@ -12,28 +12,29 @@ void App::InitializeScene()
 
 	scene = std::make_unique<Scene>(window.GetGraphics());
 
-	//scene->AddActor(std::move(sphere));
-}
+	auto light = std::make_unique<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
+	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
+	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
 
-int App::Run()
-{
-	InitializeScene();
-
-	const std::string meshesPath = "Meshes\\";
-	auto light = std::make_shared<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
-	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
-	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+	//auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 
-	float t = 0.f;
-	constexpr float step = 0.01f;
+	scene->AddActor(std::move(sphere));
+	scene->AddActor(std::move(brickWall));
+	scene->AddLight(std::move(light));
+}
 
+int App::Run()
+{
+	InitializeScene();
 	auto& graphics = window.GetGraphics();
 	auto const gui = graphics.GetGui();
+
+	const std::string meshesPath = "Meshes\\";
 
 	while (true)
 	{
@@ -43,22 +44,8 @@ int App::Run()
 		}
 
 		HandleInput();
-		graphics.SetCamera(scene->GetMainCamera()->GetMatrix());
-		graphics.RenderBegin();
 
-		light->Draw(graphics);
-		graphics.SetLight(light.get());
-		sphere->Draw(graphics);
-		brickWall->Draw(graphics);
-		// drawing here
-
-		gui->RenderActorTree(sphere.get());
-		gui->RenderActorTree(light.get());
-		gui->RenderActorTree(brickWall.get());
-		gui->RenderControlWindow();
-		graphics.RenderEnd();
-
-		t += step;
+		scene->Draw(graphics);
 	}
 
 	graphics.OnDestroy();

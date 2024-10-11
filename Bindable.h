@@ -7,8 +7,7 @@ class Graphics;
 class Bindable
 {
 public:
-	virtual void Bind(Graphics& graphics) noexcept = 0;
-	virtual void Update(Graphics& graphics);
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept = 0;
 	virtual ~Bindable() = default;
 	void WaitForQueueFinish(Graphics& graphics);
 

@@ -8,7 +8,7 @@ class VertexBuffer : public Bindable
 {
 public:
 	VertexBuffer(Graphics& graphics, const std::vector<float>& verticesData, const UINT vertexSize, const UINT verticesNum);
-	virtual void Bind(Graphics& graphics) noexcept override;
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer;

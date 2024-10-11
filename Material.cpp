@@ -68,13 +68,13 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
-		bindables.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u, rootParameters));
+		cBuffers.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, BufferType::Pixel, 1u, rootParameters));
 	}
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();
-		bindables.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u, rootParameters));
+		cBuffers.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, BufferType::Pixel, 2u, rootParameters));
 	}
 	/*
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))
@@ -119,17 +119,24 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	pipelineStateStream.rasterizer = rasterizerDesc;
 }
 
-void Material::Bind(Graphics& graphics) noexcept
+void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	for (auto& bindable : bindables)
+	for (auto& cBuffer : cBuffers)
 	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
+		cBuffer->Bind(commandList);
 	}
 
 	if (texesDescRanges.size() > 0)
 	{
 		auto srvGpuHandle = graphics.GetCbvSrvGpuHeapStartHandle();
-		graphics.commandList->SetGraphicsRootDescriptorTable(desciptorTableRootIndex, srvGpuHandle);
+		commandList->SetGraphicsRootDescriptorTable(desciptorTableRootIndex, srvGpuHandle);
+	}
+}
+
+void Material::Update()
+{
+	for (auto& cBuffer : cBuffers)
+	{
+		cBuffer->Update();
 	}
 }

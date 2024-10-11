@@ -23,9 +23,15 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	const ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
 
-	generatesShadow = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
+	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters = graphics.GetCommonRootParametersRef();
+
+	if (lighted && rootParameters.empty())
+	{
+		throw std::runtime_error("Light actor has to be created and bound before actors using it are created");
+	}
+
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u, rootParameters);
 
 	PipelineState::PipelineStateStream pipelineStateStream;
@@ -47,12 +53,31 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	pipelineStateStream.depthStencil = depthStencilDesc;
 
-	if (generatesShadow)
+	if (lighted)
 	{
 		//modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
 	}
 
 	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
+
+	// Create and record the bundle.
+	{
+		auto srvHeap = graphics.GetSrvHeap();
+		bundle = graphics.CreateBundle();
+		bundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		bundle->SetDescriptorHeaps(1, &srvHeap);
+		pipelineState->Bind(bundle.Get());
+		rootSignature->Bind(bundle.Get());
+		transformConstantBuffer->Bind(bundle.Get());
+		model->Bind(bundle.Get());
+		material->Bind(graphics, bundle.Get());
+		if (lighted)
+		{
+			graphics.BindLighting(bundle.Get());
+		}
+		bundle.Get()->DrawIndexedInstanced(model->GetIndicesNumber(), 1, 0, 0, 0);
+		CHECK_HR(bundle->Close());
+	}
 }
 
 void MeshComponent::RenderComponentDetails(Gui& gui)
@@ -69,25 +94,14 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 void MeshComponent::Draw(Graphics& graphics)
 {
 	UpdateTransformBuffer(graphics);
-
-	pipelineState->Bind(graphics);
-	rootSignature->Bind(graphics);
-	transformConstantBuffer->Update(graphics);
-	transformConstantBuffer->Bind(graphics);
-	model->Bind(graphics);
-	material->Bind(graphics);
-
-	if (generatesShadow)
-	{
-		graphics.BindLighting();
-	}
-
-	graphics.DrawIndexed(model->GetIndicesNumber());
+	transformConstantBuffer->Update();
+	material->Update();
+	graphics.ExecuteBundle(bundle.Get());
 }
 
 void MeshComponent::RenderShadowMap(Graphics& graphics)
 {
-	if (generatesShadow)
+	/*if (generatesShadow)
 	{
 		UpdateTransformBuffer(graphics);
 		modelForShadowMapping->Bind(graphics);
@@ -96,7 +110,7 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 		transformConstantBuffer->Bind(graphics);
 
 		graphics.DrawIndexed(modelForShadowMapping->GetIndicesNumber());
-	}
+	}*/
 }
 
 Material* MeshComponent::GetMaterial() noexcept

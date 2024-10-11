@@ -36,7 +36,7 @@ VertexBuffer::VertexBuffer(Graphics& graphics, const std::vector<float>& vertice
 	};
 }
 
-void VertexBuffer::Bind(Graphics& graphics) noexcept
+void VertexBuffer::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetCommandList(graphics)->IASetVertexBuffers(0, 1, &vertexBufferView);
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 }

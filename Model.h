@@ -34,7 +34,7 @@ private:
 
 public:
 	Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
-	void Bind(Graphics& graphics) noexcept;
+	void Bind(ID3D12GraphicsCommandList* const commandList) noexcept;
 
 	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
 	UINT GetIndicesNumber() const noexcept;

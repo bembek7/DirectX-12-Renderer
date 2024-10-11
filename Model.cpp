@@ -50,15 +50,14 @@ Model::Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineSta
 	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
 }
 
-void Model::Bind(Graphics& graphics) noexcept
+void Model::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
 	for (auto& bindable : bindables)
 	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
+		bindable->Bind(commandList);
 	}
 
-	indexBuffer->Bind(graphics);
+	indexBuffer->Bind(commandList);
 }
 
 Model::VertexLayout Model::GenerateVertexLayout(const aiMesh* const assignedMesh, const ShaderSettings shaderSettings) const

@@ -1,9 +1,6 @@
 #include "Bindable.h"
 #include "Graphics.h"
 
-void Bindable::Update(Graphics& graphics)
-{}
-
 void Bindable::WaitForQueueFinish(Graphics& graphics)
 {
 	graphics.fence->WaitForQueueFinish(graphics, INFINITE);

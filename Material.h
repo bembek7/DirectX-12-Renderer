@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "ShaderSettings.h"
 #include "PipelineState.h"
+#include "ConstantBuffer.h"
 
 struct aiMaterial;
 class Texture;
@@ -18,10 +19,10 @@ class Material
 public:
 	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
 		ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
-	void Bind(Graphics& graphics) noexcept;
-
+	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
+	void Update();
 private:
-	std::vector<std::unique_ptr<Bindable>> bindables;
+	std::vector<std::unique_ptr<Updatable>> cBuffers;
 	std::vector<std::shared_ptr<Texture>> textures;
 	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 	UINT desciptorTableRootIndex;

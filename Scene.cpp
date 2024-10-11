@@ -1,6 +1,5 @@
 #include "Scene.h"
-//#include "Actor.h"
-//#include "PointLight.h"
+#include "PointLight.h"
 #include <stdexcept>
 #include "Graphics.h"
 //#include "DepthCubeTexture.h"
@@ -18,25 +17,25 @@ Scene::Scene(Graphics& graphics)
 	drawingPass = std::make_unique<RegularDrawingPass>(graphics, shadowMapCube);*/
 }
 
-//void Scene::AddActor(std::shared_ptr<Actor> actorToAdd)
-//{
-//	if (dynamic_cast<PointLight*>(actorToAdd.get()))
-//	{
-//		throw std::runtime_error("Light should be added using add light function");
-//	}
-//	actors.push_back(std::move(actorToAdd));
-//}
-//
-//void Scene::AddLight(std::shared_ptr<PointLight> lightToAdd)
-//{
-//	if (light)
-//	{
-//		throw std::runtime_error("Only scenes with one light are handled right now");
-//	}
-//	light = lightToAdd;
-//	actors.push_back(std::move(lightToAdd));
-//}
-//
+void Scene::AddActor(std::unique_ptr<Actor> actorToAdd)
+{
+	if (dynamic_cast<PointLight*>(actorToAdd.get()))
+	{
+		throw std::runtime_error("Light should be added using add light function");
+	}
+	actors.push_back(std::move(actorToAdd));
+}
+
+void Scene::AddLight(std::unique_ptr<PointLight> lightToAdd)
+{
+	if (light)
+	{
+		throw std::runtime_error("Only scenes with one light are handled right now");
+	}
+	light = lightToAdd.get();
+	actors.push_back(std::move(lightToAdd));
+}
+
 //void Scene::AddSkybox(std::unique_ptr<Skybox> skyboxToAdd)
 //{
 //	if (skybox)
@@ -45,24 +44,34 @@ Scene::Scene(Graphics& graphics)
 //	}
 //	skybox = std::move(skyboxToAdd);
 //}
-//
-//void Scene::Draw(Graphics& graphics)
-//{
-//	shadowMapPass->Execute(graphics, actors, light.get());
-//	drawingPass->Execute(graphics, actors, light.get(), mainCamera.get());
-//
-//	// Skybox should be drawn last
-//	skybox->Draw(graphics);
-//}
-//
-//void Scene::RenderControls(Graphics& graphics)
-//{
-//	for (auto& actor : actors)
-//	{
-//		//graphics.GetGui()->RenderActorTree(actor.get());
-//	}
-//	//graphics.GetGui()->RenderControlWindow();
-//}
+
+void Scene::Draw(Graphics& graphics)
+{
+	//shadowMapPass->Execute(graphics, actors, light.get());
+	//drawingPass->Execute(graphics, actors, light.get(), mainCamera.get());
+
+	// Skybox should be drawn last
+	//skybox->Draw(graphics);
+	light->Update(graphics);
+	graphics.SetCamera(mainCamera->GetMatrix());
+
+	graphics.RenderBegin();
+	for (auto& actor : actors)
+	{
+		actor->Draw(graphics);
+	}
+	RenderControls(graphics);
+	graphics.RenderEnd();
+}
+
+void Scene::RenderControls(Graphics& graphics)
+{
+	for (auto& actor : actors)
+	{
+		graphics.GetGui()->RenderActorTree(actor.get());
+	}
+	graphics.GetGui()->RenderControlWindow();
+}
 
 Camera* Scene::GetMainCamera()
 {

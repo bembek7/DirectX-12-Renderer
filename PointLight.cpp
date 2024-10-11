@@ -13,6 +13,8 @@ PointLight::PointLight(Graphics& graphics, const std::string& fileName, const st
 	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 0u, rootParams);
 
 	constantShadowMapBuffer = std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, BufferType::Vertex, 1u, rootParams);
+
+	graphics.SetLight(this);
 }
 
 void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor)
@@ -20,14 +22,18 @@ void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 new
 	lightBuffer.diffuseColor = newColor;
 }
 
-void PointLight::Bind(Graphics& graphics)
+void PointLight::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList)
+{
+	constantLightBuffer->Bind(commandList);
+	constantShadowMapBuffer->Bind(commandList);
+}
+
+void PointLight::Update(Graphics& graphics)
 {
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
 	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
-	constantLightBuffer->Update(graphics);
-	constantShadowMapBuffer->Update(graphics);
-	constantLightBuffer->Bind(graphics);
-	constantShadowMapBuffer->Bind(graphics);
+	constantLightBuffer->Update();
+	constantShadowMapBuffer->Update();
 }
 
 DirectX::XMMATRIX PointLight::GetLightPerspective() const noexcept

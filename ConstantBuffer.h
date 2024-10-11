@@ -10,8 +10,14 @@ enum class BufferType
 	Vertex
 };
 
+class Updatable : public Bindable
+{
+public:
+	virtual void Update();
+};
+
 template<typename Structure>
-class ConstantBuffer : public Bindable
+class ConstantBuffer : public Updatable
 {
 public:
 	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) :
@@ -47,24 +53,22 @@ public:
 			IID_PPV_ARGS(&uploadBuffer)));
 	}
 
-	virtual void Update(Graphics& graphics) override
+	virtual void Update() override
 	{
+		BYTE* mappedData = nullptr;
 		CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
 		memcpy(mappedData, bufferData, sizeof(Structure));
 		if (uploadBuffer)
 		{
 			uploadBuffer->Unmap(0, nullptr);
 		}
-
-		mappedData = nullptr;
 	}
-	virtual void Bind(Graphics& graphics) noexcept override
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override
 	{
-		GetCommandList(graphics)->SetGraphicsRootConstantBufferView(rootParameterIndex, uploadBuffer->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, uploadBuffer->GetGPUVirtualAddress());
 	}
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
-	BYTE* mappedData = nullptr;
 	const Structure* const bufferData;
 	UINT slot;
 	UINT rootParameterIndex;

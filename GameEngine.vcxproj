@@ -183,6 +183,7 @@
     <ClCompile Include="Bindable.cpp" />
     <ClCompile Include="BindablesPool.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Fence.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Gui.cpp" />

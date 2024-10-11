@@ -42,6 +42,7 @@ private:
 	std::unique_ptr<Model> modelForShadowMapping;
 	std::unique_ptr<RootSignature> rootSignature;
 	std::unique_ptr<PipelineState> pipelineState;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> bundle;
 
 	struct TransformBuffer
 	{
@@ -55,5 +56,5 @@ private:
 
 	std::unique_ptr<ConstantBuffer<TransformBuffer>> transformConstantBuffer;
 
-	bool generatesShadow = false;
+	bool lighted = false;
 };

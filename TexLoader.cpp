@@ -126,6 +126,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 
 	graphics.ExecuteCommandList();
 
+	OutputDebugString("Should not wait when loading textures");
 	graphics.fence->WaitForQueueFinish(graphics, INFINITE);
 
 	return texture;

@@ -21,9 +21,9 @@ IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices)
 	};
 }
 
-void IndexBuffer::Bind(Graphics& graphics) noexcept
+void IndexBuffer::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetCommandList(graphics)->IASetIndexBuffer(&indexBufferView);
+	commandList->IASetIndexBuffer(&indexBufferView);
 }
 
 UINT IndexBuffer::GetIndicesNumber() const noexcept

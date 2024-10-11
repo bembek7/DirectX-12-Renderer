@@ -16,7 +16,6 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	windowHeight(windowHeight)
 {
 	{
-		// setup perspective projection matrix
 		const auto aspectRatio = windowWidth / windowHeight;
 		const auto projection = Dx::XMMatrixPerspectiveFovLH(Dx::XMConvertToRadians(90.f), aspectRatio, 0.1f, 100.0f);
 
@@ -39,7 +38,6 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 
 void Graphics::RenderBegin()
 {
-	// Record all the commands we need to render the scene into the command list.
 	gui->BeginFrame();
 	PopulateCommandList();
 }
@@ -60,11 +58,9 @@ void Graphics::RenderEnd()
 
 	CHECK_HR(commandList->Close());
 
-	// Execute the command list.
 	ID3D12CommandList* const commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
 
-	// Present the frame.
 	CHECK_HR(swapChain->Present(1, 0));
 
 	// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
@@ -80,17 +76,21 @@ void Graphics::OnDestroy()
 	fence->CloseEventHandle();
 }
 
-void Graphics::DrawIndexed(const UINT indicesNumber)
-{
-	commandList->DrawIndexedInstanced(indicesNumber, 1, 0, 0, 0);
-}
-
-void Graphics::BindLighting()
+void Graphics::BindLighting(ID3D12GraphicsCommandList* const commandList)
 {
 	if (light)
 	{
-		light->Bind(*this);
+		light->Bind(*this, commandList);
 	}
+	else
+	{
+		throw std::runtime_error("Object tried binding lighting that was not set. Light actors should be created and bound first, before actors that use them");
+	}
+}
+
+void Graphics::ExecuteBundle(ID3D12GraphicsCommandList* const bundle)
+{
+	commandList->ExecuteBundle(bundle);
 }
 
 void Graphics::SetLight(PointLight* const pointLight) noexcept
@@ -233,15 +233,13 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 	device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesk, dsvHandle);
 
 	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator)));
+	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&bundleAllocator)));
 }
 
 void Graphics::LoadAssets()
 {
 	// Create the command list.
 	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList)));
-
-	// Command lists are created in the recording state, but there is nothing
-	// to record yet. The main loop expects it to be closed, so close it now.
 	CHECK_HR(commandList->Close());
 
 	fence = std::make_unique<Fence>(*this);
@@ -270,13 +268,9 @@ void Graphics::PopulateCommandList()
 	// clear the depth buffer
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 
-	// configure IA
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
-
 	// configure RS
-	viewport->Bind(*this);
-	scissorRect->Bind(*this);
+	viewport->Bind(commandList.Get());
+	scissorRect->Bind(commandList.Get());
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
 }
@@ -292,6 +286,13 @@ void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 }
 
+Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Graphics::CreateBundle()
+{
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> bundle;
+	CHECK_HR(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_BUNDLE, bundleAllocator.Get(), nullptr, IID_PPV_ARGS(&bundle)));
+	return bundle;
+}
+
 CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvCpuHandle() const noexcept
 {
 	return srvCpuHandle;
@@ -302,6 +303,11 @@ CD3DX12_GPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvGpuHeapStartHandle() const noex
 	auto srvGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE{ srvHeap->GetGPUDescriptorHandleForHeapStart() };
 	srvGpuHandle.Offset(1u, cbvSrvDescriptorSize); // offsetting because of imgui taking one
 	return srvGpuHandle;
+}
+
+ID3D12DescriptorHeap* Graphics::GetSrvHeap() const noexcept
+{
+	return srvHeap.Get();
 }
 
 UINT Graphics::GetCbvSrvDescriptorSize() const noexcept

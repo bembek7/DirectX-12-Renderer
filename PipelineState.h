@@ -18,7 +18,7 @@ public:
 	};
 
 	PipelineState(Graphics& graphics, PipelineStateStream& pipelineStateStream);
-	void Bind(Graphics& graphics) noexcept override;
+	void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;

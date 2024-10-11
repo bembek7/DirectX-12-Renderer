@@ -47,7 +47,7 @@ ID3D12RootSignature* RootSignature::Get() noexcept
 	return rootSignature.Get();
 }
 
-void RootSignature::Bind(Graphics& graphics) noexcept
+void RootSignature::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetCommandList(graphics)->SetGraphicsRootSignature(rootSignature.Get());
+	commandList->SetGraphicsRootSignature(rootSignature.Get());
 }

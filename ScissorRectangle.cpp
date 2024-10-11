@@ -1,6 +1,6 @@
 #include "ScissorRectangle.h"
 
-void ScissorRectangle::Bind(Graphics& graphics) noexcept
+void ScissorRectangle::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetCommandList(graphics)->RSSetScissorRects(1, &scissorRect);
+	commandList->RSSetScissorRects(1, &scissorRect);
 }
