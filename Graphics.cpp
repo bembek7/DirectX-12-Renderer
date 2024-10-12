@@ -20,13 +20,7 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 
 	cbvSrvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount,
-		renderTargetDxgiFormat,
-		srvHeap.Get(),
-		srvHeap->GetCPUDescriptorHandleForHeapStart(),
-		srvHeap->GetGPUDescriptorHandleForHeapStart()
-	);
-	OffsetCbvSrvCpuHandle(1);
+	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount, renderTargetDxgiFormat);
 }
 
 void Graphics::RenderBegin()
@@ -189,18 +183,6 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		}
 	}
 
-	// descriptor heap for the shader resource view
-	{
-		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 10000,
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-		};
-		CHECK_HR(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
-	}
-
-	srvCpuHandle = { srvHeap->GetCPUDescriptorHandleForHeapStart() };
-
 	// depth buffer
 	{
 		const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
@@ -310,32 +292,37 @@ Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Graphics::CreateBundle()
 	return bundle;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvCpuHandle() const noexcept
+ID3D12Device2* Graphics::GetDevice()
 {
-	return srvCpuHandle;
+	return device.Get();
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvGpuHeapStartHandle() const noexcept
-{
-	auto srvGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE{ srvHeap->GetGPUDescriptorHandleForHeapStart() };
-	srvGpuHandle.Offset(1u, cbvSrvDescriptorSize); // offsetting because of imgui taking one
-	return srvGpuHandle;
-}
-
-ID3D12DescriptorHeap* Graphics::GetSrvHeap() const noexcept
-{
-	return srvHeap.Get();
-}
+//CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvCpuHandle() const noexcept
+//{
+//	return srvCpuHandle;
+//}
+//
+//CD3DX12_GPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvGpuHeapStartHandle() const noexcept
+//{
+//	auto srvGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE{ srvHeap->GetGPUDescriptorHandleForHeapStart() };
+//	srvGpuHandle.Offset(1u, cbvSrvDescriptorSize); // offsetting because of imgui taking one
+//	return srvGpuHandle;
+//}
+//
+//ID3D12DescriptorHeap* Graphics::GetSrvHeap() const noexcept
+//{
+//	return srvHeap.Get();
+//}
 
 UINT Graphics::GetCbvSrvDescriptorSize() const noexcept
 {
 	return cbvSrvDescriptorSize;
 }
 
-void Graphics::OffsetCbvSrvCpuHandle(INT descNum)
-{
-	srvCpuHandle.Offset(descNum, cbvSrvDescriptorSize);
-}
+//void Graphics::OffsetCbvSrvCpuHandle(INT descNum)
+//{
+//	srvCpuHandle.Offset(descNum, cbvSrvDescriptorSize);
+//}
 
 float Graphics::GetWindowWidth() const noexcept
 {

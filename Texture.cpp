@@ -2,7 +2,7 @@
 #include "TexLoader.h"
 #include "Graphics.h"
 
-Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName) :
+Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle) :
 	slot(slot)
 {
 	auto& texLoader = TexLoader::GetInstance();
@@ -15,8 +15,7 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 		.Texture2D{.MipLevels = texture->Get()->GetDesc().MipLevels },
 	};
-	graphics.device->CreateShaderResourceView(texture->Get(), &srvDesc, graphics.GetCbvSrvCpuHandle());
-	graphics.OffsetCbvSrvCpuHandle(1);
+	graphics.device->CreateShaderResourceView(texture->Get(), &srvDesc, srvCpuHandle);
 }
 
 UINT Texture::GetSlot() const noexcept

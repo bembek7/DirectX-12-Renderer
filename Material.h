@@ -22,6 +22,8 @@ public:
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
 private:
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
 	std::vector<std::unique_ptr<Updatable>> cBuffers;
 	std::vector<std::shared_ptr<Texture>> textures;
 	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
@@ -42,4 +44,5 @@ private:
 	std::unique_ptr<Color> colorBuffer = nullptr;
 
 	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> psPaths;
+	static const std::unordered_map<ShaderSettings, UINT, ShaderSettingsHash> texturesNumMap;
 };

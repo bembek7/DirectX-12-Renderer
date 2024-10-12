@@ -21,6 +21,7 @@ void App::InitializeScene()
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 	//sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.05f, 0.05f, 0.05f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
+	//sponza->SetActorLocation(Dx::XMFLOAT3{ 0.f, 3.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 

@@ -62,10 +62,8 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	// Create and record the bundle.
 	{
-		auto srvHeap = graphics.GetSrvHeap();
 		bundle = graphics.CreateBundle();
 		bundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		bundle->SetDescriptorHeaps(1, &srvHeap);
 		pipelineState->Bind(bundle.Get());
 		rootSignature->Bind(bundle.Get());
 		transformConstantBuffer->Bind(bundle.Get());

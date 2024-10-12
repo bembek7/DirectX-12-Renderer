@@ -6,8 +6,6 @@
 #include <DirectXMath.h>
 #include <memory>
 #include <dxgi1_6.h>
-#include "Fence.h"
-#include "RootSignature.h"
 #include "ThrowMacros.h"
 #include "Gui.h"
 
@@ -33,12 +31,13 @@ public:
 
 	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
+	ID3D12Device2* GetDevice();
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
-	CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
-	ID3D12DescriptorHeap* GetSrvHeap() const noexcept;
+	//CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
+	//CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
+	//ID3D12DescriptorHeap* GetSrvHeap() const noexcept;
 	UINT GetCbvSrvDescriptorSize() const noexcept;
-	void OffsetCbvSrvCpuHandle(INT descNum);
+	//void OffsetCbvSrvCpuHandle(INT descNum);
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
@@ -132,8 +131,6 @@ private:
 	PointLight* light = nullptr;
 
 	// Pipeline objects.
-	std::unique_ptr<Bindable> viewport;
-	std::unique_ptr<Bindable> scissorRect;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	Microsoft::WRL::ComPtr<ID3D12Device2> device;
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];
@@ -144,8 +141,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "BetterWindows.h"
-#include <d3d12.h>
 #include <unordered_map>
+#include "d3dx12/d3dx12.h"
 
 class Actor;
 class PointLight;
@@ -11,8 +11,7 @@ class MeshComponent;
 class Gui
 {
 public:
-	Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat, ID3D12DescriptorHeap* const srvDescHeap,
-		const D3D12_CPU_DESCRIPTOR_HANDLE& cpuDescHandle, const D3D12_GPU_DESCRIPTOR_HANDLE& gpuDescHandle);
+	Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat);
 	~Gui();
 	Gui(const Gui&) = delete;
 	Gui& operator=(const Gui&) = delete;
@@ -32,6 +31,7 @@ private:
 	void RenderComponentTree(SceneComponent* const component, Actor* const actor);
 
 private:
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	Actor* selectedActor = nullptr;
 	SceneComponent* selectedComponent = nullptr;
 };

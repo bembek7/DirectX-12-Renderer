@@ -7,7 +7,7 @@ class Graphics;
 class Texture
 {
 public:
-	Texture(Graphics& graphics, const UINT slot, const std::string& fileName);
+	Texture(Graphics& graphics, const UINT slot, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle);
 	UINT GetSlot() const noexcept;
 
 	bool HasAlpha() const noexcept;

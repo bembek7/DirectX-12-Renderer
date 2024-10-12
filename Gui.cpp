@@ -8,16 +8,22 @@
 #include "PointLight.h"
 #include <sstream>
 
-Gui::Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat, ID3D12DescriptorHeap* const srvDescHeap,
-	const D3D12_CPU_DESCRIPTOR_HANDLE& cpuDescHandle, const D3D12_GPU_DESCRIPTOR_HANDLE& gpuDescHandle)
+Gui::Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
+	const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+		.NumDescriptors = 1,
+		.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+	};
+	CHECK_HR(device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
+
 	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX12_Init(device, framesInFlightNum, rtFormat, srvDescHeap, cpuDescHandle, gpuDescHandle);
+	ImGui_ImplDX12_Init(device, framesInFlightNum, rtFormat, srvHeap.Get(), srvHeap->GetCPUDescriptorHandleForHeapStart(), srvHeap->GetGPUDescriptorHandleForHeapStart());
 }
 
 Gui::~Gui()
@@ -36,6 +42,7 @@ void Gui::BeginFrame()
 
 void Gui::EndFrame(ID3D12GraphicsCommandList* const commandList)
 {
+	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }

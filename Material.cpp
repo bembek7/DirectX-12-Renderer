@@ -1,12 +1,12 @@
 #include "Material.h"
 #include <assimp\material.h>
-#include "BindablesPool.h"
 #include <d3d12.h>
 #include <stdexcept>
 #include "ThrowMacros.h"
 #include <d3dcompiler.h>
 #include "ConstantBuffer.h"
 #include "Texture.h"
+#include "Graphics.h"
 //#include "Sampler.h"
 //#include "Blender.h"
 //#include "CubeTexture.h"
@@ -23,12 +23,37 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"PhongTexNMSMATPS.cso" },
 };
 
+const std::unordered_map<ShaderSettings, UINT, ShaderSettingsHash> Material::texturesNumMap =
+{
+	{ ShaderSettings::Skybox, 0u },
+	{ ShaderSettings::Color, 0u },
+	{ ShaderSettings::Color | ShaderSettings::Phong, 0u },
+	{ ShaderSettings::Phong | ShaderSettings::Texture, 1u },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, 2u },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, 2u },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, 3u },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting, 3u },
+};
+
 Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
 	ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters)
 {
 	CD3DX12_RASTERIZER_DESC rasterizerDesc(D3D12_DEFAULT);
 
-	auto& bindablesPool = BindablesPool::GetInstance();
+	const UINT texturesNum = texturesNumMap.at(shaderSettings);
+	// descriptor heap for the shader resource view
+	if (texturesNum > 0)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			.NumDescriptors = texturesNum,
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+		};
+		CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
+
+		srvCpuHandle = { srvHeap->GetCPUDescriptorHandleForHeapStart() };
+	}
+
 	/*
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Skybox))
 	{
@@ -42,8 +67,8 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 1u, texFileName.C_Str(), rootParameters));
-		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str());
+		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str(), srvCpuHandle);
+		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 		if (diffTex->HasAlpha())
 		{
 			rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
@@ -55,15 +80,15 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 2u, normalTexFileName.C_Str(), rootParameters));
-		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str()));
+		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str(), srvCpuHandle));
+		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		//sharedBindables.push_back(bindablesPool.GetBindable<Texture>(graphics, 3u, specularTexFileName.C_Str()));
-		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str()));
+		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str(), srvCpuHandle));
+		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
@@ -128,8 +153,8 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 
 	if (texesDescRanges.size() > 0)
 	{
-		auto srvGpuHandle = graphics.GetCbvSrvGpuHeapStartHandle();
-		commandList->SetGraphicsRootDescriptorTable(desciptorTableRootIndex, srvGpuHandle);
+		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+		commandList->SetGraphicsRootDescriptorTable(desciptorTableRootIndex, srvHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 }
 
