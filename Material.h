@@ -9,9 +9,9 @@
 #include "ShaderSettings.h"
 #include "PipelineState.h"
 #include "ConstantBuffer.h"
+#include "Texture.h"
 
 struct aiMaterial;
-class Texture;
 
 class Material
 {
@@ -25,7 +25,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
 	std::vector<std::unique_ptr<Updatable>> cBuffers;
-	std::vector<std::shared_ptr<Texture>> textures;
+	std::vector<std::unique_ptr<Texture>> textures;
 	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 	UINT desciptorTableRootIndex;
 	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;

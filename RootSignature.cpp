@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include "ThrowMacros.h"
 #include <DirectXMath.h>
+#include "Graphics.h"
 
 namespace Wrl = Microsoft::WRL;
 namespace Dx = DirectX;
@@ -39,7 +40,7 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 		CHECK_HR(hr);
 	}
 	// Create the root signature.
-	CHECK_HR(GetDevice(graphics)->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
+	CHECK_HR(graphics.GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
 }
 
 ID3D12RootSignature* RootSignature::Get() noexcept

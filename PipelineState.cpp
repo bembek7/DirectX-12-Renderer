@@ -11,7 +11,7 @@ PipelineState::PipelineState(Graphics& graphics, PipelineStateStream& pipelineSt
 	const D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
 		sizeof(PipelineStateStream), &pipelineStateStream
 	};
-	CHECK_HR(GetDevice(graphics)->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&pipelineState)));
+	CHECK_HR(graphics.GetDevice()->CreatePipelineState(&pipelineStateStreamDesc, IID_PPV_ARGS(&pipelineState)));
 }
 
 void PipelineState::Bind(ID3D12GraphicsCommandList* const commandList) noexcept

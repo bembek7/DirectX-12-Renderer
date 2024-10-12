@@ -4,6 +4,8 @@
 #include <memory>
 #include <DirectXMath.h>
 
+class Graphics;
+
 class Pass
 {
 public:

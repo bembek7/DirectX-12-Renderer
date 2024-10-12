@@ -67,7 +67,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		auto diffTex = std::make_shared<Texture>(graphics, 1u, texFileName.C_Str(), srvCpuHandle);
+		auto diffTex = std::make_unique<Texture>(graphics, 1u, texFileName.C_Str(), srvCpuHandle);
 		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 		if (diffTex->HasAlpha())
 		{
@@ -80,14 +80,14 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		textures.push_back(std::make_shared<Texture>(graphics, 2u, normalTexFileName.C_Str(), srvCpuHandle));
+		textures.push_back(std::make_unique<Texture>(graphics, 2u, normalTexFileName.C_Str(), srvCpuHandle));
 		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		textures.push_back(std::make_shared<Texture>(graphics, 3u, specularTexFileName.C_Str(), srvCpuHandle));
+		textures.push_back(std::make_unique<Texture>(graphics, 3u, specularTexFileName.C_Str(), srvCpuHandle));
 		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))

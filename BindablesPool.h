@@ -4,6 +4,8 @@
 #include<memory>
 #include "Bindable.h"
 
+class Graphics;
+
 class BindablesPool
 {
 public:

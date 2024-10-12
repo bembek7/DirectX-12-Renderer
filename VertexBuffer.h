@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include <wrl/client.h>
 
+class Graphics;
+
 class VertexBuffer : public Bindable
 {
 public:

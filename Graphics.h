@@ -11,10 +11,6 @@
 
 class Graphics
 {
-	friend class Bindable;
-	friend class Fence;
-	friend class TexLoader;
-	friend class Texture;
 public:
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
@@ -33,11 +29,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
 	ID3D12Device2* GetDevice();
 
-	//CD3DX12_CPU_DESCRIPTOR_HANDLE GetCbvSrvCpuHandle() const noexcept;
-	//CD3DX12_GPU_DESCRIPTOR_HANDLE GetCbvSrvGpuHeapStartHandle() const noexcept;
-	//ID3D12DescriptorHeap* GetSrvHeap() const noexcept;
 	UINT GetCbvSrvDescriptorSize() const noexcept;
-	//void OffsetCbvSrvCpuHandle(INT descNum);
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;

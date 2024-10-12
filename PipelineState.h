@@ -1,6 +1,8 @@
 #pragma once
 #include "Bindable.h"
 
+class Graphics;
+
 class PipelineState : public Bindable
 {
 public:

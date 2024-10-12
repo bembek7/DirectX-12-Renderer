@@ -15,7 +15,7 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 		.Texture2D{.MipLevels = texture->Get()->GetDesc().MipLevels },
 	};
-	graphics.device->CreateShaderResourceView(texture->Get(), &srvDesc, srvCpuHandle);
+	graphics.GetDevice()->CreateShaderResourceView(texture->Get(), &srvDesc, srvCpuHandle);
 }
 
 UINT Texture::GetSlot() const noexcept

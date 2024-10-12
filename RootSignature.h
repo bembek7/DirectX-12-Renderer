@@ -2,6 +2,8 @@
 #include "Bindable.h"
 #include <wrl/client.h>
 
+class Graphics;
+
 class RootSignature : public Bindable
 {
 public:

@@ -63,7 +63,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 		};
 		const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_DEFAULT };
-		CHECK_HR(graphics.device->CreateCommittedResource(
+		CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
 			&heapProps,
 			D3D12_HEAP_FLAG_NONE,
 			&texDesc,
@@ -92,7 +92,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 		const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_UPLOAD };
 		const auto uploadBufferSize = GetRequiredIntermediateSize(texture.Get(), 0, (UINT)subresourceData.size());
 		const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
-		CHECK_HR(graphics.device->CreateCommittedResource(
+		CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
 			&heapProps,
 			D3D12_HEAP_FLAG_NONE,
 			&resourceDesc,
@@ -105,7 +105,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	graphics.ResetCommandListAndAllocator();
 	// write commands to copy data to upload texture (copying each subresource)
 	UpdateSubresources(
-		graphics.commandList.Get(),
+		graphics.GetMainCommandList(),
 		texture.Get(),
 		uploadBuffer.Get(),
 		0, 0,
@@ -118,11 +118,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 			texture.Get(),
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		graphics.commandList->ResourceBarrier(1, &barrier);
+		graphics.GetMainCommandList()->ResourceBarrier(1, &barrier);
 	}
 
 	// close command list
-	CHECK_HR(graphics.commandList->Close());
+	CHECK_HR(graphics.GetMainCommandList()->Close());
 
 	graphics.ExecuteCommandList();
 

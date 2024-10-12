@@ -184,7 +184,6 @@
     <ClCompile Include="BindablesPool.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="Fence.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_dx12.cpp" />
@@ -236,7 +235,6 @@
     <ClInclude Include="d3dx12\d3dx12_resource_helpers.h" />
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
-    <ClInclude Include="Fence.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="imgui\backends\imgui_impl_dx12.h" />
