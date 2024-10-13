@@ -16,29 +16,28 @@ TexLoader& TexLoader::GetInstance()
 	return instance;
 }
 
-std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> TexLoader::GetTexture(Graphics& graphics, const std::string& fileName, bool& hasAlpha)
+std::shared_ptr<TexLoader::Image> TexLoader::GetTexture(Graphics& graphics, const std::string& fileName)
 {
-	using TexRes = Wrl::ComPtr<ID3D12Resource>;
 	auto texIt = texturesMap.find(fileName);
-	std::shared_ptr<TexRes> sharedTex;
+	std::shared_ptr<Image> sharedTex;
 	if (texIt != texturesMap.end())
 	{
 		sharedTex = texIt->second.lock();
 		if (!sharedTex)
 		{
-			sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName, hasAlpha));
+			sharedTex = std::make_shared<TexLoader::Image>(TexLoader::LoadTextureFromFile(graphics, fileName));
 			texIt->second = sharedTex;
 		}
 	}
 	else
 	{
-		sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName, hasAlpha));
+		sharedTex = std::make_shared<TexLoader::Image>(TexLoader::LoadTextureFromFile(graphics, fileName));
 		texturesMap[fileName] = sharedTex;
 	}
 	return sharedTex;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName, bool& hasAlpha)
+TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName)
 {
 	Dx::ScratchImage scratchImage;
 	CHECK_HR(Dx::LoadFromWICFile(Utils::StringToWstring("Textures\\" + fileName).c_str(), Dx::WIC_FLAGS_NONE, nullptr, scratchImage));
@@ -46,9 +45,9 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	Dx::ScratchImage mipChain;
 	CHECK_HR(Dx::GenerateMipMaps(*scratchImage.GetImages(), Dx::TEX_FILTER_BOX, 0, mipChain));
 
-	hasAlpha = !scratchImage.IsAlphaAllOpaque();
+	TexLoader::Image image;
+	image.hasAlpha = !scratchImage.IsAlphaAllOpaque();
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> texture;
 	{
 		const auto& chainBase = *mipChain.GetImages();
 		const D3D12_RESOURCE_DESC texDesc{
@@ -69,7 +68,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 			&texDesc,
 			D3D12_RESOURCE_STATE_COPY_DEST,
 			nullptr,
-			IID_PPV_ARGS(&texture)
+			IID_PPV_ARGS(&image.resource)
 		));
 	}
 
@@ -90,7 +89,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	Wrl::ComPtr<ID3D12Resource> uploadBuffer;
 	{
 		const CD3DX12_HEAP_PROPERTIES heapProps{ D3D12_HEAP_TYPE_UPLOAD };
-		const auto uploadBufferSize = GetRequiredIntermediateSize(texture.Get(), 0, (UINT)subresourceData.size());
+		const auto uploadBufferSize = GetRequiredIntermediateSize(image.resource.Get(), 0, (UINT)subresourceData.size());
 		const auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
 		CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
 			&heapProps,
@@ -106,7 +105,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	// write commands to copy data to upload texture (copying each subresource)
 	UpdateSubresources(
 		graphics.GetMainCommandList(),
-		texture.Get(),
+		image.resource.Get(),
 		uploadBuffer.Get(),
 		0, 0,
 		(UINT)subresourceData.size(),
@@ -116,7 +115,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	// write command to transition texture to texture state
 	{
 		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			texture.Get(),
+			image.resource.Get(),
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		graphics.GetMainCommandList()->ResourceBarrier(1, &barrier);
 	}
@@ -129,5 +128,5 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	OutputDebugString("Should not wait when loading textures");
 	graphics.WaitForQueueFinish();
 
-	return texture;
+	return image;
 }

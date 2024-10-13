@@ -73,6 +73,8 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 
 void MeshComponent::Draw(Graphics& graphics)
 {
+	SceneComponent::Draw(graphics);
+
 	UpdateTransformBuffer(graphics);
 	transformConstantBuffer->Update();
 	material->Update();

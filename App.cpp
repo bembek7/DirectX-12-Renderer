@@ -16,17 +16,27 @@ void App::InitializeScene()
 	auto light = std::make_unique<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
 	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
-	//auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
+	auto wall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "plant.obj", "wall");
+
+	/*for (size_t i = 0; i < 100; i++)
+	{
+		auto brickWall2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
+		brickWall2->SetActorLocation(Dx::XMFLOAT3{ 5.f * i, 0.f, 2.5f });
+		scene->AddActor(std::move(brickWall2));
+	}*/
+	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
-	//sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.05f, 0.05f, 0.05f });
+
+	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.05f, 0.05f, 0.05f });
+	wall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 1.5f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
-	//sponza->SetActorLocation(Dx::XMFLOAT3{ 0.f, 3.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 
-	//scene->AddActor(std::move(sponza));
+	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
+	scene->AddActor(std::move(wall));
 	scene->AddActor(std::move(brickWall));
 	scene->AddLight(std::move(light));
 }

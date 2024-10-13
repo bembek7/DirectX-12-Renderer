@@ -38,8 +38,7 @@ const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::text
 Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
 	ShaderSettings shaderSettings)
 {
-	CD3DX12_RASTERIZER_DESC rasterizerDesc(D3D12_DEFAULT);
-
+	auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
 	const UINT descriptorsNum = textureHighestSlotMap.at(shaderSettings) + 1;
 	// descriptor heap for the shader resource view
 	if (descriptorsNum > 0)

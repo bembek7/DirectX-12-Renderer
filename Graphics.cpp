@@ -193,7 +193,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 			DXGI_FORMAT_D32_FLOAT,
 			(UINT)windowWidth, (UINT)windowHeight,
 			1, 0, 1, 0,
-			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
 		const D3D12_CLEAR_VALUE clearValue = {
 			.Format = DXGI_FORMAT_D32_FLOAT,
 			.DepthStencil = { 1.0f, 0 },
@@ -355,9 +355,7 @@ PipelineState::PipelineStateStream Graphics::GetCommonPSS()
 		.NumRenderTargets = 1,
 	};
 	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-	const CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(CD3DX12_DEFAULT{});
-	commonPipelineStateStream.depthStencil = depthStencilDesc;
-
+	commonPipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
 	return commonPipelineStateStream;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <wrl/client.h>
 #include "d3dx12\d3dx12.h"
+#include "TexLoader.h"
 
 class Graphics;
 
@@ -12,7 +13,6 @@ public:
 	bool HasAlpha() const noexcept;
 	//static std::string ResolveID(const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) noexcept;
 private:
-	bool hasAlpha = false;
-	std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> texture;
+	std::shared_ptr<TexLoader::Image> image;
 	CD3DX12_DESCRIPTOR_RANGE descRange;
 };

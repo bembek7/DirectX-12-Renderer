@@ -1,0 +1,14 @@
+newmtl VasePlant
+	Ns 3.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Kd vase_plant.png
+	map_Kn vase_plant_NRM.png
+	map_Ks vase_plant_spec.png
