@@ -20,28 +20,10 @@ template<typename Structure>
 class ConstantBuffer : public Updatable
 {
 public:
-	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) :
+	ConstantBuffer(Graphics& graphics, const Structure& data, const UINT rootParameterIndex) :
 		bufferData(&data),
-		bufferType(bufferType),
-		slot(slot)
+		rootParameterIndex(rootParameterIndex)
 	{
-		D3D12_SHADER_VISIBILITY shaderVisibility{};
-		switch (bufferType)
-		{
-		case BufferType::Pixel:
-			shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-			break;
-		case BufferType::Vertex:
-			shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-			break;
-		default:
-			break;
-		}
-		CD3DX12_ROOT_PARAMETER rootParameter{};
-		rootParameter.InitAsConstantBufferView(slot, 0u, shaderVisibility);
-		rootParameters.push_back(std::move(rootParameter));
-		rootParameterIndex = (UINT)rootParameters.size() - 1;
-
 		const CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(data));
 		CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
@@ -70,7 +52,5 @@ public:
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
 	const Structure* const bufferData;
-	UINT slot;
 	UINT rootParameterIndex;
-	BufferType bufferType;
 };

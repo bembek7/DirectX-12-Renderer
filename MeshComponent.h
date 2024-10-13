@@ -40,7 +40,7 @@ private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
 	std::unique_ptr<Model> modelForShadowMapping;
-	std::unique_ptr<RootSignature> rootSignature;
+	//std::unique_ptr<RootSignature> rootSignature;
 	std::unique_ptr<PipelineState> pipelineState;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> bundle;
 

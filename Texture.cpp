@@ -2,11 +2,10 @@
 #include "TexLoader.h"
 #include "Graphics.h"
 
-Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle) :
-	slot(slot)
+Texture::Texture(Graphics& graphics, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle)
 {
 	auto& texLoader = TexLoader::GetInstance();
-	texture = texLoader.GetTexture(graphics, fileName); // be wary that its a shared ptr to com ptr
+	texture = texLoader.GetTexture(graphics, fileName, hasAlpha); // be wary that its a shared ptr to com ptr
 
 	// create the descriptor in the heap
 	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
@@ -16,11 +15,6 @@ Texture::Texture(Graphics& graphics, const UINT slot, const std::string& fileNam
 		.Texture2D{.MipLevels = texture->Get()->GetDesc().MipLevels },
 	};
 	graphics.GetDevice()->CreateShaderResourceView(texture->Get(), &srvDesc, srvCpuHandle);
-}
-
-UINT Texture::GetSlot() const noexcept
-{
-	return slot;
 }
 
 bool Texture::HasAlpha() const noexcept

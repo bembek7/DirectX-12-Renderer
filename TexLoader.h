@@ -15,9 +15,9 @@ public:
 	TexLoader(TexLoader const&) = delete;
 	void operator=(TexLoader const&) = delete;
 
-	std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> GetTexture(Graphics& graphics, const std::string& fileName);
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> GetTexture(Graphics& graphics, const std::string& fileName, bool& hasAlpha);
 private:
-	static Microsoft::WRL::ComPtr<ID3D12Resource> LoadTextureFromFile(Graphics& graphics, const std::string& fileName);
+	static Microsoft::WRL::ComPtr<ID3D12Resource> LoadTextureFromFile(Graphics& graphics, const std::string& fileName, bool& hasAlpha);
 	TexLoader() = default;
 private:
 	std::unordered_map<std::string, std::weak_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>>> texturesMap;

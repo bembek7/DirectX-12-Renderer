@@ -18,16 +18,15 @@ class Material
 	friend class Gui;
 public:
 	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
-		ShaderSettings shaderSettings, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
+		ShaderSettings shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuStartHandle;
 	std::vector<std::unique_ptr<Updatable>> cBuffers;
 	std::vector<std::unique_ptr<Texture>> textures;
-	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
-	UINT desciptorTableRootIndex;
+	//UINT desciptorTableRootIndex;
 	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;
 	struct Roughness
 	{
@@ -44,5 +43,5 @@ private:
 	std::unique_ptr<Color> colorBuffer = nullptr;
 
 	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> psPaths;
-	static const std::unordered_map<ShaderSettings, UINT, ShaderSettingsHash> texturesNumMap;
+	static const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> textureHighestSlotMap;
 };

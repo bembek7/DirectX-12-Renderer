@@ -16,7 +16,7 @@ TexLoader& TexLoader::GetInstance()
 	return instance;
 }
 
-std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> TexLoader::GetTexture(Graphics& graphics, const std::string& fileName)
+std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> TexLoader::GetTexture(Graphics& graphics, const std::string& fileName, bool& hasAlpha)
 {
 	using TexRes = Wrl::ComPtr<ID3D12Resource>;
 	auto texIt = texturesMap.find(fileName);
@@ -26,19 +26,19 @@ std::shared_ptr<Microsoft::WRL::ComPtr<ID3D12Resource>> TexLoader::GetTexture(Gr
 		sharedTex = texIt->second.lock();
 		if (!sharedTex)
 		{
-			sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName));
+			sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName, hasAlpha));
 			texIt->second = sharedTex;
 		}
 	}
 	else
 	{
-		sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName));
+		sharedTex = std::make_shared<TexRes>(TexLoader::LoadTextureFromFile(graphics, fileName, hasAlpha));
 		texturesMap[fileName] = sharedTex;
 	}
 	return sharedTex;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName)
+Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName, bool& hasAlpha)
 {
 	Dx::ScratchImage scratchImage;
 	CHECK_HR(Dx::LoadFromWICFile(Utils::StringToWstring("Textures\\" + fileName).c_str(), Dx::WIC_FLAGS_NONE, nullptr, scratchImage));
@@ -46,7 +46,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TexLoader::LoadTextureFromFile(Graphics& 
 	Dx::ScratchImage mipChain;
 	CHECK_HR(Dx::GenerateMipMaps(*scratchImage.GetImages(), Dx::TEX_FILTER_BOX, 0, mipChain));
 
-	//hasAlpha = !scratchImage.IsAlphaAllOpaque();
+	hasAlpha = !scratchImage.IsAlphaAllOpaque();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> texture;
 	{

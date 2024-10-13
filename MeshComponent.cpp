@@ -25,33 +25,15 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters = graphics.GetCommonRootParametersRef();
+	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, 0u);
 
-	if (lighted && rootParameters.empty())
-	{
-		throw std::runtime_error("Light actor has to be created and bound before actors using it are created");
-	}
-
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u, rootParameters);
-
-	PipelineState::PipelineStateStream pipelineStateStream;
+	PipelineState::PipelineStateStream pipelineStateStream = graphics.GetCommonPSS();
 
 	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, shaderSettings, nullptr);
-	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, shaderSettings, rootParameters);
-
-	rootSignature = std::make_unique<RootSignature>(graphics, rootParameters);
+	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, shaderSettings);
 
 	// filling pso structure
-	pipelineStateStream.rootSignature = rootSignature->Get();
-	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	pipelineStateStream.renderTargetFormats = {
-		.RTFormats{ graphics.GetRTFormat() },
-		.NumRenderTargets = 1,
-	};
-	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-	const CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(CD3DX12_DEFAULT{});
-
-	pipelineStateStream.depthStencil = depthStencilDesc;
+	pipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
 
 	if (lighted)
 	{
@@ -65,7 +47,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		bundle = graphics.CreateBundle();
 		bundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pipelineState->Bind(bundle.Get());
-		rootSignature->Bind(bundle.Get());
+		graphics.GetRootSignature()->Bind(bundle.Get());
 		transformConstantBuffer->Bind(bundle.Get());
 		model->Bind(bundle.Get());
 		material->Bind(graphics, bundle.Get());

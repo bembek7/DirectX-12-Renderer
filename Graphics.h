@@ -8,6 +8,8 @@
 #include <dxgi1_6.h>
 #include "ThrowMacros.h"
 #include "Gui.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class Graphics
 {
@@ -29,12 +31,13 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
 	ID3D12Device2* GetDevice();
 
+	PipelineState::PipelineStateStream GetCommonPSS();
+	RootSignature* GetRootSignature();
 	UINT GetCbvSrvDescriptorSize() const noexcept;
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
 
-	DXGI_FORMAT GetRTFormat() const noexcept;
 	std::vector<CD3DX12_ROOT_PARAMETER>& GetCommonRootParametersRef() noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
@@ -104,6 +107,7 @@ public:
 private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();
+	void CreateRootSignature();
 	void PopulateCommandList();
 	void ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv);
 
@@ -119,6 +123,9 @@ private:
 	std::unique_ptr<Gui> gui;
 
 	std::vector<CD3DX12_ROOT_PARAMETER> commonRootParameters;
+	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
+	std::unique_ptr<RootSignature> rootSignature;
+	std::unique_ptr<PipelineState> pipelineState;
 
 	PointLight* light = nullptr;
 

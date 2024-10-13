@@ -7,6 +7,7 @@
 #include "PointLight.h"
 #include "Viewport.h"
 #include "ScissorRectangle.h"
+#include "RootSignature.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
@@ -19,6 +20,8 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	LoadAssets();
 
 	cbvSrvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	CreateRootSignature();
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount, renderTargetDxgiFormat);
 }
@@ -245,6 +248,35 @@ void Graphics::LoadAssets()
 	WaitForQueueFinish();
 }
 
+void Graphics::CreateRootSignature()
+{
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
+	CD3DX12_ROOT_PARAMETER transformCB{};
+	transformCB.InitAsConstantBufferView(0u, 0u, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters.push_back(std::move(transformCB));
+	CD3DX12_ROOT_PARAMETER shadowMapCB{};
+	shadowMapCB.InitAsConstantBufferView(1u, 0u, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters.push_back(std::move(shadowMapCB));
+	CD3DX12_ROOT_PARAMETER lightCB{};
+	lightCB.InitAsConstantBufferView(0u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters.push_back(std::move(lightCB));
+	CD3DX12_ROOT_PARAMETER roughnessCB{};
+	roughnessCB.InitAsConstantBufferView(1u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters.push_back(std::move(roughnessCB));
+	CD3DX12_ROOT_PARAMETER colorCB{};
+	colorCB.InitAsConstantBufferView(2u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters.push_back(std::move(colorCB));
+	CD3DX12_ROOT_PARAMETER texturesDT{};
+	texesDescRanges = {};
+	for (UINT i = 0; i < 4; i++)
+	{
+		texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, i, 0u, i });
+	}
+	texturesDT.InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters.push_back(std::move(texturesDT));
+	rootSignature = std::make_unique<RootSignature>(*this, rootParameters);
+}
+
 void Graphics::PopulateCommandList()
 {
 	// select current buffer to render to
@@ -314,6 +346,26 @@ ID3D12Device2* Graphics::GetDevice()
 //	return srvHeap.Get();
 //}
 
+PipelineState::PipelineStateStream Graphics::GetCommonPSS()
+{
+	PipelineState::PipelineStateStream commonPipelineStateStream;
+	commonPipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	commonPipelineStateStream.renderTargetFormats = {
+		.RTFormats{ renderTargetDxgiFormat },
+		.NumRenderTargets = 1,
+	};
+	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
+	const CD3DX12_DEPTH_STENCIL_DESC depthStencilDesc(CD3DX12_DEFAULT{});
+	commonPipelineStateStream.depthStencil = depthStencilDesc;
+
+	return commonPipelineStateStream;
+}
+
+RootSignature* Graphics::GetRootSignature()
+{
+	return rootSignature.get();
+}
+
 UINT Graphics::GetCbvSrvDescriptorSize() const noexcept
 {
 	return cbvSrvDescriptorSize;
@@ -332,11 +384,6 @@ float Graphics::GetWindowWidth() const noexcept
 float Graphics::GetWindowHeight() const noexcept
 {
 	return windowHeight;
-}
-
-DXGI_FORMAT Graphics::GetRTFormat() const noexcept
-{
-	return renderTargetDxgiFormat;
 }
 
 std::vector<CD3DX12_ROOT_PARAMETER>& Graphics::GetCommonRootParametersRef() noexcept
