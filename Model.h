@@ -44,7 +44,7 @@ private:
 	std::unique_ptr<VertexBuffer> GenerateVertexBuffer(Graphics& graphics, const aiMesh* const assignedMesh, const VertexLayout& vertexLayout) const;
 
 private:
-	Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> vertexShaderBlob;
 
 	VertexLayout vertexLayout;
 	std::vector<std::unique_ptr<Bindable>> bindables;

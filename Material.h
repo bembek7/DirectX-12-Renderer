@@ -27,7 +27,7 @@ private:
 	std::vector<std::unique_ptr<Updatable>> cBuffers;
 	std::vector<std::unique_ptr<Texture>> textures;
 	//UINT desciptorTableRootIndex;
-	Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob;
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> pixelShaderBlob;
 	struct Roughness
 	{
 		alignas(16) float roughness = 0.8f;

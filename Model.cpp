@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "ThrowMacros.h"
 #include <d3dcompiler.h>
+#include "ShadersPool.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model::vsPaths =
 {
@@ -44,10 +45,11 @@ Model::Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineSta
 		throw std::runtime_error("Vertex shader path not found for given flags");
 	}
 
-	CHECK_HR(D3DReadFileToBlob(vertexShaderPath.c_str(), &vertexShaderBlob));
+	auto& shadersPool = ShadersPool::GetInstance();
+	vertexShaderBlob = shadersPool.GetShaderBlob(vertexShaderPath); // be wary that its a shared ptr to com ptr
 
 	pipelineStateStream.inputLayout = { vertexLayout.inputLayout.data(), (UINT)vertexLayout.inputLayout.size() };
-	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob.Get());
+	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob->Get());
 }
 
 void Model::Bind(ID3D12GraphicsCommandList* const commandList) noexcept

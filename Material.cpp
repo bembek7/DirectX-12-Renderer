@@ -3,7 +3,7 @@
 #include <d3d12.h>
 #include <stdexcept>
 #include "ThrowMacros.h"
-#include <d3dcompiler.h>
+#include "ShadersPool.h"
 #include "ConstantBuffer.h"
 #include "Texture.h"
 #include "Graphics.h"
@@ -127,10 +127,10 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		throw std::runtime_error("Pixel shader path not found for given flags");
 	}
 
-	// Load the pixel shader.
-	CHECK_HR(D3DReadFileToBlob(pixelShaderPath.c_str(), &pixelShaderBlob));
+	auto& shadersPool = ShadersPool::GetInstance();
+	pixelShaderBlob = shadersPool.GetShaderBlob(pixelShaderPath); // be wary that its a shared ptr to com ptr
 
-	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob.Get());
+	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob->Get());
 	pipelineStateStream.rasterizer = rasterizerDesc;
 }
 
