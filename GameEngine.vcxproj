@@ -202,6 +202,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Pass.cpp" />
     <ClCompile Include="PipelineState.cpp" />
+    <ClCompile Include="PipelineStatesPool.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RegularDrawingPass.cpp" />
     <ClCompile Include="RootSignature.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pass.h" />
     <ClInclude Include="PipelineState.h" />
+    <ClInclude Include="PipelineStatesPool.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RegularDrawingPass.h" />
     <ClInclude Include="RootSignature.h" />

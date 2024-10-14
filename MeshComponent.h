@@ -20,7 +20,6 @@ class MeshComponent : public SceneComponent
 {
 public:
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
-
 	void Draw(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
@@ -40,8 +39,7 @@ private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Material> material;
 	std::unique_ptr<Model> modelForShadowMapping;
-	//std::unique_ptr<RootSignature> rootSignature;
-	std::unique_ptr<PipelineState> pipelineState;
+	std::shared_ptr<PipelineState> pipelineState;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> bundle;
 
 	struct TransformBuffer

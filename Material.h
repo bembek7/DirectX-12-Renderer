@@ -17,8 +17,7 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
-		ShaderSettings shaderSettings);
+	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
 private:

@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Passes">
       <UniqueIdentifier>{1634c20d-28d8-4b41-8222-4cbfdc6a855d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Pools">
+      <UniqueIdentifier>{d2a958f0-d019-4939-a291-ba5210376649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Pools">
+      <UniqueIdentifier>{f63bd75c-bf0d-44e7-88ca-0fe0d20cc6bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -117,9 +123,6 @@
     <ClCompile Include="SceneComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="BindablesPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PipelineState.cpp">
       <Filter>Source Files\Bindables</Filter>
     </ClCompile>
@@ -162,8 +165,14 @@
     <ClCompile Include="RegularDrawingPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineStatesPool.cpp">
+      <Filter>Source Files\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="BindablesPool.cpp">
+      <Filter>Source Files\Pools</Filter>
+    </ClCompile>
     <ClCompile Include="ShadersPool.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,9 +284,6 @@
     <ClInclude Include="Viewport.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="BindablesPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PipelineState.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
@@ -314,11 +320,17 @@
     <ClInclude Include="Pass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="ShadersPool.h">
+      <Filter>Header Files\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineStatesPool.h">
+      <Filter>Header Files\Pools</Filter>
+    </ClInclude>
     <ClInclude Include="RegularDrawingPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="ShadersPool.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BindablesPool.h">
+      <Filter>Header Files\Pools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

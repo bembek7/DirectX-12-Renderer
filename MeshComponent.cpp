@@ -7,6 +7,7 @@
 #include "Bindable.h"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "PipelineStatesPool.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -21,7 +22,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
 	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
 
-	const ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
+	ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
 
 	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
@@ -40,7 +41,8 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		//modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
 	}
 
-	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
+	auto& pipelineStatesPool = PipelineStatesPool::GetInstance();
+	pipelineState = pipelineStatesPool.GetPipelineState(graphics, shaderSettings, pipelineStateStream);
 
 	// Create and record the bundle.
 	{
