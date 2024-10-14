@@ -2,6 +2,7 @@
 #include "Bindable.h"
 #include "Graphics.h"
 #include "ThrowMacros.h"
+#include "BufferLoader.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
@@ -11,7 +12,7 @@ IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices)
 	// set the index count
 	indicesNum = (UINT)indices.size();
 
-	indexBuffer = std::move(graphics.GenerateBufferFromData(indices));
+	indexBuffer = std::move(BufferLoader::GenerateBufferFromData(graphics, indices, D3D12_RESOURCE_STATE_INDEX_BUFFER));
 
 	indexBufferView =
 	{

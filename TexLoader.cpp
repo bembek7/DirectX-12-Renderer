@@ -101,6 +101,7 @@ TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::s
 		));
 	}
 
+	graphics.WaitForSignal();
 	graphics.ResetCommandListAndAllocator();
 	// write commands to copy data to upload texture (copying each subresource)
 	UpdateSubresources(
@@ -122,11 +123,8 @@ TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::s
 
 	// close command list
 	CHECK_HR(graphics.GetMainCommandList()->Close());
-
 	graphics.ExecuteCommandList();
 
-	OutputDebugString("Should not wait when loading textures");
-	graphics.WaitForQueueFinish();
-
+	graphics.Signal();
 	return image;
 }

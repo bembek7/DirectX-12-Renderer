@@ -3,30 +3,14 @@
 #include <DirectXMath.h>
 #include "d3dx12\d3dx12.h"
 #include "Graphics.h"
+#include "BufferLoader.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
 
 VertexBuffer::VertexBuffer(Graphics& graphics, const std::vector<float>& verticesData, const UINT vertexSize, const UINT verticesNum)
 {
-	vertexBuffer = std::move(graphics.GenerateBufferFromData(verticesData));
-
-	graphics.ResetCommandListAndAllocator();
-
-	// transition vertex buffer to vertex buffer state
-	{
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			vertexBuffer.Get(),
-			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-		graphics.GetMainCommandList()->ResourceBarrier(1, &barrier);
-	}
-
-	// close command list
-	CHECK_HR(graphics.GetMainCommandList()->Close());
-
-	graphics.ExecuteCommandList();
-
-	graphics.WaitForQueueFinish();
+	vertexBuffer = std::move(BufferLoader::GenerateBufferFromData(graphics, verticesData, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
 
 	vertexBufferView =
 	{

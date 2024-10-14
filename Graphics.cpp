@@ -244,8 +244,6 @@ void Graphics::LoadAssets()
 		CHECK_HR(GetLastError());
 		throw std::runtime_error{ "Failed to create fence event" };
 	}
-
-	WaitForQueueFinish();
 }
 
 void Graphics::CreateRootSignature()
@@ -431,6 +429,20 @@ void Graphics::ExecuteCommandList()
 void Graphics::WaitForQueueFinish()
 {
 	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValues[curBufferIndex]));
+	CHECK_HR(fence->SetEventOnCompletion(fenceValues[curBufferIndex], fenceEvent));
+	if (WaitForSingleObject(fenceEvent, INFINITE) == WAIT_FAILED)
+	{
+		CHECK_HR(GetLastError());
+	}
+}
+
+void Graphics::Signal()
+{
+	CHECK_HR(commandQueue->Signal(fence.Get(), ++fenceValues[curBufferIndex]));
+}
+
+void Graphics::WaitForSignal()
+{
 	CHECK_HR(fence->SetEventOnCompletion(fenceValues[curBufferIndex], fenceEvent));
 	if (WaitForSingleObject(fenceEvent, INFINITE) == WAIT_FAILED)
 	{

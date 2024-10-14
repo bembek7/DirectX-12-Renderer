@@ -182,6 +182,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bindable.cpp" />
     <ClCompile Include="BindablesPool.cpp" />
+    <ClCompile Include="BufferLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="BetterWindows.h" />
     <ClInclude Include="Bindable.h" />
     <ClInclude Include="BindablesPool.h" />
+    <ClInclude Include="BufferLoader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dx12\d3dx12.h" />

@@ -3,6 +3,7 @@
 #include "Bindable.h"
 #include "Graphics.h"
 #include "d3dx12\d3dx12.h"
+#include "BufferLoader.h"
 
 enum class BufferType
 {
@@ -30,7 +31,7 @@ public:
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
 			nullptr,
 			IID_PPV_ARGS(&uploadBuffer)));
 	}
