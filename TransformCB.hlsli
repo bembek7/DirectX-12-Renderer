@@ -1,8 +1,8 @@
 struct Transform
 {
     matrix model;
-    matrix modelView;
-    matrix modelViewProj;
+    matrix view;
+    matrix proj;
 };
 
 ConstantBuffer<Transform> TransformCB : register(b0);

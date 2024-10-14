@@ -11,10 +11,12 @@ struct VSOut
 
 VSOut main(float3 position : POSITION, float3 normal : NORMAL)
 {
+    const matrix modelView = mul(TransformCB.model, TransformCB.view);
+    const matrix modelViewProj = mul(modelView, TransformCB.proj);
     VSOut vsout;
-    vsout.viewPos = (float3) mul(float4(position, 1.0f), TransformCB.modelView);
-    vsout.viewNormal = mul(normal, (float3x3) TransformCB.modelView);
-    vsout.pos = mul(float4(position, 1.0f), TransformCB.modelViewProj);
+    vsout.viewPos = (float3) mul(float4(position, 1.0f), modelView);
+    vsout.viewNormal = mul(normal, (float3x3) modelView);
+    vsout.pos = mul(float4(position, 1.0f), modelViewProj);
     
     // Transform the vertex position into projected space from the POV of the light.
     const float4 modelPos = mul(float4(position, 1.0f), TransformCB.model);

@@ -104,10 +104,10 @@ Material* MeshComponent::GetMaterial() noexcept
 
 void MeshComponent::UpdateTransformBuffer(Graphics& graphics)
 {
-	DirectX::XMMATRIX transformMatrix = GetTransformMatrix();
-	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera());
-	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera() * graphics.GetProjection());
-	transformBuffer = TransformBuffer(std::move(DirectX::XMMatrixTranspose(transformMatrix)), std::move(transformView), std::move(transformViewProjection));
+	DirectX::XMMATRIX transform = DirectX::XMMatrixTranspose(GetTransformMatrix());
+	DirectX::XMMATRIX view = DirectX::XMMatrixTranspose(graphics.GetCamera());
+	DirectX::XMMATRIX projection = DirectX::XMMatrixTranspose(graphics.GetProjection());
+	transformBuffer = TransformBuffer(std::move(transform), std::move(view), std::move(projection));
 }
 
 ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material)
@@ -151,9 +151,9 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 	return resolvedSettings;
 }
 
-MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection)
+MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newView, const DirectX::XMMATRIX newProjection)
 {
 	DirectX::XMStoreFloat4x4(&transform, newTransform);
-	DirectX::XMStoreFloat4x4(&transformView, newTransformView);
-	DirectX::XMStoreFloat4x4(&transformViewProjection, newTransformViewProjection);
+	DirectX::XMStoreFloat4x4(&view, newView);
+	DirectX::XMStoreFloat4x4(&projection, newProjection);
 }

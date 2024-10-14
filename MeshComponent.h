@@ -45,10 +45,10 @@ private:
 	struct TransformBuffer
 	{
 		TransformBuffer() = default;
-		TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection);
+		TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newView, const DirectX::XMMATRIX newProjection);
 		DirectX::XMFLOAT4X4 transform;
-		DirectX::XMFLOAT4X4 transformView;
-		DirectX::XMFLOAT4X4 transformViewProjection;
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
 	};
 	TransformBuffer transformBuffer = {};
 

@@ -2,5 +2,7 @@
 
 float4 main( float3 pos : POSITION ) : SV_POSITION
 {
-    return mul(float4(pos, 1.0f), TransformCB.modelViewProj);
+    const matrix modelViewProj = mul(mul(TransformCB.model, TransformCB.view), TransformCB.proj);
+
+    return mul(float4(pos, 1.0f), modelViewProj);
 }
