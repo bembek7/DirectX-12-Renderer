@@ -107,7 +107,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 		{
 			debugController->EnableDebugLayer();
-			debugController->SetEnableGPUBasedValidation(true);
+			//debugController->SetEnableGPUBasedValidation(true);
 		}
 #endif
 	}
@@ -193,7 +193,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
 		const D3D12_CLEAR_VALUE clearValue = {
 			.Format = DXGI_FORMAT_D32_FLOAT,
-			.DepthStencil = { 1.0f, 0 },
+			.DepthStencil = { 0.0f, 0 },
 		};
 		CHECK_HR(device->CreateCommittedResource(
 			&heapProperties,
@@ -290,7 +290,7 @@ void Graphics::PopulateCommandList()
 	ClearRenderTarget(backBuffer.Get(), rtv);
 
 	// clear the depth buffer
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 0.f, 0, 0, nullptr);
 
 	// bind render target
 	commandList->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
@@ -350,7 +350,9 @@ PipelineState::PipelineStateStream Graphics::GetCommonPSS()
 		.NumRenderTargets = 1,
 	};
 	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-	commonPipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+	commonPipelineStateStream.depthStencil = dsDesc;
 	return commonPipelineStateStream;
 }
 

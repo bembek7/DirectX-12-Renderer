@@ -23,6 +23,9 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 
 	// define static sampler
 	CD3DX12_STATIC_SAMPLER_DESC staticSampler{ 1u, D3D12_FILTER_MIN_MAG_MIP_LINEAR };
+	staticSampler.ShaderRegister = 1u;
+	staticSampler.Filter = D3D12_FILTER_ANISOTROPIC;
+	staticSampler.MaxAnisotropy = D3D12_REQ_MAXANISOTROPY;
 	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootSignatureDesc.Init((UINT)std::size(rootParameters), rootParameters.data(), 1u, &staticSampler, rootSignatureFlags);
 	// serialize root signature
