@@ -67,7 +67,7 @@ private:
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
 	UINT cbvSrvDescriptorSize = 0;
-	static constexpr UINT bufferCount = 3;
+	static constexpr UINT bufferCount = 2;
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	std::unique_ptr<Gui> gui;
