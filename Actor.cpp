@@ -113,6 +113,14 @@ void Actor::Draw(Graphics& graphics)
 	}
 }
 
+void Actor::Update(Graphics& graphics)
+{
+	if (rootComponent)
+	{
+		rootComponent->Update(graphics);
+	}
+}
+
 void Actor::RenderShadowMap(Graphics& graphics)
 {
 	if (rootComponent)

@@ -31,10 +31,10 @@ void App::InitializeScene()
 	ss << "Initalizing sphere took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
 	OutputDebugString(ss.str().c_str());
 
-	/*for (size_t i = 0; i < 10; i++)
+	/*for (size_t i = 0; i < 100; i++)
 	{
-		auto brickWall2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Brick Wall");
-		brickWall2->SetActorLocation(Dx::XMFLOAT3{ 5.f * i, 0.f, 2.5f });
+		auto brickWall2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
+		brickWall2->SetActorTransform(Dx::XMFLOAT3{ 5.f, 0.f, 2.5f + 0.5f * i }, Dx::XMFLOAT3{ 0.f, 0.f, 0.f + 10.5f * i }, Dx::XMFLOAT3{ 1.f, 1.f, 1.f });
 		scene->AddActor(std::move(brickWall2));
 	}*/
 	last = std::chrono::steady_clock::now();

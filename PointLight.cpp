@@ -30,6 +30,7 @@ void PointLight::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const comma
 
 void PointLight::Update(Graphics& graphics)
 {
+	Actor::Update(graphics);
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
 	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
 	constantLightBuffer->Update();

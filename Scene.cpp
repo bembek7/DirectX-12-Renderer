@@ -52,8 +52,10 @@ void Scene::Draw(Graphics& graphics)
 
 	// Skybox should be drawn last
 	//skybox->Draw(graphics);
-	light->Update(graphics);
-
+	for (auto& actor : actors)
+	{
+		actor->Update(graphics);
+	}
 	drawingPass->Execute(graphics, actors, mainCamera.get());
 
 	RenderControls(graphics);

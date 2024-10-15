@@ -34,6 +34,7 @@ public:
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
 
 	void Draw(Graphics& graphics);
+	virtual void Update(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 
 	std::string GetActorFullName();

@@ -77,11 +77,17 @@ void MeshComponent::Draw(Graphics& graphics)
 {
 	SceneComponent::Draw(graphics);
 
+	material->BindDescriptorHeap(graphics.GetMainCommandList());
+	graphics.ExecuteBundle(bundle.Get());
+}
+
+void MeshComponent::Update(Graphics& graphics)
+{
+	SceneComponent::Update(graphics);
+
 	UpdateTransformBuffer(graphics);
 	transformConstantBuffer->Update();
 	material->Update();
-	material->BindDescriptorHeap(graphics.GetMainCommandList());
-	graphics.ExecuteBundle(bundle.Get());
 }
 
 void MeshComponent::RenderShadowMap(Graphics& graphics)

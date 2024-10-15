@@ -115,6 +115,14 @@ void SceneComponent::Draw(Graphics& graphics)
 	}
 }
 
+void SceneComponent::Update(Graphics& graphics)
+{
+	for (auto& child : children)
+	{
+		child->Update(graphics);
+	}
+}
+
 void SceneComponent::RenderShadowMap(Graphics& graphics)
 {
 	for (auto& child : children)

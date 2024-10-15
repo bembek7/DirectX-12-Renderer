@@ -35,6 +35,7 @@ public:
 	}
 
 	virtual void Draw(Graphics& graphics);
+	virtual void Update(Graphics& graphics);
 	virtual void RenderShadowMap(Graphics& graphics);
 
 	DirectX::XMMATRIX GetTransformMatrix() const noexcept;
