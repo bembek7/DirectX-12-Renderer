@@ -39,11 +39,8 @@ void Graphics::RenderEnd()
 	// select current buffer to render to
 	auto& backBuffer = renderTargets[curBufferIndex];
 
-	// prepare buffer for presentation by transitioning to present state
-	{
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		commandList->ResourceBarrier(1, &barrier);
-	}
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	commandList->ResourceBarrier(1, &barrier);
 
 	CHECK_HR(commandList->Close());
 

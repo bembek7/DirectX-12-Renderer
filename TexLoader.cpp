@@ -101,7 +101,6 @@ TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::s
 		));
 	}
 
-	graphics.WaitForSignal();
 	graphics.ResetCommandListAndAllocator();
 	// write commands to copy data to upload texture (copying each subresource)
 	UpdateSubresources(
@@ -113,18 +112,15 @@ TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::s
 		subresourceData.data()
 	);
 
-	// write command to transition texture to texture state
-	{
-		const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			image.resource.Get(),
-			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		graphics.GetMainCommandList()->ResourceBarrier(1, &barrier);
-	}
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		image.resource.Get(),
+		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	graphics.GetMainCommandList()->ResourceBarrier(1, &barrier);
 
 	// close command list
 	CHECK_HR(graphics.GetMainCommandList()->Close());
 	graphics.ExecuteCommandList();
 
-	graphics.Signal();
+	graphics.WaitForQueueFinish();
 	return image;
 }

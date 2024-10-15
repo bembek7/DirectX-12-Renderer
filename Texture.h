@@ -14,5 +14,4 @@ public:
 	//static std::string ResolveID(const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) noexcept;
 private:
 	std::shared_ptr<TexLoader::Image> image;
-	CD3DX12_DESCRIPTOR_RANGE descRange;
 };

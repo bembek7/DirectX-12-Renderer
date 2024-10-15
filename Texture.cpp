@@ -5,7 +5,7 @@
 Texture::Texture(Graphics& graphics, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle)
 {
 	auto& texLoader = TexLoader::GetInstance();
-	image = texLoader.GetTexture(graphics, fileName); // be wary that its a shared ptr to com ptr
+	image = texLoader.GetTexture(graphics, fileName);
 
 	// create the descriptor in the heap
 	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {

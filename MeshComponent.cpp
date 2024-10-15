@@ -80,6 +80,7 @@ void MeshComponent::Draw(Graphics& graphics)
 	UpdateTransformBuffer(graphics);
 	transformConstantBuffer->Update();
 	material->Update();
+	material->BindDescriptorHeap(graphics.GetMainCommandList());
 	graphics.ExecuteBundle(bundle.Get());
 }
 

@@ -19,10 +19,10 @@ class Material
 public:
 	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
+	void BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuStartHandle;
 	std::vector<std::unique_ptr<Updatable>> cBuffers;
 	std::vector<std::unique_ptr<Texture>> textures;
 	//UINT desciptorTableRootIndex;

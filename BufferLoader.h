@@ -44,7 +44,7 @@ public:
 			uploadBuffer->Unmap(0, nullptr);
 		}
 
-		graphics.WaitForSignal();
+		//graphics.WaitForSignal();
 		graphics.ResetCommandListAndAllocator();
 		// copy upload buffer to buffer
 		graphics.GetMainCommandList()->CopyResource(finalBuffer.Get(), uploadBuffer.Get());
@@ -59,7 +59,7 @@ public:
 
 		graphics.ExecuteCommandList();
 
-		graphics.Signal();
+		graphics.WaitForQueueFinish();
 
 		return finalBuffer;
 	}

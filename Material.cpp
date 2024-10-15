@@ -41,6 +41,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
 	const UINT descriptorsNum = textureHighestSlotMap.at(shaderSettings) + 1;
 	// descriptor heap for the shader resource view
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuStartHandle{};
 	if (descriptorsNum > 0)
 	{
 		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
@@ -84,7 +85,6 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
 		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 2u, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, normalTexFileName.C_Str(), srvCpuHandle));
-		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
@@ -92,7 +92,6 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
 		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 3u, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
-		srvCpuHandle.Offset(graphics.GetCbvSrvDescriptorSize());
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
@@ -143,8 +142,16 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 
 	if (srvHeap)
 	{
-		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+		BindDescriptorHeap(commandList);
 		commandList->SetGraphicsRootDescriptorTable(5u, srvHeap->GetGPUDescriptorHandleForHeapStart());
+	}
+}
+
+void Material::BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept
+{
+	if (srvHeap)
+	{
+		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	}
 }
 
