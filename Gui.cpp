@@ -166,8 +166,8 @@ void Gui::RenderActorDetails(PointLight* const actor)
 	ImGui::Text("Specular Intensity");
 	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
 
-	ImGui::Text("Attenuation");
-	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
-	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
-	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
+	//ImGui::Text("Attenuation");
+	//ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
+	//ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
+	//ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
 }

@@ -100,6 +100,11 @@ DirectX::XMVECTOR Actor::GetActorRotationVector() const noexcept
 	return rootComponent->GetRelativeRotationVector();
 }
 
+DirectX::XMVECTOR Actor::GetActorRotationRadians() const noexcept
+{
+	return rootComponent->GetComponentRotationRadians();
+}
+
 DirectX::XMVECTOR Actor::GetActorLocationVector() const noexcept
 {
 	return rootComponent->GetRelativeLocationVector();

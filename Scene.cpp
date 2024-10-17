@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "PointLight.h"
+#include "Light.h"
 #include <stdexcept>
 #include "Graphics.h"
 #include "RegularDrawingPass.h"
@@ -20,14 +20,14 @@ Scene::Scene(Graphics& graphics)
 
 void Scene::AddActor(std::unique_ptr<Actor> actorToAdd)
 {
-	if (dynamic_cast<PointLight*>(actorToAdd.get()))
+	if (dynamic_cast<Light*>(actorToAdd.get()))
 	{
 		throw std::runtime_error("Light should be added using add light function");
 	}
 	actors.push_back(std::move(actorToAdd));
 }
 
-void Scene::AddLight(std::unique_ptr<PointLight> lightToAdd)
+void Scene::AddLight(std::unique_ptr<Light> lightToAdd)
 {
 	if (light)
 	{

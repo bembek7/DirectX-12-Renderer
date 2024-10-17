@@ -80,7 +80,7 @@ void Graphics::BindLighting(ID3D12GraphicsCommandList* const commandList)
 {
 	if (light)
 	{
-		light->Bind(*this, commandList);
+		mainLight->Bind(commandList);
 	}
 	else
 	{
@@ -95,7 +95,7 @@ void Graphics::ExecuteBundle(ID3D12GraphicsCommandList* const bundle)
 
 void Graphics::SetLight(PointLight* const pointLight) noexcept
 {
-	light = pointLight;
+	mainLight = light;
 }
 
 void Graphics::LoadPipeline(const HWND& hWnd)

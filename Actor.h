@@ -31,6 +31,7 @@ public:
 	DirectX::XMFLOAT3 GetActorLocation() const noexcept;
 	DirectX::XMVECTOR GetActorScaleVector() const noexcept;
 	DirectX::XMVECTOR GetActorRotationVector() const noexcept;
+	DirectX::XMVECTOR GetActorRotationRadians() const noexcept;
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
 
 	void Draw(Graphics& graphics);
