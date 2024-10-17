@@ -7,9 +7,7 @@
 #include "ConstantBuffer.h"
 #include "Texture.h"
 #include "Graphics.h"
-//#include "Sampler.h"
-//#include "Blender.h"
-//#include "CubeTexture.h"
+#include "RootParametersDescription.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
@@ -70,7 +68,7 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 1u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::Diffuse, srvDescSize);
 		auto diffTex = std::make_unique<Texture>(graphics, texFileName.C_Str(), srvCpuHandle);
 		if (diffTex->HasAlpha())
 		{
@@ -83,26 +81,26 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 2u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::NormalMap, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, normalTexFileName.C_Str(), srvCpuHandle));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 3u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::SpecularMap, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
-		cBuffers.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, 3u));
+		cBuffers.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
 	}
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();
-		cBuffers.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, 4u));
+		cBuffers.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, RPD::Color));
 	}
 	/*
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))

@@ -177,10 +177,10 @@
     <ClCompile Include="BufferLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
   </ItemGroup>
@@ -349,6 +349,9 @@
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="RootParametersDescription.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

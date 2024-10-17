@@ -8,6 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "PipelineStatesPool.h"
+#include "RootParametersDescription.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -26,7 +27,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, 0u);
+	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, RPD::Transform);
 
 	PipelineState::PipelineStateStream pipelineStateStream = graphics.GetCommonPSS();
 

@@ -4,6 +4,7 @@
 #include "MeshActor.h"
 #include "PointLight.h"
 #include <chrono>
+#include "DirectionalLight.h"
 
 namespace Dx = DirectX;
 
@@ -14,7 +15,7 @@ void App::InitializeScene()
 	scene = std::make_unique<Scene>(window.GetGraphics());
 
 	auto last = std::chrono::steady_clock::now();
-	auto light = std::make_unique<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
+	auto light = std::make_unique<DirectionalLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
 	std::stringstream ss;
 	ss << "Initalizing Light took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
 	OutputDebugString(ss.str().c_str());

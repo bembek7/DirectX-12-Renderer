@@ -8,6 +8,7 @@
 #include "Viewport.h"
 #include "ScissorRectangle.h"
 #include "RootSignature.h"
+#include "RootParametersDescription.h"
 
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
@@ -78,7 +79,7 @@ void Graphics::OnDestroy()
 
 void Graphics::BindLighting(ID3D12GraphicsCommandList* const commandList)
 {
-	if (light)
+	if (mainLight)
 	{
 		mainLight->Bind(commandList);
 	}
@@ -93,7 +94,7 @@ void Graphics::ExecuteBundle(ID3D12GraphicsCommandList* const bundle)
 	commandList->ExecuteBundle(bundle);
 }
 
-void Graphics::SetLight(PointLight* const pointLight) noexcept
+void Graphics::SetLight(Light* const light) noexcept
 {
 	mainLight = light;
 }
@@ -246,29 +247,18 @@ void Graphics::LoadAssets()
 void Graphics::CreateRootSignature()
 {
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
-	CD3DX12_ROOT_PARAMETER transformCB{};
-	transformCB.InitAsConstantBufferView(0u, 0u, D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters.push_back(std::move(transformCB));
-	CD3DX12_ROOT_PARAMETER shadowMapCB{};
-	shadowMapCB.InitAsConstantBufferView(1u, 0u, D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters.push_back(std::move(shadowMapCB));
-	CD3DX12_ROOT_PARAMETER lightCB{};
-	lightCB.InitAsConstantBufferView(0u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters.push_back(std::move(lightCB));
-	CD3DX12_ROOT_PARAMETER roughnessCB{};
-	roughnessCB.InitAsConstantBufferView(1u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters.push_back(std::move(roughnessCB));
-	CD3DX12_ROOT_PARAMETER colorCB{};
-	colorCB.InitAsConstantBufferView(2u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters.push_back(std::move(colorCB));
-	CD3DX12_ROOT_PARAMETER texturesDT{};
-	texesDescRanges = {};
-	for (UINT i = 0; i < 4; i++)
+	rootParameters.resize(RPD::paramsNum);
+
+	for (const auto& cbv : RPD::cbvs)
+	{
+		rootParameters[cbv.ParamIndex].InitAsConstantBufferView(cbv.slot, 0u, cbv.visibility);
+	}
+
+	for (UINT i = 0; i < RPD::texturesNum; i++)
 	{
 		texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, i, 0u, i });
 	}
-	texturesDT.InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters.push_back(std::move(texturesDT));
+	rootParameters[RPD::ParamsIndexes::TexturesDescTable].InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSignature = std::make_unique<RootSignature>(*this, rootParameters);
 }
 
