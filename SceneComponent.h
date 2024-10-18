@@ -7,6 +7,7 @@
 class Graphics;
 struct aiNode;
 struct aiScene;
+class Light;
 
 class SceneComponent
 {
@@ -34,7 +35,7 @@ public:
 		return rawChild;
 	}
 
-	virtual void Draw(Graphics& graphics);
+	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights);
 	virtual void Update(Graphics& graphics);
 	virtual void RenderShadowMap(Graphics& graphics);
 

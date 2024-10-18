@@ -9,6 +9,7 @@
 #include <assimp/postprocess.h>
 #include "PipelineStatesPool.h"
 #include "RootParametersDescription.h"
+#include "Light.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -54,11 +55,6 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		transformConstantBuffer->Bind(bundle.Get());
 		model->Bind(bundle.Get());
 		material->Bind(graphics, bundle.Get());
-		if (lighted)
-		{
-			graphics.BindLighting(bundle.Get());
-		}
-		bundle.Get()->DrawIndexedInstanced(model->GetIndicesNumber(), 1, 0, 0, 0);
 		CHECK_HR(bundle->Close());
 	}
 }
@@ -74,12 +70,21 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 	return std::unique_ptr<MeshComponent>(new MeshComponent(graphics, node, scene));
 }
 
-void MeshComponent::Draw(Graphics& graphics)
+void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
-	SceneComponent::Draw(graphics);
+	SceneComponent::Draw(graphics, lights);
 
 	material->BindDescriptorHeap(graphics.GetMainCommandList());
 	graphics.ExecuteBundle(bundle.Get());
+	if (lighted)
+	{
+		for (auto& light : lights)
+		{
+			light->Bind(graphics.GetMainCommandList());
+		}
+	}
+
+	graphics.GetMainCommandList()->DrawIndexedInstanced(model->GetIndicesNumber(), 1, 0, 0, 0);
 }
 
 void MeshComponent::Update(Graphics& graphics)

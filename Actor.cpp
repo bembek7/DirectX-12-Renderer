@@ -110,11 +110,16 @@ DirectX::XMVECTOR Actor::GetActorLocationVector() const noexcept
 	return rootComponent->GetRelativeLocationVector();
 }
 
-void Actor::Draw(Graphics& graphics)
+DirectX::XMVECTOR Actor::GetActorForwardVector() const noexcept
+{
+	return rootComponent->GetComponentForwardVector();
+}
+
+void Actor::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	if (rootComponent)
 	{
-		rootComponent->Draw(graphics);
+		rootComponent->Draw(graphics, lights);
 	}
 }
 

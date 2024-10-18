@@ -25,9 +25,7 @@ public:
 	void RenderEnd();
 	void OnDestroy();
 
-	void BindLighting(ID3D12GraphicsCommandList* const commandList);
 	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
-	void SetLight(Light* const light) noexcept;
 
 	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
@@ -78,8 +76,6 @@ private:
 	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 	std::unique_ptr<RootSignature> rootSignature;
 	std::unique_ptr<PipelineState> pipelineState;
-
-	Light* mainLight = nullptr;
 
 	// Pipeline objects.
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;

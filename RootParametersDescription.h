@@ -7,11 +7,12 @@ namespace RPD
 	enum ParamsIndexes
 	{
 		Transform = 0u,
-		ShadowMap = 1u,
-		Light = 2u,
-		Roughness = 3u,
-		Color = 4u,
-		TexturesDescTable = 5u // last of params
+		ShadowMap = Transform + 1u,
+		Roughness = ShadowMap + 1u,
+		Color = Roughness + 1u,
+		DirectionalLight = Color + 1u,
+		PointLight = DirectionalLight + 1u,
+		TexturesDescTable = PointLight + 1u // last of params
 	};
 
 	enum TextureSlots
@@ -32,9 +33,10 @@ namespace RPD
 	{
 		{0u, D3D12_SHADER_VISIBILITY_VERTEX, Transform},
 		{1u, D3D12_SHADER_VISIBILITY_VERTEX, ShadowMap},
-		{0u, D3D12_SHADER_VISIBILITY_PIXEL, Light},
-		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Roughness},
-		{2u, D3D12_SHADER_VISIBILITY_PIXEL, Color}
+		{0u, D3D12_SHADER_VISIBILITY_PIXEL, Roughness},
+		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Color},
+		{2u, D3D12_SHADER_VISIBILITY_PIXEL, DirectionalLight},
+		{3u, D3D12_SHADER_VISIBILITY_PIXEL, PointLight},
 	};
 
 	static constexpr UINT paramsNum = TexturesDescTable + 1;

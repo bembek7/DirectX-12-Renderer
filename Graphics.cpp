@@ -77,26 +77,9 @@ void Graphics::OnDestroy()
 	CloseHandle(fenceEvent);
 }
 
-void Graphics::BindLighting(ID3D12GraphicsCommandList* const commandList)
-{
-	if (mainLight)
-	{
-		mainLight->Bind(commandList);
-	}
-	else
-	{
-		throw std::runtime_error("Object tried binding lighting that was not set. Light actors should be created and bound first, before actors that use them");
-	}
-}
-
 void Graphics::ExecuteBundle(ID3D12GraphicsCommandList* const bundle)
 {
 	commandList->ExecuteBundle(bundle);
-}
-
-void Graphics::SetLight(Light* const light) noexcept
-{
-	mainLight = light;
 }
 
 void Graphics::LoadPipeline(const HWND& hWnd)

@@ -107,11 +107,11 @@ std::unique_ptr<SceneComponent> SceneComponent::LoadComponent(Graphics& graphics
 	return std::unique_ptr<SceneComponent>();
 }
 
-void SceneComponent::Draw(Graphics& graphics)
+void SceneComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	for (auto& child : children)
 	{
-		child->Draw(graphics);
+		child->Draw(graphics, lights);
 	}
 }
 

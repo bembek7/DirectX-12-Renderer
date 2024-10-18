@@ -14,23 +14,11 @@ void App::InitializeScene()
 
 	scene = std::make_unique<Scene>(window.GetGraphics());
 
-	auto last = std::chrono::steady_clock::now();
-	auto light = std::make_unique<DirectionalLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
-	std::stringstream ss;
-	ss << "Initalizing Light took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
-	OutputDebugString(ss.str().c_str());
+	auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
+	auto pointLight = std::make_unique<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
 
-	last = std::chrono::steady_clock::now();
 	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
-	ss = {};
-	ss << "Initalizing Brick wall took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
-	OutputDebugString(ss.str().c_str());
-
-	last = std::chrono::steady_clock::now();
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
-	ss = {};
-	ss << "Initalizing sphere took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
-	OutputDebugString(ss.str().c_str());
 
 	/*for (size_t i = 0; i < 100; i++)
 	{
@@ -38,9 +26,9 @@ void App::InitializeScene()
 		brickWall2->SetActorTransform(Dx::XMFLOAT3{ 5.f, 0.f, 2.5f + 0.5f * i }, Dx::XMFLOAT3{ 0.f, 0.f, 0.f + 10.5f * i }, Dx::XMFLOAT3{ 1.f, 1.f, 1.f });
 		scene->AddActor(std::move(brickWall2));
 	}*/
-	last = std::chrono::steady_clock::now();
+	auto last = std::chrono::steady_clock::now();
 	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
-	ss = {};
+	std::stringstream ss = {};
 	ss << "Initalizing sponza took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
 	OutputDebugString(ss.str().c_str());
 
@@ -50,13 +38,15 @@ void App::InitializeScene()
 	//wall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 1.5f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	light->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
+	directionalLight->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
+	pointLight->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
 
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
 	//scene->AddActor(std::move(wall));
 	scene->AddActor(std::move(brickWall));
-	scene->AddLight(std::move(light));
+	scene->AddLight(std::move(directionalLight));
+	scene->AddLight(std::move(pointLight));
 }
 
 int App::Run()

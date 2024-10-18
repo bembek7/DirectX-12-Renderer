@@ -4,6 +4,7 @@
 #include <string>
 
 class Graphics;
+class Light;
 
 class Actor
 {
@@ -33,8 +34,10 @@ public:
 	DirectX::XMVECTOR GetActorRotationVector() const noexcept;
 	DirectX::XMVECTOR GetActorRotationRadians() const noexcept;
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
+	DirectX::XMVECTOR GetActorForwardVector() const noexcept;
 
-	void Draw(Graphics& graphics);
+	void Draw(Graphics& graphics, const std::vector<Light*>& lights);
+
 	virtual void Update(Graphics& graphics);
 	void RenderShadowMap(Graphics& graphics);
 

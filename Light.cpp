@@ -8,8 +8,6 @@ Light::Light(Graphics& graphics, const std::string& fileName, const std::string&
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
 	constantBuffers.push_back(std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, RPD::ShadowMap));
-
-	graphics.SetLight(this);
 }
 
 void Light::Bind(ID3D12GraphicsCommandList* const commandList)

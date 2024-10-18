@@ -29,11 +29,7 @@ void Scene::AddActor(std::unique_ptr<Actor> actorToAdd)
 
 void Scene::AddLight(std::unique_ptr<Light> lightToAdd)
 {
-	if (light)
-	{
-		throw std::runtime_error("Only scenes with one light are handled right now");
-	}
-	light = lightToAdd.get();
+	lights.push_back(lightToAdd.get());
 	actors.push_back(std::move(lightToAdd));
 }
 
@@ -56,7 +52,7 @@ void Scene::Draw(Graphics& graphics)
 	{
 		actor->Update(graphics);
 	}
-	drawingPass->Execute(graphics, actors, mainCamera.get());
+	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 
 	RenderControls(graphics);
 }

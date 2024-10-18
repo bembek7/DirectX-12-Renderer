@@ -7,7 +7,7 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoo
 {
     const float3 realViewNormal = normalize(viewNormal);
     
-    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, LightCB.diffuseColor);
+    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, DirectionalLightCB.diffuseColor);
     
     const float4 texSample = tex.Sample(texSampler, texCoord);
     return float4(texSample.rgb * finalLight, 1.0f);

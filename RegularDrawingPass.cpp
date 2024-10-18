@@ -23,12 +23,12 @@ RegularDrawingPass::RegularDrawingPass(Graphics& graphics)
 	DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
 }
 
-void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const Camera* const mainCamera)
+void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const Camera* const mainCamera)
 {
 	Pass::Execute(graphics);
 	graphics.SetCamera(mainCamera->GetMatrix());
 	for (auto& actor : actors)
 	{
-		actor->Draw(graphics);
+		actor->Draw(graphics, lights);
 	}
 }

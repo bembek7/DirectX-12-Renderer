@@ -141,7 +141,7 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 	if (srvHeap)
 	{
 		BindDescriptorHeap(commandList);
-		commandList->SetGraphicsRootDescriptorTable(5u, srvHeap->GetGPUDescriptorHandleForHeapStart());
+		commandList->SetGraphicsRootDescriptorTable(RPD::TexturesDescTable, srvHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 }
 

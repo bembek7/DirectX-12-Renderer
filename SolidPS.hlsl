@@ -3,7 +3,7 @@ struct Color
     float4 color;
 };
 
-ConstantBuffer<Color> ColorCBuf : register(b2);
+ConstantBuffer<Color> ColorCBuf : register(b1);
 
 float4 main() : SV_TARGET
 {

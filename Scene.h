@@ -27,7 +27,7 @@ private:
 	std::unique_ptr<RegularDrawingPass> drawingPass;
 	/*std::unique_ptr<ShadowMapPass> shadowMapPass;*/
 	std::vector<std::unique_ptr<Actor>> actors;
-	Light* light = nullptr;
+	std::vector<Light*> lights;
 	//std::unique_ptr<Skybox> skybox;
 	std::unique_ptr<Camera> mainCamera;
 };

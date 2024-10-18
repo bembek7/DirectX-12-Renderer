@@ -20,7 +20,7 @@ class MeshComponent : public SceneComponent
 {
 public:
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
-	virtual void Draw(Graphics& graphics) override;
+	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights) override;
 	virtual void Update(Graphics& graphics) override;
 	void RenderShadowMap(Graphics& graphics);
 
