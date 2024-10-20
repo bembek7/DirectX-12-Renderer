@@ -34,16 +34,14 @@ void App::InitializeScene()
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 
-	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.05f, 0.05f, 0.05f });
-	//wall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 1.5f });
+	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	directionalLight->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
-	pointLight->SetActorScale(Dx::XMFLOAT3{ 0.2f, 0.2f, 0.2f });
+	directionalLight->SetActorTransform({ 0.f, -100.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
+	pointLight->SetActorScale(Dx::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
-	//scene->AddActor(std::move(wall));
 	scene->AddActor(std::move(brickWall));
 	scene->AddLight(std::move(directionalLight));
 	scene->AddLight(std::move(pointLight));

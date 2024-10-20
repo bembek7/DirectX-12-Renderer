@@ -9,8 +9,7 @@ PointLight::PointLight(Graphics& graphics, const std::string& fileName, const st
 
 void PointLight::Update(Graphics& graphics)
 {
-	//DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
-	DirectX::XMStoreFloat3(&lightBuffer.lightDirection, GetActorRotationRadians());
+	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
 
 	Light::Update(graphics);
 }
