@@ -213,6 +213,7 @@
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
     <ClCompile Include="ShadersPool.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TexLoader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="ScissorRectangle.h" />
     <ClInclude Include="ShaderSettings.h" />
     <ClInclude Include="ShadersPool.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TexLoader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ThrowMacros.h" />

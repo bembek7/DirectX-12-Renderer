@@ -16,8 +16,8 @@ private:
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 diffuseColor = { 1.0f, 1.0f, 1.0f };
-		float diffuseIntensity = 0.7f;
-		DirectX::XMFLOAT3 ambient = { 0.15f, 0.15f, 0.15f };
+		float diffuseIntensity = 0.5f;
+		DirectX::XMFLOAT3 ambient = { 0.1f, 0.1f, 0.1f };
 		float specularIntensity = 0.6f;
 		DirectX::XMFLOAT3 lightDirection = { 0.f, 0.f, 0.f };
 		char padding[4];

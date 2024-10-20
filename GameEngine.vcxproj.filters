@@ -183,6 +183,9 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -352,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="RootParametersDescription.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Actor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,8 @@ namespace RPD
 		Color = Roughness + 1u,
 		DirectionalLight = Color + 1u,
 		PointLight = DirectionalLight + 1u,
-		TexturesDescTable = PointLight + 1u // last of params
+		SpotLight = PointLight + 1u,
+		TexturesDescTable = SpotLight + 1u // last of params
 	};
 
 	enum TextureSlots
@@ -37,6 +38,7 @@ namespace RPD
 		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Color},
 		{2u, D3D12_SHADER_VISIBILITY_PIXEL, DirectionalLight},
 		{3u, D3D12_SHADER_VISIBILITY_PIXEL, PointLight},
+		{4u, D3D12_SHADER_VISIBILITY_PIXEL, SpotLight},
 	};
 
 	static constexpr UINT paramsNum = TexturesDescTable + 1;

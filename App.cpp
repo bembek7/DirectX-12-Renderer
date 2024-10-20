@@ -5,6 +5,7 @@
 #include "PointLight.h"
 #include <chrono>
 #include "DirectionalLight.h"
+#include "SpotLight.h"
 
 namespace Dx = DirectX;
 
@@ -16,6 +17,7 @@ void App::InitializeScene()
 
 	auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
 	auto pointLight = std::make_unique<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
+	auto spotLight = std::make_unique<SpotLight>(window.GetGraphics(), meshesPath + "lightSphere.obj");
 
 	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
@@ -38,13 +40,15 @@ void App::InitializeScene()
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	directionalLight->SetActorTransform({ 0.f, -100.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
-	pointLight->SetActorScale(Dx::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
+	spotLight->SetActorTransform({ 30.f, 0.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
+	pointLight->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
 	scene->AddActor(std::move(brickWall));
 	scene->AddLight(std::move(directionalLight));
 	scene->AddLight(std::move(pointLight));
+	scene->AddLight(std::move(spotLight));
 }
 
 int App::Run()

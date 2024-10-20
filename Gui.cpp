@@ -8,6 +8,7 @@
 #include "PointLight.h"
 #include <sstream>
 #include "DirectionalLight.h"
+#include "SpotLight.h"
 
 Gui::Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat)
 {
@@ -186,4 +187,27 @@ void Gui::RenderActorDetails(DirectionalLight* const actor)
 
 	ImGui::Text("Specular Intensity");
 	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
+}
+
+void Gui::RenderActorDetails(SpotLight* const actor)
+{
+	ImGui::Text("Diffuse");
+	ImGui::DragFloat3("##Diffuse", (float*)&actor->lightBuffer.diffuseColor, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Ambient");
+	ImGui::DragFloat3("##Ambient", (float*)&actor->lightBuffer.ambient, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Diffuse Intensity");
+	ImGui::DragFloat("##DiffuseIntensity", (float*)&actor->lightBuffer.diffuseIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Specular Intensity");
+	ImGui::DragFloat("##SpecularIntensity", (float*)&actor->lightBuffer.specularIntensity, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Spot Power");
+	ImGui::DragFloat("##SpotPower", (float*)&actor->lightBuffer.spotPower, 0.01f, 0.0f, 1.0f);
+
+	ImGui::Text("Attenuation");
+	ImGui::DragFloat("##Const", (float*)&actor->lightBuffer.attenuationConst, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Lin", (float*)&actor->lightBuffer.attenuationLin, 0.0001f, 0.0f, 1.0f);
+	ImGui::DragFloat("##Quad", (float*)&actor->lightBuffer.attenuationQuad, 0.0001f, 0.0f, 1.0f);
 }

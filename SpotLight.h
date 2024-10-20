@@ -1,12 +1,10 @@
 #pragma once
-#include <DirectXMath.h>
 #include "Light.h"
-
-class PointLight : public Light
+class SpotLight : public Light
 {
 	friend class Gui;
 public:
-	PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Point Light");
+	SpotLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Spot Light");
 	virtual void Update(Graphics& graphics) override;
 
 protected:
@@ -20,9 +18,11 @@ private:
 		DirectX::XMFLOAT3 ambient = { 0.05f, 0.05f, 0.05f };
 		float specularIntensity = 0.6f;
 		DirectX::XMFLOAT3 lightViewLocation = { 0.f, 0.f, 0.f };
+		float spotPower = 1.0f;
+		DirectX::XMFLOAT3 lightDirection = { 0.f, 0.f, 0.f };
 		float attenuationConst = 1.0f;
-		float attenuationLin = 0.095f;
-		float attenuationQuad = 0.0040f;
+		float attenuationLin = 0.045f;
+		float attenuationQuad = 0.0020f;
 		char padding[8];
 	} lightBuffer;
 };

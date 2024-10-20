@@ -6,6 +6,7 @@
 class Actor;
 class PointLight;
 class DirectionalLight;
+class SpotLight;
 class SceneComponent;
 class MeshComponent;
 
@@ -29,6 +30,7 @@ public:
 	void RenderActorDetails(Actor* const actor);
 	void RenderActorDetails(PointLight* const actor);
 	void RenderActorDetails(DirectionalLight* const actor);
+	void RenderActorDetails(SpotLight* const actor);
 private:
 	void RenderComponentTree(SceneComponent* const component, Actor* const actor);
 
