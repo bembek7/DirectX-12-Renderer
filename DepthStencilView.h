@@ -1,7 +1,9 @@
 #pragma once
-#include "Bindable.h"
+#include "d3dx12\d3dx12.h"
 
-class DepthStencilView : public Bindable
+class Graphics;
+
+class DepthStencilView
 {
 public:
 	enum class Usage
@@ -10,17 +12,12 @@ public:
 		Depth
 	};
 	DepthStencilView(Graphics& graphics, const Usage usage, const UINT width, const UINT height);
-	DepthStencilView(Graphics& graphics, Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, const UINT face);
-	void Bind(Graphics& graphics) noexcept override;
-	virtual void Update(Graphics& graphics) override;
-	ID3D11DepthStencilView* Get() noexcept;
-	ID3D11Texture2D* GetTexture() noexcept;
-
-private:
-	void Clear(Graphics& graphics);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const noexcept;
+	void Clear(ID3D12GraphicsCommandList* const commandList);
 
 private:
 	Usage usage;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 };

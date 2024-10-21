@@ -26,6 +26,8 @@ public:
 	void OnDestroy();
 
 	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
+	void ClearRenderTargetView();
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetRtvCpuHandle() noexcept;
 
 	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
@@ -58,8 +60,6 @@ private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();
 	void CreateRootSignature();
-	void PopulateCommandList();
-	void ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv);
 
 private:
 	float windowWidth;
@@ -84,9 +84,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocators[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> bundleAllocator;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;

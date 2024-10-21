@@ -185,6 +185,7 @@
     <ClCompile Include="BufferLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="DepthStencilView.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Gui.cpp" />
@@ -213,6 +214,7 @@
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
     <ClCompile Include="ShadersPool.cpp" />
+    <ClCompile Include="ShadowMapPass.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TexLoader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -242,6 +244,7 @@
     <ClInclude Include="d3dx12\d3dx12_resource_helpers.h" />
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
+    <ClInclude Include="DepthStencilView.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Gui.h" />
@@ -272,6 +275,7 @@
     <ClInclude Include="ScissorRectangle.h" />
     <ClInclude Include="ShaderSettings.h" />
     <ClInclude Include="ShadersPool.h" />
+    <ClInclude Include="ShadowMapPass.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TexLoader.h" />
     <ClInclude Include="Texture.h" />

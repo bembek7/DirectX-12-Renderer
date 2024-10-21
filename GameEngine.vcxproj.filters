@@ -186,6 +186,12 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMapPass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -358,6 +364,12 @@
     </ClInclude>
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilView.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

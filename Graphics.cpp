@@ -30,7 +30,7 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 void Graphics::RenderBegin()
 {
 	gui->BeginFrame();
-	PopulateCommandList();
+	ResetCommandListAndAllocator();
 }
 
 void Graphics::RenderEnd()
@@ -167,46 +167,6 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 		}
 	}
 
-	// depth buffer
-	{
-		const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
-		const CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Tex2D(
-			DXGI_FORMAT_D32_FLOAT,
-			(UINT)windowWidth, (UINT)windowHeight,
-			1, 0, 1, 0,
-			D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
-		const D3D12_CLEAR_VALUE clearValue = {
-			.Format = DXGI_FORMAT_D32_FLOAT,
-			.DepthStencil = { 0.0f, 0 },
-		};
-		CHECK_HR(device->CreateCommittedResource(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&desc,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&clearValue,
-			IID_PPV_ARGS(&depthBuffer)));
-	}
-
-	// dsv descriptor heap
-	{
-		const D3D12_DESCRIPTOR_HEAP_DESC desc = {
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-			.NumDescriptors = 1,
-		};
-		CHECK_HR(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&dsvHeap)));
-	}
-
-	const D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesk =
-	{
-		.Format = DXGI_FORMAT_D32_FLOAT,
-		.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D
-	};
-
-	// dsv and handle
-	dsvHandle = { dsvHeap->GetCPUDescriptorHandleForHeapStart() };
-	device->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesk, dsvHandle);
-
 	CHECK_HR(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&bundleAllocator)));
 }
 
@@ -245,39 +205,25 @@ void Graphics::CreateRootSignature()
 	rootSignature = std::make_unique<RootSignature>(*this, rootParameters);
 }
 
-void Graphics::PopulateCommandList()
+void Graphics::ClearRenderTargetView()
 {
-	// select current buffer to render to
-	auto& backBuffer = renderTargets[curBufferIndex];
-
-	// reset command list and allocator
-	ResetCommandListAndAllocator();
-
-	// get rtv handle for the buffer used in this frame
-	const CD3DX12_CPU_DESCRIPTOR_HANDLE rtv
-	{
-		rtvHeap->GetCPUDescriptorHandleForHeapStart(),
-		(INT)curBufferIndex, rtvDescriptorSize
-	};
-
-	ClearRenderTarget(backBuffer.Get(), rtv);
-
-	// clear the depth buffer
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 0.f, 0, 0, nullptr);
-
-	// bind render target
-	commandList->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
-}
-
-void Graphics::ClearRenderTarget(ID3D12Resource* const backBuffer, const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv)
-{
+	const auto& rtv = GetRtvCpuHandle();
 	// transition buffer resource to render target state
-	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTargets[curBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandList->ResourceBarrier(1, &barrier);
 	// calculate clear color
 	const FLOAT clearColor[] = { 0.13f, 0.05f, 0.05f, 1.0f };
 	// clear rtv
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+}
+
+CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetRtvCpuHandle() noexcept
+{
+	return CD3DX12_CPU_DESCRIPTOR_HANDLE
+	{
+		rtvHeap->GetCPUDescriptorHandleForHeapStart(),
+		(INT)curBufferIndex, rtvDescriptorSize
+	};
 }
 
 ID3D12GraphicsCommandList* Graphics::GetMainCommandList()
@@ -296,23 +242,6 @@ ID3D12Device2* Graphics::GetDevice()
 {
 	return device.Get();
 }
-
-//CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvCpuHandle() const noexcept
-//{
-//	return srvCpuHandle;
-//}
-//
-//CD3DX12_GPU_DESCRIPTOR_HANDLE Graphics::GetCbvSrvGpuHeapStartHandle() const noexcept
-//{
-//	auto srvGpuHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE{ srvHeap->GetGPUDescriptorHandleForHeapStart() };
-//	srvGpuHandle.Offset(1u, cbvSrvDescriptorSize); // offsetting because of imgui taking one
-//	return srvGpuHandle;
-//}
-//
-//ID3D12DescriptorHeap* Graphics::GetSrvHeap() const noexcept
-//{
-//	return srvHeap.Get();
-//}
 
 PipelineState::PipelineStateStream Graphics::GetCommonPSS()
 {
