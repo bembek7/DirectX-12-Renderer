@@ -11,7 +11,8 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float4 lightP
 {
     const float3 realViewNormal = normalize(viewNormal);
     
-    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, DirectionalLightCB.diffuseColor);
+    const float3 white = float3(1.0f, 1.0f, 1.0f);
+    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, white);
     
     return float4(ColorCBuf.color.rgb * finalLight, 1.f);
 }

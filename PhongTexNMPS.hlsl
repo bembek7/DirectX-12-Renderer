@@ -9,7 +9,8 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoo
 {
     const float3 realViewNormal = CalculateViewNormal(viewNormal, tangent, bitangent, nMap.Sample(texSampler, texCoord).xyz);
     
-    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, DirectionalLightCB.diffuseColor);
+    const float3 white = float3(1.0f, 1.0f, 1.0f);
+    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, white);
     
     const float4 texSample = tex.Sample(texSampler, texCoord);
     return float4(texSample.rgb * finalLight, 1.0f);

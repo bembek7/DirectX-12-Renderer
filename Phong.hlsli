@@ -84,6 +84,25 @@ struct SpotLight
     float attenuationQuad; 
 };
 
+#define DIRECTIONAL_LIGHTS_NUM 1
+#define POINT_LIGHTS_NUM 1
+#define SPOT_LIGHTS_NUM 1
+
+struct DirectionalLights
+{
+    DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUM];
+};
+
+struct PointLights
+{
+    PointLight pointLights[POINT_LIGHTS_NUM];
+};
+
+struct SpotLights
+{
+    SpotLight spotLights[SPOT_LIGHTS_NUM];
+};
+
 struct Roughness
 {
     float roughness;
@@ -91,69 +110,83 @@ struct Roughness
 
 ConstantBuffer<Roughness> RoughnessCB : register(b0);
 
-ConstantBuffer<DirectionalLight> DirectionalLightCB : register(b2);
-ConstantBuffer<PointLight> PointLightCB : register(b3);
-ConstantBuffer<SpotLight> SpotLightCB : register(b4);
+ConstantBuffer<DirectionalLights> DirectionalLightsCB : register(b2);
+ConstantBuffer<PointLights> PointLightsCB : register(b3);
+ConstantBuffer<SpotLights> SpotLightsCB : register(b4);
 
 
-float3 CalculateDirectionalLight(const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
+float3 CalculateDirectionalLight(const DirectionalLight lightParams, const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
 {
     const float attenuation = 1.0f;
-    const float3 diffuse = Diffuse(DirectionalLightCB.diffuseColor, DirectionalLightCB.diffuseIntensity, attenuation, -DirectionalLightCB.lightDirection, realViewNormal);
+    const float3 diffuse = Diffuse(lightParams.diffuseColor, lightParams.diffuseIntensity, attenuation, -lightParams.lightDirection, realViewNormal);
 	
-    const float3 specular = Speculate(specularColor, DirectionalLightCB.diffuseIntensity * DirectionalLightCB.specularIntensity, realViewNormal,
-                                    -DirectionalLightCB.lightDirection, viewPos, attenuation, RoughnessCB.roughness);
+    const float3 specular = Speculate(specularColor, lightParams.diffuseIntensity * lightParams.specularIntensity, realViewNormal,
+                                    -lightParams.lightDirection, viewPos, attenuation, RoughnessCB.roughness);
     
-    return saturate(diffuse + DirectionalLightCB.ambient + specular);
+    return saturate(diffuse + lightParams.ambient + specular);
 }
 
-float3 CalculatePointLight(const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
+float3 CalculatePointLight(const PointLight lightParams, const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
 {
-    const LightVectorData lightVector = CalculateLightVectorData(PointLightCB.lightViewPos, viewPos);
+    const LightVectorData lightVector = CalculateLightVectorData(lightParams.lightViewPos, viewPos);
     
-    const float attenuation = Attenuate(PointLightCB.attenuationConst, PointLightCB.attenuationLin, PointLightCB.attenuationQuad, lightVector.distanceToLight);
-    const float3 diffuse = Diffuse(PointLightCB.diffuseColor, PointLightCB.diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
+    const float attenuation = Attenuate(lightParams.attenuationConst, lightParams.attenuationLin, lightParams.attenuationQuad, lightVector.distanceToLight);
+    const float3 diffuse = Diffuse(lightParams.diffuseColor, lightParams.diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
 	
-    const float3 specular = Speculate(specularColor, PointLightCB.diffuseIntensity * PointLightCB.specularIntensity, realViewNormal,
+    const float3 specular = Speculate(specularColor, lightParams.diffuseIntensity * lightParams.specularIntensity, realViewNormal,
                                     lightVector.vectorToLight, viewPos, attenuation, RoughnessCB.roughness);
     
-    return saturate(diffuse + PointLightCB.ambient + specular);
+    return saturate(diffuse + lightParams.ambient + specular);
 }
 
-float CalculateSpotFactor(const float3 directionToLight)
+float CalculateSpotFactor(const SpotLight lightParams, const float3 directionToLight)
 {
-    return pow(max(dot(-directionToLight, SpotLightCB.lightDirection), 0.0f), SpotLightCB.spotPower);
+    return pow(max(dot(-directionToLight, lightParams.lightDirection), 0.0f), lightParams.spotPower);
 }
 
-float3 CalculateSpotLight(const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
+float3 CalculateSpotLight(const SpotLight lightParams, const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
 {
-    const LightVectorData lightVector = CalculateLightVectorData(SpotLightCB.lightViewPos, viewPos);
+    const LightVectorData lightVector = CalculateLightVectorData(lightParams.lightViewPos, viewPos);
     
-    float attenuation = Attenuate(SpotLightCB.attenuationConst, SpotLightCB.attenuationLin, SpotLightCB.attenuationQuad, lightVector.distanceToLight);
+    float attenuation = Attenuate(lightParams.attenuationConst, lightParams.attenuationLin, lightParams.attenuationQuad, lightVector.distanceToLight);
     
-    const float spotFactor = CalculateSpotFactor(lightVector.directionToLight);
+    const float spotFactor = CalculateSpotFactor(lightParams, lightVector.directionToLight);
 
     attenuation *= spotFactor;
     
-    const float3 diffuse = Diffuse(SpotLightCB.diffuseColor, SpotLightCB.diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
+    const float3 diffuse = Diffuse(lightParams.diffuseColor, lightParams.diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
 	
-    const float3 specular = Speculate(specularColor, SpotLightCB.diffuseIntensity * SpotLightCB.specularIntensity, realViewNormal,
+    const float3 specular = Speculate(specularColor, lightParams.diffuseIntensity * lightParams.specularIntensity, realViewNormal,
                                     lightVector.vectorToLight, viewPos, attenuation, RoughnessCB.roughness);
     
-    return saturate(diffuse + SpotLightCB.ambient + specular);
+    return saturate(diffuse + lightParams.ambient + specular);
 }
 
 float3 CalculateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float4 lightPerspectivePos, const float3 specularColor)
 {
     const float lighting = 1.0f;
     //const float lighting = CalculateLighting(lightPerspectivePos);
-
-    const float3 directionalLight = CalculateDirectionalLight(viewPos, realViewNormal, specularColor);
-    const float3 pointLight = CalculatePointLight(viewPos, realViewNormal, specularColor);
-    const float3 spotLight = CalculateSpotLight(viewPos, realViewNormal, specularColor);
+    float3 light = float3(0.0f, 0.0f, 0.0f);
     
-    const float3 light = lighting * saturate(directionalLight + pointLight + spotLight);
-    const float3 shadow = (1.0f - lighting) * DirectionalLightCB.ambient;
+    [unroll]
+    for (int d = 0; d < DIRECTIONAL_LIGHTS_NUM; ++d)
+    {
+        light += CalculateDirectionalLight(DirectionalLightsCB.directionalLights[d], viewPos, realViewNormal, specularColor);
+    }
+    [unroll]
+    for (int p = 0; p < POINT_LIGHTS_NUM; ++p)
+    {
+        light += CalculatePointLight(PointLightsCB.pointLights[p], viewPos, realViewNormal, specularColor);
+    }
+    [unroll]
+    for (int s = 0; s < SPOT_LIGHTS_NUM; ++s)
+    {
+        light += CalculateSpotLight(SpotLightsCB.spotLights[s], viewPos, realViewNormal, specularColor);
+    }
+    
+    light = lighting * saturate(light);
+    //const float3 shadow = (1.0f - lighting) * DirectionalLightCB.ambient;
+    const float3 shadow = 0.0f;
     
     return light + shadow;
 }
