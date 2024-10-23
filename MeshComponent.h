@@ -41,7 +41,8 @@ private:
 	std::unique_ptr<Material> material;
 	std::unique_ptr<Model> modelForShadowMapping;
 	std::shared_ptr<PipelineState> pipelineState;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> bundle;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> shadowMapBundle;
 
 	struct TransformBuffer
 	{

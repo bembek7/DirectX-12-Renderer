@@ -3,8 +3,7 @@
 #include <vector>
 #include "Camera.h"
 #include "RegularDrawingPass.h"
-//#include "ShadowMapPass.h"
-//#include "Skybox.h"
+#include "ShadowMapPass.h"
 #include "Actor.h"
 
 class Graphics;
@@ -17,7 +16,7 @@ public:
 
 	void AddActor(std::unique_ptr<Actor> actorToAdd);
 	void AddLight(std::unique_ptr<Light> lightToAdd);
-	//void AddSkybox(std::unique_ptr<Skybox> skyboxToAdd);
+	void AddDirectionalLight(std::unique_ptr<DirectionalLight> directionalLightToAdd);
 	void Draw(Graphics& graphics);
 	Camera* GetMainCamera();
 private:
@@ -25,9 +24,9 @@ private:
 
 private:
 	std::unique_ptr<RegularDrawingPass> drawingPass;
-	/*std::unique_ptr<ShadowMapPass> shadowMapPass;*/
+	std::unique_ptr<ShadowMapPass> shadowMapPass;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<Light*> lights;
-	//std::unique_ptr<Skybox> skybox;
+	DirectionalLight* directionalLight = nullptr;
 	std::unique_ptr<Camera> mainCamera;
 };

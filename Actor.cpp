@@ -115,6 +115,11 @@ DirectX::XMVECTOR Actor::GetActorForwardVector() const noexcept
 	return rootComponent->GetComponentForwardVector();
 }
 
+DirectX::XMVECTOR Actor::GetActorUpVector() const noexcept
+{
+	return rootComponent->GetComponentUpVector();
+}
+
 void Actor::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	if (rootComponent)

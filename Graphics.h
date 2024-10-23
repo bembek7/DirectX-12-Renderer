@@ -61,6 +61,9 @@ private:
 	void LoadAssets();
 	void CreateRootSignature();
 
+public:
+	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
 private:
 	float windowWidth;
 	float windowHeight;
@@ -68,7 +71,6 @@ private:
 	DirectX::XMFLOAT4X4 projection;
 	UINT cbvSrvDescriptorSize = 0;
 	static constexpr UINT bufferCount = 2;
-	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 	std::unique_ptr<Gui> gui;
 

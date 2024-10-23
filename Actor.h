@@ -35,6 +35,7 @@ public:
 	DirectX::XMVECTOR GetActorRotationRadians() const noexcept;
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
 	DirectX::XMVECTOR GetActorForwardVector() const noexcept;
+	DirectX::XMVECTOR GetActorUpVector() const noexcept;
 
 	void Draw(Graphics& graphics, const std::vector<Light*>& lights);
 

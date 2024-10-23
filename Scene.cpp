@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "RegularDrawingPass.h"
 //#include "DepthCubeTexture.h"
+#include "DirectionalLight.h"
 
 namespace Dx = DirectX;
 
@@ -12,9 +13,9 @@ Scene::Scene(Graphics& graphics)
 	mainCamera = Camera::CreateComponent();
 	mainCamera->AddRelativeLocation(Dx::XMVECTOR{ 0.0f, 0.0f, -6.0f });
 	/*const float shadowMapCubeFaceSize = 1024.f;
-	auto shadowMapCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)shadowMapCubeFaceSize);
-
-	shadowMapPass = std::make_unique<ShadowMapPass>(graphics, shadowMapCube);*/
+	auto shadowMapCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)shadowMapCubeFaceSize);*/
+	graphics.SetCamera(mainCamera->GetMatrix());
+	shadowMapPass = std::make_unique<ShadowMapPass>(graphics);
 	drawingPass = std::make_unique<RegularDrawingPass>(graphics);
 }
 
@@ -33,25 +34,19 @@ void Scene::AddLight(std::unique_ptr<Light> lightToAdd)
 	actors.push_back(std::move(lightToAdd));
 }
 
-//void Scene::AddSkybox(std::unique_ptr<Skybox> skyboxToAdd)
-//{
-//	if (skybox)
-//	{
-//		throw std::runtime_error("Only one skyubox should be added to scene");
-//	}
-//	skybox = std::move(skyboxToAdd);
-//}
+void Scene::AddDirectionalLight(std::unique_ptr<DirectionalLight> directionalLightToAdd)
+{
+	if (directionalLight)
+	{
+		throw std::runtime_error("There can be only one directional light in a scene");
+	}
+	directionalLight = directionalLightToAdd.get();
+	AddLight(std::move(directionalLightToAdd));
+}
 
 void Scene::Draw(Graphics& graphics)
 {
-	//shadowMapPass->Execute(graphics, actors, light.get());
-
-	// Skybox should be drawn last
-	//skybox->Draw(graphics);
-	for (auto& actor : actors)
-	{
-		actor->Update(graphics);
-	}
+	//shadowMapPass->Execute(graphics, actors, lights, directionalLight);
 	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 
 	RenderControls(graphics);

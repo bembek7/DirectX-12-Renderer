@@ -10,6 +10,8 @@
 #include "PipelineStatesPool.h"
 #include "RootParametersDescription.h"
 #include "Light.h"
+#include <d3d12.h>
+#include "RegularDrawingPass.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -30,32 +32,50 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, RPD::Transform);
 
-	PipelineState::PipelineStateStream pipelineStateStream = graphics.GetCommonPSS();
+	PipelineState::PipelineStateStream pipelineStateStream = RegularDrawingPass::GetCommonPSS();
 
 	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, shaderSettings, nullptr);
 	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, shaderSettings);
 
-	// filling pso structure
 	pipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
-
-	if (lighted)
-	{
-		//modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
-	}
 
 	auto& pipelineStatesPool = PipelineStatesPool::GetInstance();
 	pipelineState = pipelineStatesPool.GetPipelineState(graphics, shaderSettings, pipelineStateStream);
 
-	// Create and record the bundle.
+	// Create and record drawing bundle.
+	drawingBundle = graphics.CreateBundle();
+	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pipelineState->Bind(drawingBundle.Get());
+	graphics.GetRootSignature()->Bind(drawingBundle.Get());
+	transformConstantBuffer->Bind(drawingBundle.Get());
+	model->Bind(drawingBundle.Get());
+	material->Bind(graphics, drawingBundle.Get());
+	CHECK_HR(drawingBundle->Close());
+
+	if (lighted)
 	{
-		bundle = graphics.CreateBundle();
-		bundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pipelineState->Bind(bundle.Get());
-		graphics.GetRootSignature()->Bind(bundle.Get());
-		transformConstantBuffer->Bind(bundle.Get());
-		model->Bind(bundle.Get());
-		material->Bind(graphics, bundle.Get());
-		CHECK_HR(bundle->Close());
+		auto smPipelineStateStream = graphics.GetCommonPSS();
+		/*smPipelineStateStream.renderTargetFormats = {
+		.RTFormats{},
+		.NumRenderTargets = 0,
+		};*/
+		modelForShadowMapping = std::make_unique<Model>(graphics, smPipelineStateStream, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
+		smPipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+		smPipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
+		auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+		smPipelineStateStream.rasterizer = rasterizerDesc;
+		auto& pipelineStatesPool = PipelineStatesPool::GetInstance();
+		pipelineState = pipelineStatesPool.GetPipelineState(graphics, ShaderSettings{}, smPipelineStateStream);
+
+		// Create and record shadow map bundle.
+		shadowMapBundle = graphics.CreateBundle();
+		shadowMapBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		pipelineState->Bind(shadowMapBundle.Get());
+		graphics.GetRootSignature()->Bind(shadowMapBundle.Get());
+		transformConstantBuffer->Bind(shadowMapBundle.Get());
+		modelForShadowMapping->Bind(shadowMapBundle.Get());
+		CHECK_HR(shadowMapBundle->Close());
 	}
 }
 
@@ -75,7 +95,7 @@ void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 	SceneComponent::Draw(graphics, lights);
 
 	material->BindDescriptorHeap(graphics.GetMainCommandList());
-	graphics.ExecuteBundle(bundle.Get());
+	graphics.ExecuteBundle(drawingBundle.Get());
 	if (lighted)
 	{
 		for (auto& light : lights)
@@ -98,16 +118,12 @@ void MeshComponent::Update(Graphics& graphics)
 
 void MeshComponent::RenderShadowMap(Graphics& graphics)
 {
-	/*if (generatesShadow)
+	if (lighted)
 	{
-		UpdateTransformBuffer(graphics);
-		modelForShadowMapping->Bind(graphics);
+		graphics.ExecuteBundle(shadowMapBundle.Get());
 
-		transformConstantBuffer->Update(graphics);
-		transformConstantBuffer->Bind(graphics);
-
-		graphics.DrawIndexed(modelForShadowMapping->GetIndicesNumber());
-	}*/
+		graphics.GetMainCommandList()->DrawIndexedInstanced(modelForShadowMapping->GetIndicesNumber(), 1, 0, 0, 0);
+	}
 }
 
 Material* MeshComponent::GetMaterial() noexcept

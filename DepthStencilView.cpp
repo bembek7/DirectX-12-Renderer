@@ -2,10 +2,11 @@
 #include "Graphics.h"
 #include "ThrowMacros.h"
 
-DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const UINT width, const UINT height) :
-	usage(usage)
+DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const float clearValue, const UINT width, const UINT height) :
+	usage(usage),
+	clearValue(clearValue)
 {
-	DXGI_FORMAT format;
+	DXGI_FORMAT format{};
 	switch (usage)
 	{
 	case Usage::DepthStencil:
@@ -23,16 +24,16 @@ DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const 
 		width, height,
 		1, 0, 1, 0,
 		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
-	const D3D12_CLEAR_VALUE clearValue = {
+	const D3D12_CLEAR_VALUE clearValueDesc = {
 		.Format = format,
-		.DepthStencil = { 0.0f, 0 },
+		.DepthStencil = { clearValue, 0 },
 	};
 	CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE,
-		&clearValue,
+		&clearValueDesc,
 		IID_PPV_ARGS(&depthBuffer)));
 
 	const D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {
@@ -71,5 +72,5 @@ void DepthStencilView::Clear(ID3D12GraphicsCommandList* const commandList)
 	default:
 		break;
 	}
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 0.f, 0, 0, nullptr);
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, clearValue, 0, 0, nullptr);
 }

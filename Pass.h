@@ -14,5 +14,5 @@ public:
 protected:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;
-	DirectX::XMFLOAT4X4 projection;
+	DirectX::XMFLOAT4X4 projection{};
 };

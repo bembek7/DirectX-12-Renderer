@@ -46,7 +46,7 @@ void App::InitializeScene()
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
 	scene->AddActor(std::move(brickWall));
-	scene->AddLight(std::move(directionalLight));
+	scene->AddDirectionalLight(std::move(directionalLight));
 	scene->AddLight(std::move(pointLight));
 	scene->AddLight(std::move(spotLight));
 }

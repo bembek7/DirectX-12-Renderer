@@ -253,7 +253,7 @@ PipelineState::PipelineStateStream Graphics::GetCommonPSS()
 	};
 	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
 	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
-	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+	//dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
 	commonPipelineStateStream.depthStencil = dsDesc;
 	return commonPipelineStateStream;
 }

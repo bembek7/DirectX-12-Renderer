@@ -1,17 +1,10 @@
 #include "ShadowMapPass.h"
-//#include "BindablesPool.h"
-//#include <numbers>
-//#include "ShadowRasterizer.h"
-//#include <DirectXMath.h>
 #include "Viewport.h"
-//#include "DepthStencilState.h"
-//#include "PixelShader.h"
-//#include "RenderTargetView.h"
-//#include "Actor.h"
 #include "Graphics.h"
-//#include "PointLight.h"
-//#include "DepthCubeTexture.h"
 #include "ScissorRectangle.h"
+#include "Actor.h"
+#include "Camera.h"
+#include "DirectionalLight.h"
 
 namespace Dx = DirectX;
 
@@ -33,21 +26,35 @@ ShadowMapPass::ShadowMapPass(Graphics& graphics)
 	bindables.push_back(std::make_unique<ScissorRectangle>());
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
-	DirectX::XMMATRIX reverseZ =
-	{
-		1.0f, 0.0f,  0.0f, 0.0f,
-		0.0f, 1.0f,  0.0f, 0.0f,
-		0.0f, 0.0f, -1.0f, 0.0f,
-		0.0f, 0.0f,  1.0f, 1.0f
-	};
+	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 1.f, UINT(windowWidth), UINT(windowHeight));
 
-	DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixOrthographicLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
+	//depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
+
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 0.5f, 700.0f));
 }
 
-void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::shared_ptr<Actor>>& actors, PointLight* const pointLight)
+void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const DirectionalLight* const directionalLight)
 {
 	Pass::Execute(graphics);
 
+	const auto lightDir = directionalLight->GetActorForwardVector();
+	const auto lightLocation = Dx::XMVectorScale(lightDir, -300);
+	graphics.SetCamera(Dx::XMMatrixLookAtLH(lightLocation, Dx::XMVectorAdd(lightLocation, lightDir), directionalLight->GetActorUpVector()));
+
+	for (auto& actor : actors)
+	{
+		actor->Update(graphics);
+	}
+	graphics.ClearRenderTargetView();
+	depthStencilView->Clear(graphics.GetMainCommandList());
+	auto rtv = graphics.GetRtvCpuHandle();
+	auto dsvHandle = depthStencilView->GetDsvHandle();
+	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
+
+	for (auto& actor : actors)
+	{
+		actor->Draw(graphics, lights);
+	}
 	/*shadowMapCube->Clear(graphics);
 
 	static const std::vector<DirectX::XMFLOAT3> shadowCameraRotations =
