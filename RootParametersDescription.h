@@ -7,8 +7,8 @@ namespace RPD
 	enum ParamsIndexes
 	{
 		Transform = 0u,
-		ShadowMap = Transform + 1u,
-		Roughness = ShadowMap + 1u,
+		ShadowMapping = Transform + 1u,
+		Roughness = ShadowMapping + 1u,
 		Color = Roughness + 1u,
 		DirectionalLight = Color + 1u,
 		PointLight = DirectionalLight + 1u,
@@ -33,7 +33,7 @@ namespace RPD
 	static const std::vector<CBV> cbvs =
 	{
 		{0u, D3D12_SHADER_VISIBILITY_VERTEX, Transform},
-		{1u, D3D12_SHADER_VISIBILITY_VERTEX, ShadowMap},
+		{1u, D3D12_SHADER_VISIBILITY_VERTEX, ShadowMapping},
 		{0u, D3D12_SHADER_VISIBILITY_PIXEL, Roughness},
 		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Color},
 		{2u, D3D12_SHADER_VISIBILITY_PIXEL, DirectionalLight},

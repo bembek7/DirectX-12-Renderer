@@ -1,4 +1,4 @@
-#include "ShadowMapPass.h"
+#include "ShadowMappingPass.h"
 #include "Viewport.h"
 #include "Graphics.h"
 #include "ScissorRectangle.h"
@@ -8,10 +8,10 @@
 
 namespace Dx = DirectX;
 
-ShadowMapPass::ShadowMapPass(Graphics& graphics)
+ShadowMappingPass::ShadowMappingPass(Graphics& graphics)
 {
-	/*const float shadowMapCubeFaceSize = float(shadowMapCube->GetFaceSize());
-	bindables.push_back(std::make_unique<Viewport>(shadowMapCubeFaceSize, shadowMapCubeFaceSize));
+	/*const float ShadowMappingCubeFaceSize = float(ShadowMappingCube->GetFaceSize());
+	bindables.push_back(std::make_unique<Viewport>(ShadowMappingCubeFaceSize, ShadowMappingCubeFaceSize));
 	bindables.push_back(std::make_unique<NullRenderTargetView>());
 	bindables.push_back(std::make_unique<DepthStencilState>(graphics, DepthStencilState::Usage::Regular));
 	auto& bindablesPool = BindablesPool::GetInstance();
@@ -28,12 +28,10 @@ ShadowMapPass::ShadowMapPass(Graphics& graphics)
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 1.f, UINT(windowWidth), UINT(windowHeight));
 
-	//depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
-
 	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 0.5f, 700.0f));
 }
 
-void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const DirectionalLight* const directionalLight)
+void ShadowMappingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const DirectionalLight* const directionalLight)
 {
 	Pass::Execute(graphics);
 
@@ -45,17 +43,17 @@ void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::unique_pt
 	{
 		actor->Update(graphics);
 	}
-	graphics.ClearRenderTargetView();
+
 	depthStencilView->Clear(graphics.GetMainCommandList());
-	auto rtv = graphics.GetRtvCpuHandle();
+
 	auto dsvHandle = depthStencilView->GetDsvHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
+	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
 
 	for (auto& actor : actors)
 	{
-		actor->Draw(graphics, lights);
+		actor->RenderShadowMap(graphics);
 	}
-	/*shadowMapCube->Clear(graphics);
+	/*ShadowMappingCube->Clear(graphics);
 
 	static const std::vector<DirectX::XMFLOAT3> shadowCameraRotations =
 	{
@@ -70,14 +68,31 @@ void ShadowMapPass::Execute(Graphics& graphics, const std::vector<std::unique_pt
 	{
 		pointLight->SetActorRotation(shadowCameraRotations[faceIndex]);
 		graphics.SetCamera(pointLight->GetLightPerspective());
-		//graphics.SetCurrentDepthStenilView(shadowMapCube->GetDepthBuffer(faceIndex)->Get());
+		//graphics.SetCurrentDepthStenilView(ShadowMappingCube->GetDepthBuffer(faceIndex)->Get());
 		//graphics.BindCurrentRenderTarget();
 
 		for (auto& actor : actors)
 		{
-			actor->RenderShadowMap(graphics);
+			actor->RenderShadowMapping(graphics);
 		}
 	}
 	pointLight->SetActorRotation(DirectX::XMFLOAT3{ 0.f, 0.f, 0.f });
 	//graphics.ClearRenderTargetBinds();*/
+}
+
+PipelineState::PipelineStateStream ShadowMappingPass::GetCommonPSS() noexcept
+{
+	PipelineState::PipelineStateStream commonPipelineStateStream;
+	commonPipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	commonPipelineStateStream.renderTargetFormats =
+	{
+		.NumRenderTargets = 0,
+	};
+	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
+	commonPipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+	auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+	commonPipelineStateStream.rasterizer = rasterizerDesc;
+
+	return commonPipelineStateStream;
 }

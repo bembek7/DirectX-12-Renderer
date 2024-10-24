@@ -6,6 +6,12 @@
 
 class Graphics;
 
+enum class PassType
+{
+	RegularDrawing,
+	ShadowMapping
+};
+
 class Pass
 {
 public:

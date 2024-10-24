@@ -10,6 +10,8 @@
 #include "Gui.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "Pass.h"
+#include <array>
 
 class Light;
 
@@ -63,6 +65,7 @@ private:
 
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	static constexpr std::array<PassType, 2> passTypes = { PassType::RegularDrawing, PassType::ShadowMapping };
 
 private:
 	float windowWidth;

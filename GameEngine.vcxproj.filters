@@ -186,7 +186,7 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowMapPass.cpp">
+    <ClCompile Include="ShadowMappingPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="DepthStencilView.cpp">
@@ -365,7 +365,7 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMapPass.h">
+    <ClInclude Include="ShadowMappingPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="DepthStencilView.h">
@@ -429,7 +429,7 @@
     <None Include="TransformCB.hlsli">
       <Filter>Resource Files\VertexShaders</Filter>
     </None>
-    <None Include="ShadowMapCB.hlsli">
+    <None Include="ShadowMappingCB.hlsli">
       <Filter>Resource Files\VertexShaders</Filter>
     </None>
   </ItemGroup>

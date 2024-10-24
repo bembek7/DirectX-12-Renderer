@@ -214,7 +214,7 @@
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
     <ClCompile Include="ShadersPool.cpp" />
-    <ClCompile Include="ShadowMapPass.cpp" />
+    <ClCompile Include="ShadowMappingPass.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TexLoader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -275,7 +275,7 @@
     <ClInclude Include="ScissorRectangle.h" />
     <ClInclude Include="ShaderSettings.h" />
     <ClInclude Include="ShadersPool.h" />
-    <ClInclude Include="ShadowMapPass.h" />
+    <ClInclude Include="ShadowMappingPass.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TexLoader.h" />
     <ClInclude Include="Texture.h" />
@@ -419,7 +419,7 @@
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
     <None Include="Shadow.hlsli" />
-    <None Include="ShadowMapCB.hlsli" />
+    <None Include="ShadowMappingCB.hlsli" />
     <None Include="TransformCB.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

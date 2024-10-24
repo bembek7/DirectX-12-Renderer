@@ -3,7 +3,7 @@
 #include <vector>
 #include "Camera.h"
 #include "RegularDrawingPass.h"
-#include "ShadowMapPass.h"
+#include "ShadowMappingPass.h"
 #include "Actor.h"
 
 class Graphics;
@@ -24,7 +24,7 @@ private:
 
 private:
 	std::unique_ptr<RegularDrawingPass> drawingPass;
-	std::unique_ptr<ShadowMapPass> shadowMapPass;
+	std::unique_ptr<ShadowMappingPass> shadowMappingPass;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<Light*> lights;
 	DirectionalLight* directionalLight = nullptr;

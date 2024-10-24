@@ -12,6 +12,7 @@
 #include "Light.h"
 #include <d3d12.h>
 #include "RegularDrawingPass.h"
+#include "ShadowMappingPass.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -54,28 +55,22 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	if (lighted)
 	{
-		auto smPipelineStateStream = graphics.GetCommonPSS();
-		/*smPipelineStateStream.renderTargetFormats = {
-		.RTFormats{},
-		.NumRenderTargets = 0,
-		};*/
-		modelForShadowMapping = std::make_unique<Model>(graphics, smPipelineStateStream, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
-		smPipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+		static constexpr auto smShaderSettings = ShaderSettings::ShadowMapping;
+
+		auto smPipelineStateStream = ShadowMappingPass::GetCommonPSS();
+		modelForShadowMapping = std::make_unique<Model>(graphics, smPipelineStateStream, assignedMesh, smShaderSettings, model->ShareIndexBuffer());
 		smPipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
-		auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
-		rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-		smPipelineStateStream.rasterizer = rasterizerDesc;
-		auto& pipelineStatesPool = PipelineStatesPool::GetInstance();
-		pipelineState = pipelineStatesPool.GetPipelineState(graphics, ShaderSettings{}, smPipelineStateStream);
+
+		smPipelineState = pipelineStatesPool.GetPipelineState(graphics, smShaderSettings, smPipelineStateStream);
 
 		// Create and record shadow map bundle.
-		shadowMapBundle = graphics.CreateBundle();
-		shadowMapBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pipelineState->Bind(shadowMapBundle.Get());
-		graphics.GetRootSignature()->Bind(shadowMapBundle.Get());
-		transformConstantBuffer->Bind(shadowMapBundle.Get());
-		modelForShadowMapping->Bind(shadowMapBundle.Get());
-		CHECK_HR(shadowMapBundle->Close());
+		shadowMappingBundle = graphics.CreateBundle();
+		shadowMappingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		smPipelineState->Bind(shadowMappingBundle.Get());
+		graphics.GetRootSignature()->Bind(shadowMappingBundle.Get());
+		transformConstantBuffer->Bind(shadowMappingBundle.Get());
+		modelForShadowMapping->Bind(shadowMappingBundle.Get());
+		CHECK_HR(shadowMappingBundle->Close());
 	}
 }
 
@@ -120,7 +115,7 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 {
 	if (lighted)
 	{
-		graphics.ExecuteBundle(shadowMapBundle.Get());
+		graphics.ExecuteBundle(shadowMappingBundle.Get());
 
 		graphics.GetMainCommandList()->DrawIndexedInstanced(modelForShadowMapping->GetIndicesNumber(), 1, 0, 0, 0);
 	}

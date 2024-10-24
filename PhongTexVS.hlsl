@@ -1,5 +1,5 @@
 #include "TransformCB.hlsli"
-#include "ShadowMapCB.hlsli"
+#include "ShadowMappingCB.hlsli"
 
 struct VSOut
 {
@@ -22,7 +22,7 @@ VSOut main(float3 position : POSITION, float3 normal : NORMAL, float2 texCoord :
     
     // Transform the vertex position into projected space from the POV of the light.
     const float4 modelPos = mul(float4(position, 1.0f), TransformCB.model);
-    vsout.lightPerspectivePos = mul(modelPos, ShadowMapCB.lightPerspective);
+    vsout.lightPerspectivePos = mul(modelPos, ShadowMappingCB.lightPerspective);
     
     return vsout;
 }

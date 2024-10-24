@@ -12,10 +12,10 @@ Scene::Scene(Graphics& graphics)
 {
 	mainCamera = Camera::CreateComponent();
 	mainCamera->AddRelativeLocation(Dx::XMVECTOR{ 0.0f, 0.0f, -6.0f });
-	/*const float shadowMapCubeFaceSize = 1024.f;
-	auto shadowMapCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)shadowMapCubeFaceSize);*/
+	/*const float ShadowMappingCubeFaceSize = 1024.f;
+	auto ShadowMappingCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)ShadowMappingCubeFaceSize);*/
 	graphics.SetCamera(mainCamera->GetMatrix());
-	shadowMapPass = std::make_unique<ShadowMapPass>(graphics);
+	shadowMappingPass = std::make_unique<ShadowMappingPass>(graphics);
 	drawingPass = std::make_unique<RegularDrawingPass>(graphics);
 }
 
@@ -46,7 +46,7 @@ void Scene::AddDirectionalLight(std::unique_ptr<DirectionalLight> directionalLig
 
 void Scene::Draw(Graphics& graphics)
 {
-	//shadowMapPass->Execute(graphics, actors, lights, directionalLight);
+	//ShadowMappingPass->Execute(graphics, actors, lights, directionalLight);
 	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 
 	RenderControls(graphics);

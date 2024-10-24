@@ -8,7 +8,8 @@ enum class ShaderSettings
 	NormalMap = 8,
 	SpecularMap = 16,
 	AlphaTesting = 32,
-	Skybox = 64
+	Skybox = 64,
+	ShadowMapping = 128
 };
 
 struct ShaderSettingsHash
