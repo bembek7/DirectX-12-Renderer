@@ -23,7 +23,7 @@ public:
 	void Update();
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
-	std::vector<std::unique_ptr<Updatable>> cBuffers;
+	std::vector<std::unique_ptr<ConstantBuffer>> cBuffers;
 	std::vector<std::unique_ptr<Texture>> textures;
 	//UINT desciptorTableRootIndex;
 	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> pixelShaderBlob;

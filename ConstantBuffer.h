@@ -5,23 +5,17 @@
 #include "d3dx12\d3dx12.h"
 #include "BufferLoader.h"
 
-enum class BufferType
-{
-	Pixel,
-	Vertex
-};
-
-class Updatable : public Bindable
+class ConstantBuffer : public Bindable
 {
 public:
-	virtual void Update();
+	virtual void Update() = 0;
 };
 
 template<typename Structure>
-class ConstantBuffer : public Updatable
+class ConstantBufferCBV : public ConstantBuffer
 {
 public:
-	ConstantBuffer(Graphics& graphics, const Structure& data, const UINT rootParameterIndex) :
+	ConstantBufferCBV(Graphics& graphics, const Structure& data, const UINT rootParameterIndex) :
 		bufferData(&data),
 		rootParameterIndex(rootParameterIndex)
 	{
@@ -52,6 +46,28 @@ public:
 	}
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
+	const Structure* const bufferData;
+	UINT rootParameterIndex;
+};
+
+template<typename Structure>
+class ConstantBufferConstants : public ConstantBuffer
+{
+public:
+	ConstantBufferConstants(const Structure& data, const UINT rootParameterIndex) :
+		bufferData(&data),
+		rootParameterIndex(rootParameterIndex)
+	{}
+
+	virtual void Update() override
+	{
+		;
+	}
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override
+	{
+		commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, sizeof(Structure) / 4, bufferData, 0);
+	}
+private:
 	const Structure* const bufferData;
 	UINT rootParameterIndex;
 };

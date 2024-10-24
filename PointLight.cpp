@@ -4,7 +4,7 @@
 PointLight::PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
 	Light(graphics, fileName, actorName)
 {
-	constantBuffers.push_back(std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, RPD::PointLight));
+	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, RPD::PointLight));
 }
 
 void PointLight::Update(Graphics& graphics)

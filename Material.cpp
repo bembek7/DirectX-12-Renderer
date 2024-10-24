@@ -94,13 +94,13 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
-		cBuffers.push_back(std::make_unique<ConstantBuffer<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
+		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
 	}
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{
 		colorBuffer = std::make_unique<Color>();
-		cBuffers.push_back(std::make_unique<ConstantBuffer<Color>>(graphics, *colorBuffer, RPD::Color));
+		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Color>>(graphics, *colorBuffer, RPD::Color));
 	}
 	/*
 	if (static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap)))

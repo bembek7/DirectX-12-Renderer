@@ -55,7 +55,7 @@ private:
 	};
 	TransformBuffer transformBuffer = {};
 
-	std::unique_ptr<ConstantBuffer<TransformBuffer>> transformConstantBuffer;
+	std::unique_ptr<ConstantBufferConstants<TransformBuffer>> transformConstantBuffer;
 
 	bool lighted = false;
 };

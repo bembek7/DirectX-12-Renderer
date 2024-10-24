@@ -46,7 +46,12 @@ void Scene::AddDirectionalLight(std::unique_ptr<DirectionalLight> directionalLig
 
 void Scene::Draw(Graphics& graphics)
 {
-	//ShadowMappingPass->Execute(graphics, actors, lights, directionalLight);
+	for (auto& actor : actors)
+	{
+		actor->Update(graphics);
+	}
+
+	shadowMappingPass->Execute(graphics, actors, lights, directionalLight);
 	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 
 	RenderControls(graphics);

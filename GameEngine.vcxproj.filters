@@ -183,14 +183,14 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShadowMappingPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="DepthStencilView.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\Actor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

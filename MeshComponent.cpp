@@ -31,7 +31,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, RPD::Transform);
+	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, RPD::Transform);
 
 	PipelineState::PipelineStateStream pipelineStateStream = RegularDrawingPass::GetCommonPSS();
 
@@ -48,7 +48,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pipelineState->Bind(drawingBundle.Get());
 	graphics.GetRootSignature()->Bind(drawingBundle.Get());
-	transformConstantBuffer->Bind(drawingBundle.Get());
+
 	model->Bind(drawingBundle.Get());
 	material->Bind(graphics, drawingBundle.Get());
 	CHECK_HR(drawingBundle->Close());
@@ -68,7 +68,7 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		shadowMappingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		smPipelineState->Bind(shadowMappingBundle.Get());
 		graphics.GetRootSignature()->Bind(shadowMappingBundle.Get());
-		transformConstantBuffer->Bind(shadowMappingBundle.Get());
+
 		modelForShadowMapping->Bind(shadowMappingBundle.Get());
 		CHECK_HR(shadowMappingBundle->Close());
 	}
@@ -88,9 +88,10 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	SceneComponent::Draw(graphics, lights);
-
 	material->BindDescriptorHeap(graphics.GetMainCommandList());
 	graphics.ExecuteBundle(drawingBundle.Get());
+	UpdateTransformBuffer(graphics);
+	transformConstantBuffer->Bind(graphics.GetMainCommandList());
 	if (lighted)
 	{
 		for (auto& light : lights)
@@ -105,9 +106,6 @@ void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 void MeshComponent::Update(Graphics& graphics)
 {
 	SceneComponent::Update(graphics);
-
-	UpdateTransformBuffer(graphics);
-	transformConstantBuffer->Update();
 	material->Update();
 }
 
@@ -116,7 +114,8 @@ void MeshComponent::RenderShadowMap(Graphics& graphics)
 	if (lighted)
 	{
 		graphics.ExecuteBundle(shadowMappingBundle.Get());
-
+		UpdateTransformBuffer(graphics);
+		transformConstantBuffer->Bind(graphics.GetMainCommandList());
 		graphics.GetMainCommandList()->DrawIndexedInstanced(modelForShadowMapping->GetIndicesNumber(), 1, 0, 0, 0);
 	}
 }

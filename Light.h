@@ -17,7 +17,7 @@ protected:
 	virtual void RenderActorDetails(Gui& gui) override = 0;
 
 protected:
-	std::vector<std::unique_ptr<Updatable>> constantBuffers;
+	std::vector<std::unique_ptr<ConstantBuffer>> constantBuffers;
 
 private:
 	struct ShadowMapBuffer

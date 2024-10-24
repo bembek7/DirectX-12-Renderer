@@ -30,9 +30,20 @@ namespace RPD
 		ParamsIndexes ParamIndex;
 	};
 
+	struct CBConst
+	{
+		UINT slot;
+		D3D12_SHADER_VISIBILITY visibility;
+		ParamsIndexes ParamIndex;
+		UINT dataSize;
+	};
+
+	static const std::vector<CBConst> cbConsts =
+	{
+		{0u, D3D12_SHADER_VISIBILITY_VERTEX, Transform, 192u},
+	};
 	static const std::vector<CBV> cbvs =
 	{
-		{0u, D3D12_SHADER_VISIBILITY_VERTEX, Transform},
 		{1u, D3D12_SHADER_VISIBILITY_VERTEX, ShadowMapping},
 		{0u, D3D12_SHADER_VISIBILITY_PIXEL, Roughness},
 		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Color},

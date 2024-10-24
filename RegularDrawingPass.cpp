@@ -28,19 +28,13 @@ RegularDrawingPass::RegularDrawingPass(Graphics& graphics)
 void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const Camera* const mainCamera)
 {
 	Pass::Execute(graphics);
-
-	for (auto& actor : actors)
-	{
-		actor->Update(graphics);
-	}
+	graphics.SetCamera(mainCamera->GetMatrix());
 
 	graphics.ClearRenderTargetView();
 	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto rtv = graphics.GetRtvCpuHandle();
 	auto dsvHandle = depthStencilView->GetDsvHandle();
 	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
-
-	graphics.SetCamera(mainCamera->GetMatrix());
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, lights);

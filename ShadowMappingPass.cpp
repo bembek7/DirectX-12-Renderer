@@ -39,11 +39,6 @@ void ShadowMappingPass::Execute(Graphics& graphics, const std::vector<std::uniqu
 	const auto lightLocation = Dx::XMVectorScale(lightDir, -300);
 	graphics.SetCamera(Dx::XMMatrixLookAtLH(lightLocation, Dx::XMVectorAdd(lightLocation, lightDir), directionalLight->GetActorUpVector()));
 
-	for (auto& actor : actors)
-	{
-		actor->Update(graphics);
-	}
-
 	depthStencilView->Clear(graphics.GetMainCommandList());
 
 	auto dsvHandle = depthStencilView->GetDsvHandle();

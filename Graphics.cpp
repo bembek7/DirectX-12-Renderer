@@ -192,6 +192,11 @@ void Graphics::CreateRootSignature()
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
 	rootParameters.resize(RPD::paramsNum);
 
+	for (const auto& cb : RPD::cbConsts)
+	{
+		rootParameters[cb.ParamIndex].InitAsConstants(cb.dataSize / 4, cb.slot, 0, cb.visibility);
+	}
+
 	for (const auto& cbv : RPD::cbvs)
 	{
 		rootParameters[cbv.ParamIndex].InitAsConstantBufferView(cbv.slot, 0u, cbv.visibility);
