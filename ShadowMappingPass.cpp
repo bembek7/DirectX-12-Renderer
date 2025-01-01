@@ -26,8 +26,8 @@ ShadowMappingPass::ShadowMappingPass(Graphics& graphics)
 	bindables.push_back(std::make_unique<ScissorRectangle>());
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
-	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 1.f, UINT(windowWidth), UINT(windowHeight));
-
+	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::DepthShadowMapping, 1.f, UINT(windowWidth), UINT(windowHeight));
+	graphics.shadowMap = depthStencilView->GetBuffer();
 	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 0.5f, 700.0f));
 }
 
@@ -35,12 +35,9 @@ void ShadowMappingPass::Execute(Graphics& graphics, const std::vector<std::uniqu
 {
 	Pass::Execute(graphics);
 
-	const auto lightDir = directionalLight->GetActorForwardVector();
-	const auto lightLocation = Dx::XMVectorScale(lightDir, -300);
-	graphics.SetCamera(Dx::XMMatrixLookAtLH(lightLocation, Dx::XMVectorAdd(lightLocation, lightDir), directionalLight->GetActorUpVector()));
+	graphics.SetCamera(directionalLight->GetLightPerspective());
 
 	depthStencilView->Clear(graphics.GetMainCommandList());
-
 	auto dsvHandle = depthStencilView->GetDsvHandle();
 	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
 

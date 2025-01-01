@@ -67,6 +67,8 @@ public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	static constexpr std::array<PassType, 2> passTypes = { PassType::RegularDrawing, PassType::ShadowMapping };
 
+	ID3D12Resource* shadowMap;
+
 private:
 	float windowWidth;
 	float windowHeight;

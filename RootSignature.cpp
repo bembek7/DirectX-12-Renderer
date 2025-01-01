@@ -21,13 +21,29 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 	// define empty root signature
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
-	// define static sampler
-	CD3DX12_STATIC_SAMPLER_DESC staticSampler{ 1u, D3D12_FILTER_MIN_MAG_MIP_LINEAR };
-	staticSampler.ShaderRegister = 1u;
-	staticSampler.Filter = D3D12_FILTER_ANISOTROPIC;
-	staticSampler.MaxAnisotropy = D3D12_REQ_MAXANISOTROPY;
-	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootSignatureDesc.Init((UINT)std::size(rootParameters), rootParameters.data(), 1u, &staticSampler, rootSignatureFlags);
+	// Define static samplers
+	CD3DX12_STATIC_SAMPLER_DESC staticSamplers[2];
+
+	// Comparison sampler
+	staticSamplers[0].Init(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
+	staticSamplers[0].ShaderRegister = 0;
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	staticSamplers[0].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	staticSamplers[0].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	// Anisotropic sampler
+	staticSamplers[1].Init(1, D3D12_FILTER_ANISOTROPIC);
+	staticSamplers[1].ShaderRegister = 1;
+	staticSamplers[1].Filter = D3D12_FILTER_ANISOTROPIC;
+	staticSamplers[1].MaxAnisotropy = D3D12_REQ_MAXANISOTROPY;
+	staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	rootSignatureDesc.Init((UINT)rootParameters.size(), rootParameters.data(), 2, staticSamplers, rootSignatureFlags);
+
 	// serialize root signature
 	Wrl::ComPtr<ID3DBlob> signatureBlob;
 	Wrl::ComPtr<ID3DBlob> errorBlob;

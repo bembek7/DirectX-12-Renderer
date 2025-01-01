@@ -1,4 +1,4 @@
-//#include "Shadow.hlsli"
+#include "Shadow.hlsli"
 
 float Attenuate(uniform float attenuationConst, uniform float attenuationLin, uniform float attenuationQuad, const in float distanceToL)
 {
@@ -164,14 +164,14 @@ float3 CalculateSpotLight(const SpotLight lightParams, const float3 viewPos, con
 
 float3 CalculateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float4 lightPerspectivePos, const float3 specularColor)
 {
-    const float lighting = 1.0f;
-    //const float lighting = CalculateLighting(lightPerspectivePos);
+    const float lighting = CalculateLighting(lightPerspectivePos);
     float3 light = float3(0.0f, 0.0f, 0.0f);
     
     [unroll]
     for (int d = 0; d < DIRECTIONAL_LIGHTS_NUM; ++d)
     {
-        light += CalculateDirectionalLight(DirectionalLightsCB.directionalLights[d], viewPos, realViewNormal, specularColor);
+        const float3 dirLight = CalculateDirectionalLight(DirectionalLightsCB.directionalLights[d], viewPos, realViewNormal, specularColor);
+        light += lighting * saturate(dirLight) + (1.0f - lighting) * DirectionalLightsCB.directionalLights[d].ambient;
     }
     [unroll]
     for (int p = 0; p < POINT_LIGHTS_NUM; ++p)
@@ -184,11 +184,10 @@ float3 CalculateFinalAmountOfLight(const float3 viewPos, const float3 realViewNo
         light += CalculateSpotLight(SpotLightsCB.spotLights[s], viewPos, realViewNormal, specularColor);
     }
     
-    light = lighting * saturate(light);
-    //const float3 shadow = (1.0f - lighting) * DirectionalLightCB.ambient;
-    const float3 shadow = 0.0f;
+    //light = lighting * saturate(light);
+    //const float3 shadow = (1.0f - lighting) * DirectionalLightsCB.directionalLights[0].ambient;
     
-    return light + shadow;
+    return saturate(light);
 }
 
 

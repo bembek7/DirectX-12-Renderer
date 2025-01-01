@@ -13,6 +13,7 @@ public:
 protected:
 	virtual void RenderActorDetails(Gui& gui) override;
 private:
+	DirectX::XMFLOAT4X4 projection{};
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 diffuseColor = { 1.0f, 1.0f, 1.0f };

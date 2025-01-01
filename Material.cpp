@@ -25,12 +25,12 @@ const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::text
 {
 	{ ShaderSettings::Skybox, -1 },
 	{ ShaderSettings::Color, -1 },
-	{ ShaderSettings::Color | ShaderSettings::Phong, -1 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture, 1 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, 2 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, 3 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, 3 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting, 3 },
+	{ ShaderSettings::Color | ShaderSettings::Phong, 0 },
+	{ ShaderSettings::Phong | ShaderSettings::Texture, 2 },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, 3 },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, 4 },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, 4 },
+	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting, 4 },
 };
 
 Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial,
@@ -95,6 +95,17 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
 		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
+		if (graphics.shadowMap)
+		{
+			srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::ShadowMap, srvDescSize);
+			const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
+			.Format = DXGI_FORMAT_R32_FLOAT,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+			.Texture2D{.MipLevels = graphics.shadowMap->GetDesc().MipLevels },
+			};
+			graphics.GetDevice()->CreateShaderResourceView(graphics.shadowMap, &srvDesc, srvCpuHandle);
+		}
 	}
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))

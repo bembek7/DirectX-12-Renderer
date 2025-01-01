@@ -9,11 +9,13 @@ public:
 	enum class Usage
 	{
 		DepthStencil,
-		Depth
+		Depth,
+		DepthShadowMapping
 	};
 	DepthStencilView(Graphics& graphics, const Usage usage, const float clearValue, const UINT width, const UINT height);
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const noexcept;
 	void Clear(ID3D12GraphicsCommandList* const commandList);
+	ID3D12Resource* GetBuffer() noexcept;
 
 private:
 	float clearValue = 0.f;

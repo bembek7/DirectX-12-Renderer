@@ -6,13 +6,19 @@ DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const 
 	usage(usage),
 	clearValue(clearValue)
 {
+	auto resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 	DXGI_FORMAT format{};
 	switch (usage)
 	{
 	case Usage::DepthStencil:
 		format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		resourceFlags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 		break;
 	case Usage::Depth:
+		format = DXGI_FORMAT_D32_FLOAT;
+		resourceFlags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+		break;
+	case Usage::DepthShadowMapping:
 		format = DXGI_FORMAT_D32_FLOAT;
 		break;
 	default:
@@ -23,7 +29,7 @@ DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const 
 		format,
 		width, height,
 		1, 0, 1, 0,
-		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+		resourceFlags);
 	const D3D12_CLEAR_VALUE clearValueDesc = {
 		.Format = format,
 		.DepthStencil = { clearValue, 0 },
@@ -73,4 +79,9 @@ void DepthStencilView::Clear(ID3D12GraphicsCommandList* const commandList)
 		break;
 	}
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, clearValue, 0, 0, nullptr);
+}
+
+ID3D12Resource* DepthStencilView::GetBuffer() noexcept
+{
+	return depthBuffer.Get();
 }

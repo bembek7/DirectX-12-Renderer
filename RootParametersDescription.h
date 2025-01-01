@@ -18,6 +18,7 @@ namespace RPD
 
 	enum TextureSlots
 	{
+		ShadowMap = 0u,
 		Diffuse = 1u,
 		NormalMap = 2u,
 		SpecularMap = 3u,

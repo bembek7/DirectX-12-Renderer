@@ -1,20 +1,31 @@
 
-TextureCube shadowMap : register(t0);
+Texture2D shadowMap : register(t0);
 SamplerComparisonState shadowSampler : register(s0);
 
-static const float zf = 200.0f;
-static const float zn = 0.5f;
-static const float c1 = zf / (zf - zn);
-static const float c0 = -zn * zf / (zf - zn);
+//static const float zf = 200.0f;
+//static const float zn = 0.5f;
+//static const float c1 = zf / (zf - zn);
+//static const float c0 = -zn * zf / (zf - zn);
+
+//float CalculateLighting(float4 lightPerspectivePos)
+//{
+//    // get magnitudes for each basis component
+//    const float3 m = abs(lightPerspectivePos).xyz;
+//    // get the length in the dominant axis
+//    // (this correlates with shadow map face and derives comparison depth)
+//    const float major = max(m.x, max(m.y, m.z));
+//    // converting from distance in shadow light space to projected depth
+//    const float depth = (c1 * major + c0) / major;
+//    return shadowMap.SampleCmpLevelZero(shadowSampler, lightPerspectivePos.xy, depth);
+//}
 
 float CalculateLighting(float4 lightPerspectivePos)
 {
-    // get magnitudes for each basis component
-    const float3 m = abs(lightPerspectivePos).xyz;
-    // get the length in the dominant axis
-    // (this correlates with shadow map face and derives comparison depth)
-    const float major = max(m.x, max(m.y, m.z));
-    // converting from distance in shadow light space to projected depth
-    const float depth = (c1 * major + c0) / major;
-    return shadowMap.SampleCmpLevelZero(shadowSampler, lightPerspectivePos.xyz, depth);
+    float2 shadowTexCoords;
+    shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
+    shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
+    float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
+    // Depth in NDC space.
+    float depth = lightPerspectivePos.z;
+    return shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth).r;
 }

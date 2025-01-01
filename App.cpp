@@ -39,16 +39,16 @@ void App::InitializeScene()
 	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
 	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	directionalLight->SetActorTransform({ 0.f, -100.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
+	directionalLight->SetActorTransform({ 0.f, 80.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
 	spotLight->SetActorTransform({ 30.f, 0.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
 	pointLight->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
 	scene->AddActor(std::move(sponza));
 	scene->AddActor(std::move(sphere));
 	scene->AddActor(std::move(brickWall));
-	scene->AddDirectionalLight(std::move(directionalLight));
 	scene->AddLight(std::move(pointLight));
 	scene->AddLight(std::move(spotLight));
+	scene->AddDirectionalLight(std::move(directionalLight)); // has to be added last for now
 }
 
 int App::Run()
