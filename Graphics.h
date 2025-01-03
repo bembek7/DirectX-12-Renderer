@@ -56,6 +56,9 @@ public:
 	void Signal();
 	void WaitForSignal();
 
+	ID3D12Resource* GetShadowMap() noexcept;
+	void SetShadowMap(ID3D12Resource* const newShadowMap) noexcept;
+
 	Gui* const GetGui() noexcept;
 
 private:
@@ -66,8 +69,6 @@ private:
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	static constexpr std::array<PassType, 2> passTypes = { PassType::RegularDrawing, PassType::ShadowMapping };
-
-	ID3D12Resource* shadowMap;
 
 private:
 	float windowWidth;
@@ -94,6 +95,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
+
+	ID3D12Resource* shadowMap;
+	//ID3D12Resource* mainDepthBuffer;
 
 	// Synchronization objects.
 	UINT curBufferIndex = 0;

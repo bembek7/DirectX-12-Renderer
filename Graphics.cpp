@@ -356,6 +356,16 @@ void Graphics::WaitForSignal()
 	}
 }
 
+ID3D12Resource* Graphics::GetShadowMap() noexcept
+{
+	return shadowMap;
+}
+
+void Graphics::SetShadowMap(ID3D12Resource* const newShadowMap) noexcept
+{
+	shadowMap = newShadowMap;
+}
+
 Gui* const Graphics::GetGui() noexcept
 {
 	return gui.get();

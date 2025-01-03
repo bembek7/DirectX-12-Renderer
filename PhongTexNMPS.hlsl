@@ -13,5 +13,6 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoo
     const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, white);
     
     const float4 texSample = tex.Sample(texSampler, texCoord);
+    
     return float4(texSample.rgb * finalLight, 1.0f);
 }

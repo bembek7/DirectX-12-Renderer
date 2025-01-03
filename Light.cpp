@@ -22,15 +22,18 @@ void Light::Update(Graphics& graphics)
 {
 	Actor::Update(graphics);
 
-	//DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
-
 	for (auto& cB : constantBuffers)
 	{
 		cB->Update();
 	}
 }
 
-DirectX::XMMATRIX Light::GetLightPerspective() const noexcept
+DirectX::XMMATRIX Light::GetLightCameraMatrix() const noexcept
 {
 	return shadowMapCamera->GetMatrix();
+}
+
+DirectX::XMMATRIX Light::GetLightProjectionMatrix() const noexcept
+{
+	return DirectX::XMLoadFloat4x4(&projection);
 }

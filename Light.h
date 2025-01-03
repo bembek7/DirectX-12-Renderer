@@ -10,7 +10,8 @@ class Light : public MeshActor
 public:
 	void Bind(ID3D12GraphicsCommandList* const commandList);
 	virtual void Update(Graphics& graphics) override;
-	DirectX::XMMATRIX GetLightPerspective() const noexcept;
+	DirectX::XMMATRIX GetLightCameraMatrix() const noexcept;
+	DirectX::XMMATRIX GetLightProjectionMatrix() const noexcept;
 
 protected:
 	Light(Graphics& graphics, const std::string& fileName, const std::string& actorName);
@@ -18,7 +19,7 @@ protected:
 
 protected:
 	std::vector<std::unique_ptr<ConstantBuffer>> constantBuffers;
-
+	DirectX::XMFLOAT4X4 projection{};
 	Camera* shadowMapCamera;
 	struct ShadowMapBuffer
 	{

@@ -95,16 +95,16 @@ Material::Material(Graphics& graphics, PipelineState::PipelineStateStream& pipel
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
 		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
-		if (graphics.shadowMap)
+		if (auto smRes = graphics.GetShadowMap())
 		{
 			srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::ShadowMap, srvDescSize);
 			const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
 			.Format = DXGI_FORMAT_R32_FLOAT,
 			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
 			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-			.Texture2D{.MipLevels = graphics.shadowMap->GetDesc().MipLevels },
+			.Texture2D{.MipLevels = smRes->GetDesc().MipLevels },
 			};
-			graphics.GetDevice()->CreateShaderResourceView(graphics.shadowMap, &srvDesc, srvCpuHandle);
+			graphics.GetDevice()->CreateShaderResourceView(smRes, &srvDesc, srvCpuHandle);
 		}
 	}
 

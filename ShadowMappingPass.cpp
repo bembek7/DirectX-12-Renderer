@@ -27,7 +27,7 @@ ShadowMappingPass::ShadowMappingPass(Graphics& graphics)
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::DepthShadowMapping, 1.f, UINT(windowWidth), UINT(windowHeight));
-	graphics.shadowMap = depthStencilView->GetBuffer();
+	graphics.SetShadowMap(depthStencilView->GetBuffer());
 	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 0.5f, 700.0f));
 }
 
@@ -35,7 +35,9 @@ void ShadowMappingPass::Execute(Graphics& graphics, const std::vector<std::uniqu
 {
 	Pass::Execute(graphics);
 
-	graphics.SetCamera(directionalLight->GetLightPerspective());
+	graphics.SetCamera(directionalLight->GetLightCameraMatrix());
+	graphics.SetProjection(directionalLight->GetLightProjectionMatrix());
+
 
 	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto dsvHandle = depthStencilView->GetDsvHandle();
@@ -85,6 +87,6 @@ PipelineState::PipelineStateStream ShadowMappingPass::GetCommonPSS() noexcept
 	auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
 	commonPipelineStateStream.rasterizer = rasterizerDesc;
-
+	//commonPipelineStateStream.rootSignature = rootSignature.Get;
 	return commonPipelineStateStream;
 }

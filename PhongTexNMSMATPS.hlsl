@@ -22,6 +22,6 @@ float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoo
     const float3 realViewNormal = CalculateViewNormal(viewNormal, tangent, bitangent, nMap.Sample(texSampler, texCoord).xyz);
     
     const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, specularMap.Sample(texSampler, texCoord).rgb);
-    
+
     return float4(texSample.rgb * finalLight, 1.0f);
 }
