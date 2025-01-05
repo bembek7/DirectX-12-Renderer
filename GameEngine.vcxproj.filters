@@ -192,6 +192,9 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
+    <ClCompile Include="DepthPrePass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -370,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthPrePass.h">
+      <Filter>Header Files\Passes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

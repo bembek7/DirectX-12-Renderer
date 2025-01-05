@@ -115,6 +115,14 @@ void SceneComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 	}
 }
 
+void SceneComponent::Draw(Graphics& graphics, const PassType& passType)
+{
+	for (auto& child : children)
+	{
+		child->Draw(graphics, passType);
+	}
+}
+
 void SceneComponent::Update(Graphics& graphics)
 {
 	for (auto& child : children)
@@ -128,6 +136,14 @@ void SceneComponent::RenderShadowMap(Graphics& graphics)
 	for (auto& child : children)
 	{
 		child->RenderShadowMap(graphics);
+	}
+}
+
+void SceneComponent::PrepareForPass(Graphics& graphics, const Pass* const pass)
+{
+	for (auto& child : children)
+	{
+		child->PrepareForPass(graphics, pass);
 	}
 }
 

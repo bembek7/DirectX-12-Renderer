@@ -10,7 +10,7 @@ public:
 
 private:
 	void HandleInput();
-	void InitializeScene();
+	void InitializeScene(Graphics& graphics);
 private:
 	std::unique_ptr<Scene> scene;
 	Window window = Window(1444, 810);

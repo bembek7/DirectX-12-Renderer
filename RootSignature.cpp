@@ -22,7 +22,7 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
 	// Define static samplers
-	CD3DX12_STATIC_SAMPLER_DESC staticSamplers[2];
+	CD3DX12_STATIC_SAMPLER_DESC staticSamplers[2]{};
 
 	// Comparison sampler
 	staticSamplers[0].Init(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
@@ -44,6 +44,26 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_
 
 	rootSignatureDesc.Init((UINT)rootParameters.size(), rootParameters.data(), 2, staticSamplers, rootSignatureFlags);
 
+	// serialize root signature
+	Wrl::ComPtr<ID3DBlob> signatureBlob;
+	Wrl::ComPtr<ID3DBlob> errorBlob;
+	if (const auto hr = D3D12SerializeRootSignature(
+		&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		&signatureBlob, &errorBlob); FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			auto errorBufferPtr = static_cast<const char*>(errorBlob->GetBufferPointer());
+			throw std::runtime_error(errorBufferPtr);
+		}
+		CHECK_HR(hr);
+	}
+	// Create the root signature.
+	CHECK_HR(graphics.GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
+}
+
+RootSignature::RootSignature(Graphics& graphics, const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc)
+{
 	// serialize root signature
 	Wrl::ComPtr<ID3DBlob> signatureBlob;
 	Wrl::ComPtr<ID3DBlob> errorBlob;

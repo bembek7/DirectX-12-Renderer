@@ -5,6 +5,7 @@
 #include "RegularDrawingPass.h"
 //#include "DepthCubeTexture.h"
 #include "DirectionalLight.h"
+#include "DepthPrePass.h"
 
 namespace Dx = DirectX;
 
@@ -17,31 +18,40 @@ Scene::Scene(Graphics& graphics)
 	graphics.SetCamera(mainCamera->GetMatrix());
 	shadowMappingPass = std::make_unique<ShadowMappingPass>(graphics);
 	drawingPass = std::make_unique<RegularDrawingPass>(graphics);
+	passes.push_back(std::make_unique<DepthPrePass>(graphics));
 }
 
-void Scene::AddActor(std::unique_ptr<Actor> actorToAdd)
+void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 {
 	if (dynamic_cast<Light*>(actorToAdd.get()))
 	{
 		throw std::runtime_error("Light should be added using add light function");
 	}
+	for (const auto& pass : passes)
+	{
+		actorToAdd->PrepareForPass(graphics, pass.get());
+	}
 	actors.push_back(std::move(actorToAdd));
 }
 
-void Scene::AddLight(std::unique_ptr<Light> lightToAdd)
+void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
 	lights.push_back(lightToAdd.get());
+	for (const auto& pass : passes)
+	{
+		lightToAdd->PrepareForPass(graphics, pass.get());
+	}
 	actors.push_back(std::move(lightToAdd));
 }
 
-void Scene::AddDirectionalLight(std::unique_ptr<DirectionalLight> directionalLightToAdd)
+void Scene::AddDirectionalLight(Graphics& graphics, std::unique_ptr<DirectionalLight> directionalLightToAdd)
 {
 	if (directionalLight)
 	{
 		throw std::runtime_error("There can be only one directional light in a scene");
 	}
 	directionalLight = directionalLightToAdd.get();
-	AddLight(std::move(directionalLightToAdd));
+	AddLight(graphics, std::move(directionalLightToAdd));
 }
 
 void Scene::Draw(Graphics& graphics)
@@ -51,6 +61,10 @@ void Scene::Draw(Graphics& graphics)
 		actor->Update(graphics);
 	}
 
+	for (const auto& pass : passes)
+	{
+		pass->Execute(graphics, actors, mainCamera.get());
+	}
 	shadowMappingPass->Execute(graphics, actors, lights, directionalLight);
 	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 

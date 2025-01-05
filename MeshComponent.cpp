@@ -13,6 +13,7 @@
 #include <d3d12.h>
 #include "RegularDrawingPass.h"
 #include "ShadowMappingPass.h"
+#include "DepthPrePass.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -33,9 +34,13 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 
 	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, RPD::Transform);
 
+	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
+
 	PipelineState::PipelineStateStream pipelineStateStream = RegularDrawingPass::GetCommonPSS();
 
-	model = std::make_unique<Model>(graphics, pipelineStateStream, assignedMesh, shaderSettings, nullptr);
+	model = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, nullptr);
+	pipelineStateStream.inputLayout = model->GetInputLayout();
+	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
 	material = std::make_unique<Material>(graphics, pipelineStateStream, assignedMaterial, shaderSettings);
 
 	pipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
@@ -58,9 +63,10 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 		static constexpr auto smShaderSettings = ShaderSettings::ShadowMapping;
 
 		auto smPipelineStateStream = ShadowMappingPass::GetCommonPSS();
-		modelForShadowMapping = std::make_unique<Model>(graphics, smPipelineStateStream, assignedMesh, smShaderSettings, model->ShareIndexBuffer());
+		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, smShaderSettings, model->ShareIndexBuffer());
 		smPipelineStateStream.rootSignature = graphics.GetRootSignature()->Get();
-
+		smPipelineStateStream.inputLayout = modelForShadowMapping->GetInputLayout();
+		smPipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(modelForShadowMapping->GetVSBlob());
 		smPipelineState = pipelineStatesPool.GetPipelineState(graphics, smShaderSettings, smPipelineStateStream);
 
 		// Create and record shadow map bundle.
@@ -101,6 +107,47 @@ void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 	}
 
 	graphics.GetMainCommandList()->DrawIndexedInstanced(model->GetIndicesNumber(), 1, 0, 0, 0);
+}
+
+void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
+{
+	SceneComponent::Draw(graphics, passType);
+	graphics.ExecuteBundle(passSpecificSettings[passType].drawingBundle.Get());
+	UpdateTransformBuffer(graphics);
+	transformConstantBuffer->Bind(graphics.GetMainCommandList());
+	graphics.GetMainCommandList()->DrawIndexedInstanced(passSpecificSettings[passType].model->GetIndicesNumber(), 1, 0, 0, 0);
+}
+
+void MeshComponent::PrepareForPass(Graphics& graphics, const Pass* const pass)
+{
+	SceneComponent::PrepareForPass(graphics, pass);
+	auto pss = pass->GetPSS();
+
+	Model* model;
+
+	switch (pass->GetType())
+	{
+	default:
+		model = primitiveModel.get();
+		break;
+	}
+	
+	pss.inputLayout = model->GetInputLayout();
+	pss.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
+
+	auto& pipelineStatesPool = PipelineStatesPool::GetInstance();
+	auto ps = pipelineStatesPool.GetPipelineState(graphics, ShaderSettings::Color, pss);
+
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
+	drawingBundle = graphics.CreateBundle();
+	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	ps->Bind(drawingBundle.Get());
+	graphics.GetRootSignature()->Bind(drawingBundle.Get());
+
+	model->Bind(drawingBundle.Get());
+	CHECK_HR(drawingBundle->Close());
+
+	passSpecificSettings[pass->GetType()] = { std::move(ps), std::move(drawingBundle), model };
 }
 
 void MeshComponent::Update(Graphics& graphics)

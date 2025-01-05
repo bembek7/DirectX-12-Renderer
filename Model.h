@@ -33,9 +33,11 @@ private:
 	};
 
 public:
-	Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
+	Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer = nullptr);
 	void Bind(ID3D12GraphicsCommandList* const commandList) noexcept;
 
+	CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT GetInputLayout() const noexcept;
+	ID3DBlob* GetVSBlob() const noexcept;
 	std::shared_ptr<IndexBuffer> ShareIndexBuffer() noexcept;
 	UINT GetIndicesNumber() const noexcept;
 private:

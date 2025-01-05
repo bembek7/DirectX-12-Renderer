@@ -128,6 +128,22 @@ void Actor::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 	}
 }
 
+void Actor::Draw(Graphics& graphics, const PassType& passType)
+{
+	if (rootComponent)
+	{
+		rootComponent->Draw(graphics, passType);
+	}
+}
+
+void Actor::PrepareForPass(Graphics& graphics, const Pass* const pass)
+{
+	if (rootComponent)
+	{
+		rootComponent->PrepareForPass(graphics, pass);
+	}
+}
+
 void Actor::Update(Graphics& graphics)
 {
 	if (rootComponent)

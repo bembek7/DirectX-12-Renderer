@@ -14,3 +14,8 @@ void Pass::Execute(Graphics& graphics)
 		sharedBindable->Bind(graphics.GetMainCommandList());
 	}
 }
+
+PassType Pass::GetType() const noexcept
+{
+	return type;
+}

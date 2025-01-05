@@ -23,7 +23,7 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMVS.cso" },
 };
 
-Model::Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
+Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
 	indexBuffer(givenIndexBuffer)
 {
 	vertexLayout = GenerateVertexLayout(assignedMesh, shaderSettings);
@@ -48,9 +48,6 @@ Model::Model(Graphics& graphics, PipelineState::PipelineStateStream& pipelineSta
 
 	auto& shadersPool = ShadersPool::GetInstance();
 	vertexShaderBlob = shadersPool.GetShaderBlob(vertexShaderPath); // be wary that its a shared ptr to com ptr
-
-	pipelineStateStream.inputLayout = { vertexLayout.inputLayout.data(), (UINT)vertexLayout.inputLayout.size() };
-	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob->Get());
 }
 
 void Model::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
@@ -173,6 +170,16 @@ std::unique_ptr<VertexBuffer> Model::GenerateVertexBuffer(Graphics& graphics, co
 	}
 
 	return std::make_unique<VertexBuffer>(graphics, verticesData, vertexSize, numVertices);
+}
+
+CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT Model::GetInputLayout() const noexcept
+{
+	return D3D12_INPUT_LAYOUT_DESC{ vertexLayout.inputLayout.data(), (UINT)vertexLayout.inputLayout.size() };
+}
+
+ID3DBlob* Model::GetVSBlob() const noexcept
+{
+	return vertexShaderBlob->Get();
 }
 
 std::shared_ptr<IndexBuffer> Model::ShareIndexBuffer() noexcept

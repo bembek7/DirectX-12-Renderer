@@ -3,13 +3,12 @@
 #include <numbers>
 #include "MeshActor.h"
 #include "PointLight.h"
-#include <chrono>
 #include "DirectionalLight.h"
 #include "SpotLight.h"
 
 namespace Dx = DirectX;
 
-void App::InitializeScene()
+void App::InitializeScene(Graphics& graphics)
 {
 	const std::string meshesPath = "Meshes\\";
 
@@ -43,12 +42,12 @@ void App::InitializeScene()
 	spotLight->SetActorTransform({ 30.f, 0.f, 0.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
 	pointLight->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, Dx::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
 
-	scene->AddActor(std::move(sponza));
-	scene->AddActor(std::move(sphere));
-	scene->AddActor(std::move(brickWall));
-	scene->AddLight(std::move(pointLight));
-	scene->AddLight(std::move(spotLight));
-	scene->AddDirectionalLight(std::move(directionalLight)); // has to be added last for now
+	scene->AddActor(graphics, std::move(sponza));
+	scene->AddActor(graphics, std::move(sphere));
+	scene->AddActor(graphics, std::move(brickWall));
+	scene->AddLight(graphics, std::move(pointLight));
+	scene->AddLight(graphics, std::move(spotLight));
+	scene->AddDirectionalLight(graphics, std::move(directionalLight)); // has to be added last for now
 }
 
 int App::Run()
@@ -57,7 +56,7 @@ int App::Run()
 	auto const gui = graphics.GetGui();
 
 	auto last = std::chrono::steady_clock::now();
-	InitializeScene();
+	InitializeScene(graphics);
 	std::stringstream ss;
 	ss << "Scene initialization took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds";
 	OutputDebugString(ss.str().c_str());

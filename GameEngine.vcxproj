@@ -185,6 +185,7 @@
     <ClCompile Include="BufferLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="DepthPrePass.cpp" />
     <ClCompile Include="DepthStencilView.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="d3dx12\d3dx12_resource_helpers.h" />
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
+    <ClInclude Include="DepthPrePass.h" />
     <ClInclude Include="DepthStencilView.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Graphics.h" />
