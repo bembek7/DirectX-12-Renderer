@@ -48,7 +48,10 @@ void Graphics::RenderEnd()
 	ID3D12CommandList* const commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists((UINT)std::size(commandLists), commandLists);
 
-	CHECK_HR(swapChain->Present(1, 0));
+	if (swapChain->Present(1, 0) < 0)
+	{
+		CHECK_HR(device->GetDeviceRemovedReason());
+	}
 
 	const UINT64 currentFenceValue = fenceValues[curBufferIndex];
 	CHECK_HR(commandQueue->Signal(fence.Get(), currentFenceValue));

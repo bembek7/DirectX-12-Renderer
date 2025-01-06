@@ -21,12 +21,6 @@ void App::InitializeScene(Graphics& graphics)
 	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
 
-	/*for (size_t i = 0; i < 100; i++)
-	{
-		auto brickWall2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
-		brickWall2->SetActorTransform(Dx::XMFLOAT3{ 5.f, 0.f, 2.5f + 0.5f * i }, Dx::XMFLOAT3{ 0.f, 0.f, 0.f + 10.5f * i }, Dx::XMFLOAT3{ 1.f, 1.f, 1.f });
-		scene->AddActor(std::move(brickWall2));
-	}*/
 	auto last = std::chrono::steady_clock::now();
 	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 	std::stringstream ss = {};
@@ -48,6 +42,8 @@ void App::InitializeScene(Graphics& graphics)
 	scene->AddLight(graphics, std::move(pointLight));
 	scene->AddLight(graphics, std::move(spotLight));
 	scene->AddDirectionalLight(graphics, std::move(directionalLight)); // has to be added last for now
+
+	scene->PrepareActorsForPasses(graphics);
 }
 
 int App::Run()

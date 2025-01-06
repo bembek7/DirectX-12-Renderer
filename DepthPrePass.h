@@ -9,9 +9,9 @@ class Camera;
 class DepthPrePass : public Pass
 {
 public:
-	DepthPrePass(Graphics& graphics);
+	DepthPrePass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection);
 
-	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const Camera* const mainCamera);
+	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 };

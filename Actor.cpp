@@ -136,7 +136,7 @@ void Actor::Draw(Graphics& graphics, const PassType& passType)
 	}
 }
 
-void Actor::PrepareForPass(Graphics& graphics, const Pass* const pass)
+void Actor::PrepareForPass(Graphics& graphics, Pass* const pass)
 {
 	if (rootComponent)
 	{
@@ -149,14 +149,6 @@ void Actor::Update(Graphics& graphics)
 	if (rootComponent)
 	{
 		rootComponent->Update(graphics);
-	}
-}
-
-void Actor::RenderShadowMap(Graphics& graphics)
-{
-	if (rootComponent)
-	{
-		rootComponent->RenderShadowMap(graphics);
 	}
 }
 

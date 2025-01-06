@@ -131,15 +131,7 @@ void SceneComponent::Update(Graphics& graphics)
 	}
 }
 
-void SceneComponent::RenderShadowMap(Graphics& graphics)
-{
-	for (auto& child : children)
-	{
-		child->RenderShadowMap(graphics);
-	}
-}
-
-void SceneComponent::PrepareForPass(Graphics& graphics, const Pass* const pass)
+void SceneComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 {
 	for (auto& child : children)
 	{

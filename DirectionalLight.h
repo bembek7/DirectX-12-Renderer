@@ -20,6 +20,6 @@ private:
 		DirectX::XMFLOAT3 ambient = { 0.1f, 0.1f, 0.1f };
 		float specularIntensity = 0.6f;
 		DirectX::XMFLOAT3 lightDirection = { 0.f, 0.f, 0.f };
-		char padding[4];
+		char padding[4]{};
 	} lightBuffer;
 };

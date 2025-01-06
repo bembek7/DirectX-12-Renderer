@@ -19,14 +19,13 @@ public:
 	void AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd);
 	void AddDirectionalLight(Graphics& graphics, std::unique_ptr<DirectionalLight> directionalLightToAdd);
 	void Draw(Graphics& graphics);
+	void PrepareActorsForPasses(Graphics& graphics);
 	Camera* GetMainCamera();
 private:
 	void RenderControls(Graphics& graphics);
 
 private:
-	std::vector<std::unique_ptr<DepthPrePass>> passes;
-	std::unique_ptr<RegularDrawingPass> drawingPass;
-	std::unique_ptr<ShadowMappingPass> shadowMappingPass;
+	std::vector<std::unique_ptr<Pass>> passes;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<Light*> lights;
 	DirectionalLight* directionalLight = nullptr;

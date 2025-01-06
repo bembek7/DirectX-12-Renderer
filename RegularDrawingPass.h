@@ -12,10 +12,10 @@ class DepthCubeTexture;
 class RegularDrawingPass : public Pass
 {
 public:
-	RegularDrawingPass(Graphics& graphics);
+	RegularDrawingPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection);
 
-	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const Camera* const mainCamera);
-	static PipelineState::PipelineStateStream GetCommonPSS() noexcept;
+	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
 private:
+	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 	std::unique_ptr<DepthStencilView> depthStencilView;
 };

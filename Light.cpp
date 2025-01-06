@@ -7,7 +7,7 @@ Light::Light(Graphics& graphics, const std::string& fileName, const std::string&
 {
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
-	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<ShadowMapBuffer>>(graphics, shadowMapBuffer, RPD::ShadowMapping));
+	//constantBuffers.push_back(std::make_unique<ConstantBufferCBV<ShadowMapBuffer>>(graphics, shadowMapBuffer, RPD::ShadowMapping));
 }
 
 void Light::Bind(ID3D12GraphicsCommandList* const commandList)
@@ -28,12 +28,12 @@ void Light::Update(Graphics& graphics)
 	}
 }
 
-DirectX::XMMATRIX Light::GetLightCameraMatrix() const noexcept
+const Camera* Light::GetLightCamera() const noexcept
 {
-	return shadowMapCamera->GetMatrix();
+	return shadowMapCamera;
 }
 
-DirectX::XMMATRIX Light::GetLightProjectionMatrix() const noexcept
+DirectX::XMFLOAT4X4 Light::GetLightProjection() const noexcept
 {
-	return DirectX::XMLoadFloat4x4(&projection);
+	return projection;
 }

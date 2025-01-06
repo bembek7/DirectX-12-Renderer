@@ -13,10 +13,9 @@ class DirectionalLight;
 class ShadowMappingPass : public Pass
 {
 public:
-	ShadowMappingPass(Graphics& graphics);
+	ShadowMappingPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection);
 
-	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const std::vector<Light*>& lights, const DirectionalLight* const directionalLight);
-	static PipelineState::PipelineStateStream GetCommonPSS() noexcept;
+	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 };

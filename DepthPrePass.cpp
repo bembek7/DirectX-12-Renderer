@@ -5,8 +5,10 @@
 #include "Viewport.h"
 #include "Actor.h"
 #include "Camera.h"
+#include "RootParametersDescription.h"
 
-DepthPrePass::DepthPrePass(Graphics& graphics)
+DepthPrePass::DepthPrePass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
+	Pass(camera, projection)
 {
 	type = PassType::DepthPrePass;
 	const float windowWidth = graphics.GetWindowWidth();
@@ -16,15 +18,6 @@ DepthPrePass::DepthPrePass(Graphics& graphics)
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
-
-	DirectX::XMMATRIX reverseZ =
-	{
-		1.0f, 0.0f,  0.0f, 0.0f,
-		0.0f, 1.0f,  0.0f, 0.0f,
-		0.0f, 0.0f, -1.0f, 0.0f,
-		0.0f, 0.0f,  1.0f, 1.0f
-	};
-	DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
 
 	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -37,8 +30,15 @@ DepthPrePass::DepthPrePass(Graphics& graphics)
 	// define empty root signature
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
-	rootSignatureDesc.Init(0, nullptr, 0, nullptr, rootSignatureFlags);
-	
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
+	rootParameters.resize(1);
+
+	for (const auto& cb : RPD::cbConsts)
+	{
+		rootParameters[cb.ParamIndex].InitAsConstants(cb.dataSize / 4, cb.slot, 0, cb.visibility); // binding transform buffer
+	}
+	rootSignatureDesc.Init(1, rootParameters.data(), 0, nullptr, rootSignatureFlags);
+
 	rootSignature = std::make_unique<RootSignature>(graphics, rootSignatureDesc);
 
 	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -53,11 +53,9 @@ DepthPrePass::DepthPrePass(Graphics& graphics)
 	pipelineStateStream.rootSignature = rootSignature->Get();
 }
 
-void DepthPrePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const Camera* const mainCamera)
+void DepthPrePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
 {
-	Pass::Execute(graphics);
-
-	graphics.SetCamera(mainCamera->GetMatrix());
+	Pass::Execute(graphics, actors);
 
 	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto dsvHandle = depthStencilView->GetDsvHandle();
@@ -68,4 +66,3 @@ void DepthPrePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr
 		actor->Draw(graphics, PassType::DepthPrePass);
 	}
 }
-

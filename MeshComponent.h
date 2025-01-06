@@ -22,9 +22,8 @@ public:
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights) override;
 	virtual void Draw(Graphics& graphics, const PassType& passType) override;
-	void PrepareForPass(Graphics& graphics, const Pass* const pass);
+	void PrepareForPass(Graphics& graphics, Pass* const pass);
 	virtual void Update(Graphics& graphics) override;
-	void RenderShadowMap(Graphics& graphics);
 
 	Material* GetMaterial() noexcept;
 
@@ -36,19 +35,12 @@ protected:
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
-	//void DrawDepthPrePass(Graphics& graphics);
-
 	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
 
 private:
-	std::unique_ptr<Model> model;
+	std::unique_ptr<Model> mainModel;
 	std::unique_ptr<Model> primitiveModel;
-	std::unique_ptr<Material> material;
-	std::unique_ptr<Model> modelForShadowMapping;
-	std::shared_ptr<PipelineState> pipelineState;
-	std::shared_ptr<PipelineState> smPipelineState;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> shadowMappingBundle;
+	std::unique_ptr<Material> mainMaterial;
 
 	struct TransformBuffer
 	{
@@ -66,9 +58,10 @@ private:
 
 	struct PassSpecificSettings
 	{
-		std::shared_ptr<PipelineState> pipelineState;
+		std::unique_ptr<PipelineState> pipelineState;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
-		Model* model;
+		Model* model = nullptr;
+		Material* material = nullptr;
 	};
 	std::unordered_map<PassType, PassSpecificSettings> passSpecificSettings;
 };

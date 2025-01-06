@@ -40,8 +40,7 @@ public:
 	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights);
 	virtual void Draw(Graphics& graphics, const PassType& passType);
 	virtual void Update(Graphics& graphics);
-	virtual void RenderShadowMap(Graphics& graphics);
-	virtual void PrepareForPass(Graphics& graphics, const Pass* const pass);
+	virtual void PrepareForPass(Graphics& graphics, Pass* const pass);
 
 	DirectX::XMMATRIX GetTransformMatrix() const noexcept;
 	void AddRelativeScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept;

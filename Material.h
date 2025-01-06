@@ -17,16 +17,18 @@ class Material
 {
 	friend class Gui;
 public:
-	Material(Graphics& graphics, PipelineState::PipelineStateStream& pipelineStateStream, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
+	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
 	void BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
+	ID3DBlob* GetPSBlob() const noexcept;
+	CD3DX12_RASTERIZER_DESC GetRasterizerDesc() const noexcept;
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	std::vector<std::unique_ptr<ConstantBuffer>> cBuffers;
 	std::vector<std::unique_ptr<Texture>> textures;
-	//UINT desciptorTableRootIndex;
 	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> pixelShaderBlob;
+	CD3DX12_RASTERIZER_DESC rasterizerDesc;
 	struct Roughness
 	{
 		alignas(16) float roughness = 0.8f;

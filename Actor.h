@@ -40,9 +40,8 @@ public:
 
 	void Draw(Graphics& graphics, const std::vector<Light*>& lights);
 	void Draw(Graphics& graphics, const PassType& passType);
-	void PrepareForPass(Graphics& graphics, const Pass* const pass);
+	void PrepareForPass(Graphics& graphics, Pass* const pass);
 	virtual void Update(Graphics& graphics);
-	void RenderShadowMap(Graphics& graphics);
 
 	std::string GetActorFullName();
 

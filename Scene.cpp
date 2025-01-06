@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include "Graphics.h"
 #include "RegularDrawingPass.h"
-//#include "DepthCubeTexture.h"
 #include "DirectionalLight.h"
 #include "DepthPrePass.h"
 
@@ -13,12 +12,22 @@ Scene::Scene(Graphics& graphics)
 {
 	mainCamera = Camera::CreateComponent();
 	mainCamera->AddRelativeLocation(Dx::XMVECTOR{ 0.0f, 0.0f, -6.0f });
-	/*const float ShadowMappingCubeFaceSize = 1024.f;
-	auto ShadowMappingCube = std::make_shared<DepthCubeTexture>(graphics, 0, (UINT)ShadowMappingCubeFaceSize);*/
-	graphics.SetCamera(mainCamera->GetMatrix());
-	shadowMappingPass = std::make_unique<ShadowMappingPass>(graphics);
-	drawingPass = std::make_unique<RegularDrawingPass>(graphics);
-	passes.push_back(std::make_unique<DepthPrePass>(graphics));
+
+	DirectX::XMMATRIX reverseZ =
+	{
+		1.0f, 0.0f,  0.0f, 0.0f,
+		0.0f, 1.0f,  0.0f, 0.0f,
+		0.0f, 0.0f, -1.0f, 0.0f,
+		0.0f, 0.0f,  1.0f, 1.0f
+	};
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+
+	Dx::XMFLOAT4X4 defaultProj;
+	Dx::XMStoreFloat4x4(&defaultProj, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
+
+	passes.push_back(std::make_unique<RegularDrawingPass>(graphics, mainCamera.get(), defaultProj));
+	passes.push_back(std::make_unique<DepthPrePass>(graphics, mainCamera.get(), defaultProj));
 }
 
 void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
@@ -27,20 +36,12 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 	{
 		throw std::runtime_error("Light should be added using add light function");
 	}
-	for (const auto& pass : passes)
-	{
-		actorToAdd->PrepareForPass(graphics, pass.get());
-	}
 	actors.push_back(std::move(actorToAdd));
 }
 
 void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
 	lights.push_back(lightToAdd.get());
-	for (const auto& pass : passes)
-	{
-		lightToAdd->PrepareForPass(graphics, pass.get());
-	}
 	actors.push_back(std::move(lightToAdd));
 }
 
@@ -51,6 +52,7 @@ void Scene::AddDirectionalLight(Graphics& graphics, std::unique_ptr<DirectionalL
 		throw std::runtime_error("There can be only one directional light in a scene");
 	}
 	directionalLight = directionalLightToAdd.get();
+	passes.push_back(std::make_unique<ShadowMappingPass>(graphics, directionalLight->GetLightCamera(), directionalLight->GetLightProjection()));
 	AddLight(graphics, std::move(directionalLightToAdd));
 }
 
@@ -63,12 +65,21 @@ void Scene::Draw(Graphics& graphics)
 
 	for (const auto& pass : passes)
 	{
-		pass->Execute(graphics, actors, mainCamera.get());
+		pass->Execute(graphics, actors);
 	}
-	shadowMappingPass->Execute(graphics, actors, lights, directionalLight);
-	drawingPass->Execute(graphics, actors, lights, mainCamera.get());
 
 	RenderControls(graphics);
+}
+
+void Scene::PrepareActorsForPasses(Graphics& graphics)
+{
+	for (const auto& actor : actors)
+	{
+		for (const auto& pass : passes)
+		{
+			actor->PrepareForPass(graphics, pass.get());
+		}
+	}
 }
 
 void Scene::RenderControls(Graphics& graphics)
