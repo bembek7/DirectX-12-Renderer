@@ -7,11 +7,11 @@ SamplerState texSampler : register(s1);
 Texture2D specularMap : register(t3);
 
 float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoord : TEX_COORD,
-            float3 tangent : TANGENT, float3 bitangent : BITANGENT, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
+            float3 tangent : TANGENT, float3 bitangent : BITANGENT) : SV_TARGET
 {
     const float3 realViewNormal = CalculateViewNormal(viewNormal, tangent, bitangent, nMap.Sample(texSampler, texCoord).xyz);
     
-    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, specularMap.Sample(texSampler, texCoord).rgb);
+    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, specularMap.Sample(texSampler, texCoord).rgb);
     
     const float4 texSample = tex.Sample(texSampler, texCoord);
     

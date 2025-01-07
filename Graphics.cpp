@@ -22,8 +22,6 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 
 	cbvSrvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	CreateRootSignature();
-
 	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount, renderTargetDxgiFormat);
 }
 
@@ -35,7 +33,7 @@ void Graphics::RenderBegin()
 
 void Graphics::RenderEnd()
 {
-	gui->EndFrame(commandList.Get());
+	gui->EndFrame(GetRtvCpuHandle(), commandList.Get());
 
 	// select current buffer to render to
 	auto& backBuffer = renderTargets[curBufferIndex];
@@ -190,29 +188,6 @@ void Graphics::LoadAssets()
 	}
 }
 
-void Graphics::CreateRootSignature()
-{
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
-	rootParameters.resize(RPD::paramsNum);
-
-	for (const auto& cb : RPD::cbConsts)
-	{
-		rootParameters[cb.ParamIndex].InitAsConstants(cb.dataSize / 4, cb.slot, 0, cb.visibility);
-	}
-
-	for (const auto& cbv : RPD::cbvs)
-	{
-		rootParameters[cbv.ParamIndex].InitAsConstantBufferView(cbv.slot, 0u, cbv.visibility);
-	}
-
-	for (UINT i = 0; i < RPD::texturesNum; i++)
-	{
-		texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, i, 0u, i });
-	}
-	rootParameters[RPD::ParamsIndexes::TexturesDescTable].InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
-	rootSignature = std::make_unique<RootSignature>(*this, rootParameters);
-}
-
 void Graphics::ClearRenderTargetView()
 {
 	const auto& rtv = GetRtvCpuHandle();
@@ -251,35 +226,10 @@ ID3D12Device2* Graphics::GetDevice()
 	return device.Get();
 }
 
-PipelineState::PipelineStateStream Graphics::GetCommonPSS()
-{
-	PipelineState::PipelineStateStream commonPipelineStateStream;
-	commonPipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	commonPipelineStateStream.renderTargetFormats = {
-		.RTFormats{ renderTargetDxgiFormat },
-		.NumRenderTargets = 1,
-	};
-	commonPipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
-	//dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
-	commonPipelineStateStream.depthStencil = dsDesc;
-	return commonPipelineStateStream;
-}
-
-RootSignature* Graphics::GetRootSignature()
-{
-	return rootSignature.get();
-}
-
 UINT Graphics::GetCbvSrvDescriptorSize() const noexcept
 {
 	return cbvSrvDescriptorSize;
 }
-
-//void Graphics::OffsetCbvSrvCpuHandle(INT descNum)
-//{
-//	srvCpuHandle.Offset(descNum, cbvSrvDescriptorSize);
-//}
 
 float Graphics::GetWindowWidth() const noexcept
 {
@@ -289,11 +239,6 @@ float Graphics::GetWindowWidth() const noexcept
 float Graphics::GetWindowHeight() const noexcept
 {
 	return windowHeight;
-}
-
-std::vector<CD3DX12_ROOT_PARAMETER>& Graphics::GetCommonRootParametersRef() noexcept
-{
-	return commonRootParameters;
 }
 
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
@@ -357,16 +302,6 @@ void Graphics::WaitForSignal()
 	{
 		CHECK_HR(GetLastError());
 	}
-}
-
-ID3D12Resource* Graphics::GetShadowMap() noexcept
-{
-	return shadowMap;
-}
-
-void Graphics::SetShadowMap(ID3D12Resource* const newShadowMap) noexcept
-{
-	shadowMap = newShadowMap;
 }
 
 Gui* const Graphics::GetGui() noexcept

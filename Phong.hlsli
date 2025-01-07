@@ -162,7 +162,7 @@ float3 CalculateSpotLight(const SpotLight lightParams, const float3 viewPos, con
     return saturate(diffuse + lightParams.ambient + specular);
 }
 
-float3 CalculateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float4 lightPerspectivePos, const float3 specularColor)
+float3 CalculateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float3 specularColor)
 {
     //const float lighting = CalculateLighting(lightPerspectivePos);
     const float lighting = 1;

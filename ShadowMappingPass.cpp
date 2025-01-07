@@ -21,7 +21,6 @@ ShadowMappingPass::ShadowMappingPass(Graphics& graphics, const Camera* camera, D
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::DepthShadowMapping, 1.f, UINT(windowWidth), UINT(windowHeight));
-	graphics.SetShadowMap(depthStencilView->GetBuffer());
 
 	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |

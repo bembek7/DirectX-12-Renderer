@@ -19,7 +19,7 @@ public:
 	Gui& operator=(const Gui&) = delete;
 
 	void BeginFrame();
-	void EndFrame(ID3D12GraphicsCommandList* const commandList);
+	void EndFrame(CD3DX12_CPU_DESCRIPTOR_HANDLE rtv, ID3D12GraphicsCommandList* const commandList);
 
 	void RenderActorTree(Actor* const actor);
 	void RenderPerformanceInfo(const unsigned int fps, const float delayBetweenFrames);

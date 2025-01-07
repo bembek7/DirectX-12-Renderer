@@ -35,14 +35,10 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
 	ID3D12Device2* GetDevice();
 
-	PipelineState::PipelineStateStream GetCommonPSS();
-	RootSignature* GetRootSignature();
 	UINT GetCbvSrvDescriptorSize() const noexcept;
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
-
-	std::vector<CD3DX12_ROOT_PARAMETER>& GetCommonRootParametersRef() noexcept;
 
 	void SetProjection(const DirectX::XMMATRIX proj) noexcept;
 	void SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept;
@@ -68,7 +64,6 @@ private:
 
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	static constexpr std::array<PassType, 2> passTypes = { PassType::RegularDrawing, PassType::ShadowMapping };
 
 private:
 	float windowWidth;
@@ -82,8 +77,6 @@ private:
 
 	std::vector<CD3DX12_ROOT_PARAMETER> commonRootParameters;
 	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
-	std::unique_ptr<RootSignature> rootSignature;
-	std::unique_ptr<PipelineState> pipelineState;
 
 	// Pipeline objects.
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
@@ -96,8 +89,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 
-	ID3D12Resource* shadowMap;
-	//ID3D12Resource* mainDepthBuffer;
 
 	// Synchronization objects.
 	UINT curBufferIndex = 0;

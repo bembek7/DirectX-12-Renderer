@@ -25,7 +25,7 @@ Scene::Scene(Graphics& graphics)
 
 	Dx::XMFLOAT4X4 defaultProj;
 	Dx::XMStoreFloat4x4(&defaultProj, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
-
+	
 	passes.push_back(std::make_unique<RegularDrawingPass>(graphics, mainCamera.get(), defaultProj));
 	passes.push_back(std::make_unique<DepthPrePass>(graphics, mainCamera.get(), defaultProj));
 }
@@ -52,7 +52,7 @@ void Scene::AddDirectionalLight(Graphics& graphics, std::unique_ptr<DirectionalL
 		throw std::runtime_error("There can be only one directional light in a scene");
 	}
 	directionalLight = directionalLightToAdd.get();
-	passes.push_back(std::make_unique<ShadowMappingPass>(graphics, directionalLight->GetLightCamera(), directionalLight->GetLightProjection()));
+	//passes.push_back(std::make_unique<ShadowMappingPass>(graphics, directionalLight->GetLightCamera(), directionalLight->GetLightProjection()));
 	AddLight(graphics, std::move(directionalLightToAdd));
 }
 

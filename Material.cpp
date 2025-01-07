@@ -85,17 +85,6 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	{
 		roughnessBuffer = std::make_unique<Roughness>();
 		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
-		if (auto smRes = graphics.GetShadowMap())
-		{
-			srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::ShadowMap, srvDescSize);
-			const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
-			.Format = DXGI_FORMAT_R32_FLOAT,
-			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
-			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-			.Texture2D{.MipLevels = smRes->GetDesc().MipLevels },
-			};
-			graphics.GetDevice()->CreateShaderResourceView(smRes, &srvDesc, srvCpuHandle);
-		}
 	}
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))

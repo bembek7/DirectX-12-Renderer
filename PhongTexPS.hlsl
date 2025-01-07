@@ -3,12 +3,12 @@
 Texture2D tex : register(t1);
 SamplerState texSampler : register(s1);
 
-float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoord : TEX_COORD, float4 lightPerspectivePos : LIGHT_PERSPECTIVE_POSITION) : SV_TARGET
+float4 main(float3 viewPos : POSITION, float3 viewNormal : NORMAL, float2 texCoord : TEX_COORD) : SV_TARGET
 {
     const float3 realViewNormal = normalize(viewNormal);
     
     const float3 white = float3(1.0f, 1.0f, 1.0f);
-    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, lightPerspectivePos, white);
+    const float3 finalLight = CalculateFinalAmountOfLight(viewPos, realViewNormal, white);
     
     const float4 texSample = tex.Sample(texSampler, texCoord);
 

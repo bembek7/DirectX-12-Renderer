@@ -42,8 +42,9 @@ void Gui::BeginFrame()
 	ImGui::NewFrame();
 }
 
-void Gui::EndFrame(ID3D12GraphicsCommandList* const commandList)
+void Gui::EndFrame(CD3DX12_CPU_DESCRIPTOR_HANDLE rtv, ID3D12GraphicsCommandList* const commandList)
 {
+	commandList->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
 	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
