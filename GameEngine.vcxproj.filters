@@ -183,7 +183,7 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowMappingPass.cpp">
+    <ClCompile Include="LightPerspectivePass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="DepthStencilView.cpp">
@@ -193,6 +193,9 @@
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
     <ClCompile Include="DepthPrePass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMapGenerationPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -368,13 +371,16 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMappingPass.h">
+    <ClInclude Include="LightPerspectivePass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DepthPrePass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMapGenerationPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -421,6 +427,12 @@
     <FxCompile Include="PixelShader.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="ShadowMapGenerationVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapGenerationPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="NormalMap.hlsli">
@@ -435,7 +447,7 @@
     <None Include="TransformCB.hlsli">
       <Filter>Resource Files\VertexShaders</Filter>
     </None>
-    <None Include="ShadowMappingCB.hlsli">
+    <None Include="LightPerspectiveCB.hlsli">
       <Filter>Resource Files\VertexShaders</Filter>
     </None>
   </ItemGroup>

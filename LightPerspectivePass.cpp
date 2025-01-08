@@ -1,4 +1,4 @@
-#include "ShadowMappingPass.h"
+#include "LightPerspectivePass.h"
 #include "Viewport.h"
 #include "Graphics.h"
 #include "ScissorRectangle.h"
@@ -9,10 +9,10 @@
 
 namespace Dx = DirectX;
 
-ShadowMappingPass::ShadowMappingPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
+LightPerspectivePass::LightPerspectivePass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
 	Pass(camera, projection)
 {
-	type = PassType::ShadowMapping;
+	type = PassType::LightPerspective;
 
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
@@ -57,16 +57,30 @@ ShadowMappingPass::ShadowMappingPass(Graphics& graphics, const Camera* camera, D
 	pipelineStateStream.rootSignature = rootSignature->Get();
 }
 
-void ShadowMappingPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
+void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
 {
 	Pass::Execute(graphics, actors);
 
+	namespace Dx = DirectX;
+	Dx::XMStoreFloat4x4(&lightPerspective, Dx::XMMatrixTranspose(cameraUsed->GetMatrix() * Dx::XMLoadFloat4x4(&projection)));
+
 	depthStencilView->Clear(graphics.GetMainCommandList());
+	
 	auto dsvHandle = depthStencilView->GetDsvHandle();
 	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
 
 	for (auto& actor : actors)
 	{
-		actor->Draw(graphics, PassType::ShadowMapping);
+		actor->Draw(graphics, GetType());
 	}
+}
+
+ID3D12Resource* LightPerspectivePass::GetDepthBuffer()
+{
+	return depthStencilView->GetBuffer();
+}
+
+DirectX::XMFLOAT4X4 LightPerspectivePass::GetLightPerspective() const noexcept
+{
+	return lightPerspective;
 }

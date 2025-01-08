@@ -19,7 +19,7 @@ class Material
 public:
 	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
-	void BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept;
+	ID3D12DescriptorHeap* GetDescriptorHeap() noexcept;
 	void Update();
 	ID3DBlob* GetPSBlob() const noexcept;
 	CD3DX12_RASTERIZER_DESC GetRasterizerDesc() const noexcept;

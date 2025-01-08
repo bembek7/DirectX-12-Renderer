@@ -61,7 +61,7 @@ private:
 		std::unique_ptr<PipelineState> pipelineState;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
 		Model* model = nullptr;
-		Material* material = nullptr;
+		ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	};
 	std::unordered_map<PassType, PassSpecificSettings> passSpecificSettings;
 };

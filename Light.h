@@ -21,10 +21,4 @@ protected:
 	std::vector<std::unique_ptr<ConstantBuffer>> constantBuffers;
 	DirectX::XMFLOAT4X4 projection{};
 	Camera* shadowMapCamera;
-	struct ShadowMapBuffer
-	{
-		DirectX::XMFLOAT4X4 lightPerspective;
-	} shadowMapBuffer;
-private:
-	
 };

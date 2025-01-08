@@ -215,7 +215,8 @@
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
     <ClCompile Include="ShadersPool.cpp" />
-    <ClCompile Include="ShadowMappingPass.cpp" />
+    <ClCompile Include="LightPerspectivePass.cpp" />
+    <ClCompile Include="ShadowMapGenerationPass.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="TexLoader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -277,7 +278,8 @@
     <ClInclude Include="ScissorRectangle.h" />
     <ClInclude Include="ShaderSettings.h" />
     <ClInclude Include="ShadersPool.h" />
-    <ClInclude Include="ShadowMappingPass.h" />
+    <ClInclude Include="LightPerspectivePass.h" />
+    <ClInclude Include="ShadowMapGenerationPass.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="TexLoader.h" />
     <ClInclude Include="Texture.h" />
@@ -382,6 +384,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="ShadowMapGenerationPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ShadowMapGenerationVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="SkyboxPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -421,7 +435,7 @@
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
     <None Include="Shadow.hlsli" />
-    <None Include="ShadowMappingCB.hlsli" />
+    <None Include="LightPerspectiveCB.hlsli" />
     <None Include="TransformCB.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

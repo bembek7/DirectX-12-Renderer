@@ -20,9 +20,7 @@ void DirectionalLight::Update(Graphics& graphics)
 	namespace Dx = DirectX;
 	const auto lightDir = GetActorForwardVector();
 	const auto lightLocation = Dx::XMVectorScale(lightDir, -300);
-	//shadowMapCamera->SetRelativeLocation(Dx::XMVectorSubtract(lightLocation, GetActorLocationVector()));
 	Dx::XMStoreFloat3(&lightBuffer.lightDirection, Dx::XMVector3TransformNormal(GetActorForwardVector(), graphics.GetCamera()));
-	//DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix() * Dx::XMLoadFloat4x4(&projection)));
 	Light::Update(graphics);
 }
 

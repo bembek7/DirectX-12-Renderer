@@ -11,9 +11,6 @@
 #include "RootParametersDescription.h"
 #include "Light.h"
 #include <d3d12.h>
-#include "RegularDrawingPass.h"
-#include "ShadowMappingPass.h"
-#include "DepthPrePass.h"
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -55,7 +52,7 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	SceneComponent::Draw(graphics, lights);
-	mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+	//mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
 	//graphics.ExecuteBundle(drawingBundle.Get());
 	UpdateTransformBuffer(graphics);
 	transformConstantBuffer->Bind(graphics.GetMainCommandList());
@@ -73,9 +70,9 @@ void MeshComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
 {
 	SceneComponent::Draw(graphics, passType);
-	if (passSpecificSettings[passType].material)
+	if (passSpecificSettings[passType].descriptorHeap)
 	{
-		mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+		graphics.GetMainCommandList()->SetDescriptorHeaps(1u, &passSpecificSettings[passType].descriptorHeap);
 	}
 	graphics.ExecuteBundle(passSpecificSettings[passType].drawingBundle.Get());
 	UpdateTransformBuffer(graphics);
@@ -119,13 +116,26 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 	pass->GetRootSignature()->Bind(drawingBundle.Get());
 
 	model->Bind(drawingBundle.Get());
+
+	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+
 	if (material)
 	{
 		material->Bind(graphics, drawingBundle.Get());
+
+		descriptorHeap = material->GetDescriptorHeap();
 	}
+
+	if (!descriptorHeap)
+	{
+		descriptorHeap = pass->GetDescriptorHeap();
+	}
+
+	pass->BindPassSpecificRootParams(drawingBundle.Get());
+
 	CHECK_HR(drawingBundle->Close());
 
-	passSpecificSettings[pass->GetType()] = { std::move(ps), std::move(drawingBundle), model, material };
+	passSpecificSettings[pass->GetType()] = { std::move(ps), std::move(drawingBundle), model, descriptorHeap };
 }
 
 void MeshComponent::Update(Graphics& graphics)

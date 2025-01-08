@@ -13,7 +13,8 @@ class Actor;
 enum class PassType
 {
 	RegularDrawing,
-	ShadowMapping,
+	ShadowMapGeneraration,
+	LightPerspective,
 	DepthPrePass,
 };
 
@@ -23,6 +24,8 @@ public:
 	Pass(const Camera* const camera, DirectX::XMFLOAT4X4 projection) noexcept;
 	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
 	PipelineState::PipelineStateStream GetPSS() const { return pipelineStateStream; };
+	virtual void BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle) {};
+	virtual ID3D12DescriptorHeap* GetDescriptorHeap() noexcept { return srvHeap.Get(); };
 	virtual ~Pass() = default;
 	PassType GetType() const noexcept;
 	RootSignature* GetRootSignature() noexcept;
@@ -32,7 +35,7 @@ protected:
 	PipelineState::PipelineStateStream pipelineStateStream;
 	std::unique_ptr<RootSignature> rootSignature;
 	PassType type{};
-private:
 	DirectX::XMFLOAT4X4 projection{};
 	const Camera* cameraUsed;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 };

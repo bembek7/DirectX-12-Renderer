@@ -118,17 +118,14 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 
 	if (srvHeap)
 	{
-		BindDescriptorHeap(commandList);
+		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 		commandList->SetGraphicsRootDescriptorTable(RPD::TexturesDescTable, srvHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 }
 
-void Material::BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept
+ID3D12DescriptorHeap* Material::GetDescriptorHeap() noexcept
 {
-	if (srvHeap)
-	{
-		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
-	}
+	return srvHeap.Get();
 }
 
 void Material::Update()
