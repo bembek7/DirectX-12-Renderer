@@ -200,13 +200,23 @@ void Graphics::ClearRenderTargetView()
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetRtvCpuHandle() noexcept
+CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetRtvCpuHandle() const noexcept
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE
 	{
 		rtvHeap->GetCPUDescriptorHandleForHeapStart(),
 		(INT)curBufferIndex, rtvDescriptorSize
 	};
+}
+
+CD3DX12_CPU_DESCRIPTOR_HANDLE* Graphics::GetDSVHandle() noexcept
+{
+	return &dethPrePassDSVHandle;
+}
+
+void Graphics::SetDSVHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE& dsvHandle) noexcept
+{
+	dethPrePassDSVHandle = dsvHandle;
 }
 
 ID3D12GraphicsCommandList* Graphics::GetMainCommandList()

@@ -14,7 +14,11 @@ DepthPrePass::DepthPrePass(Graphics& graphics, const Camera* camera, DirectX::XM
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
+	bindables.push_back(std::make_unique<ScissorRectangle>());
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
+
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
+	graphics.SetDSVHandle(depthStencilView->GetDsvHandle());
 
 	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -55,8 +59,8 @@ void DepthPrePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr
 	Pass::Execute(graphics, actors);
 
 	depthStencilView->Clear(graphics.GetMainCommandList());
-	auto dsvHandle = depthStencilView->GetDsvHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
+	
+	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, graphics.GetDSVHandle());
 
 	for (auto& actor : actors)
 	{

@@ -16,8 +16,6 @@ RegularDrawingPass::RegularDrawingPass(Graphics& graphics, const Camera* camera,
 	bindables.push_back(std::make_unique<ScissorRectangle>());
 	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
-	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
-
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
 	rootParameters.resize(RPD::paramsNum);
 
@@ -46,7 +44,8 @@ RegularDrawingPass::RegularDrawingPass(Graphics& graphics, const Camera* camera,
 	};
 	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
 	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
-	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	pipelineStateStream.depthStencil = dsDesc;
 	pipelineStateStream.rootSignature = rootSignature->Get();
 }
@@ -56,10 +55,8 @@ void RegularDrawingPass::Execute(Graphics& graphics, const std::vector<std::uniq
 	Pass::Execute(graphics, actors);
 
 	graphics.ClearRenderTargetView();
-	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto rtv = graphics.GetRtvCpuHandle();
-	auto dsvHandle = depthStencilView->GetDsvHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, &dsvHandle);
+	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, graphics.GetDSVHandle());
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, PassType::RegularDrawing);

@@ -29,7 +29,9 @@ public:
 
 	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
 	void ClearRenderTargetView();
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetRtvCpuHandle() noexcept;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetRtvCpuHandle() const noexcept;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE* GetDSVHandle() noexcept;
+	void SetDSVHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE& dsvHandle) noexcept;
 
 	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();
@@ -52,15 +54,11 @@ public:
 	void Signal();
 	void WaitForSignal();
 
-	ID3D12Resource* GetShadowMap() noexcept;
-	void SetShadowMap(ID3D12Resource* const newShadowMap) noexcept;
-
 	Gui* const GetGui() noexcept;
 
 private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();
-	void CreateRootSignature();
 
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -89,6 +87,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 	UINT rtvDescriptorSize;
 
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dethPrePassDSVHandle;
 
 	// Synchronization objects.
 	UINT curBufferIndex = 0;
