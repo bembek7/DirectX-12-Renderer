@@ -14,9 +14,6 @@ DepthPrePass::DepthPrePass(Graphics& graphics, const Camera* camera, DirectX::XM
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
-	bindables.push_back(std::make_unique<ScissorRectangle>());
-	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
-
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
 
 	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
