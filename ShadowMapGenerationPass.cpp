@@ -5,12 +5,14 @@
 #include "Actor.h"
 #include "LightPerspectivePass.h"
 #include "ThrowMacros.h"
+#include "ShadersPool.h"
 
 ShadowMapGenerationPass::ShadowMapGenerationPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection, LightPerspectivePass* const connectedLPpass):
 	Pass(camera, projection),
 	connectedLPpass(connectedLPpass)
 {
 	type = PassType::ShadowMapGeneraration;
+	providesShaders = true;
 
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
@@ -85,6 +87,14 @@ ShadowMapGenerationPass::ShadowMapGenerationPass(Graphics& graphics, const Camer
 	dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	pipelineStateStream.depthStencil = dsDesc;
 	pipelineStateStream.rootSignature = rootSignature->Get();
+	std::wstring vertexShaderPath = L"ShadowMapGenerationVS.cso";
+	std::wstring pixelShaderPath = L"ShadowMapGenerationPS.cso";
+
+	auto& shadersPool = ShadersPool::GetInstance();
+	vsBlob = shadersPool.GetShaderBlob(vertexShaderPath);
+	psBlob = shadersPool.GetShaderBlob(pixelShaderPath);
+	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vsBlob->Get());
+	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(psBlob->Get());
 
 	lightPerspectiveCB = std::make_unique<ConstantBufferCBV<LightPerspectiveBuffer>>(graphics, lightPerspectiveBuffer, 1u);
 }

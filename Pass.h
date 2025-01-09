@@ -29,6 +29,7 @@ public:
 	virtual ~Pass() = default;
 	PassType GetType() const noexcept;
 	RootSignature* GetRootSignature() noexcept;
+	bool ProvidesShaders() const noexcept { return providesShaders; }
 protected:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;
@@ -38,4 +39,7 @@ protected:
 	DirectX::XMFLOAT4X4 projection{};
 	const Camera* cameraUsed;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+	bool providesShaders = false;
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> vsBlob;
+	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> psBlob;
 };

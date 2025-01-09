@@ -100,10 +100,17 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 	}
 	
 	pss.inputLayout = model->GetInputLayout();
-	pss.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
+	if (!pass->ProvidesShaders())
+	{
+		pss.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
+	}
+	
 	if (material)
 	{
-		pss.pixelShader = CD3DX12_SHADER_BYTECODE(material->GetPSBlob());
+		if (!pass->ProvidesShaders())
+		{
+			pss.pixelShader = CD3DX12_SHADER_BYTECODE(material->GetPSBlob());
+		}
 		pss.rasterizer = material->GetRasterizerDesc();
 	}
 
