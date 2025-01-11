@@ -55,6 +55,24 @@
     <Filter Include="Source Files\Pools">
       <UniqueIdentifier>{f63bd75c-bf0d-44e7-88ca-0fe0d20cc6bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers">
+      <UniqueIdentifier>{f8417bf2-450d-4465-bc95-7564116da4a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\CBs">
+      <UniqueIdentifier>{365410af-40bc-4ec2-9ace-06e7bd4bca61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\Texes">
+      <UniqueIdentifier>{838db9ce-7bd4-4860-9dc7-7f2d375b57e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\Samplers">
+      <UniqueIdentifier>{aedb4c35-791c-478b-835d-d17fd6d8e34a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\VertexShaders\Headers">
+      <UniqueIdentifier>{e6857978-4b1a-453b-be8a-b99abd276ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\VertexShaders\Headers\CBs">
+      <UniqueIdentifier>{2ac45b1f-79e2-40b4-9050-9a326098dda4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -403,32 +421,23 @@
     <FxCompile Include="SolidVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongColorPS.hlsl">
+    <FxCompile Include="DTNMPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMPS.hlsl">
+    <FxCompile Include="DTNMSMPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMSMPS.hlsl">
+    <FxCompile Include="DTPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexPS.hlsl">
+    <FxCompile Include="DTSMPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexSMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PhongTexNMSMATPS.hlsl">
+    <FxCompile Include="DTNMSMATPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="ShadowMapGenerationVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
@@ -436,40 +445,49 @@
     <FxCompile Include="ShadowMapGenerationPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="ColorPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NormalMap.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="Phong.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
     <None Include="Shadow.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="TransformCB.hlsli">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </None>
-    <None Include="LightPerspectiveCB.hlsli">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </None>
-    <None Include="ColorCB.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="RoughnessCB.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="DiffTex.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="SpecularMap.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </None>
-    <None Include="TextureSampler.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
     </None>
     <None Include="GPassOut.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="Phong.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="NormalMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="SpecularMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="TextureSampler.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Samplers</Filter>
+    </None>
+    <None Include="RoughnessCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="ColorCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="DiffTex.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="ComparisonSampler.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Samplers</Filter>
+    </None>
+    <None Include="MainDepthBuffer.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="TransformCB.hlsli">
+      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="LightPerspectiveCB.hlsli">
+      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
     </None>
   </ItemGroup>
 </Project>
