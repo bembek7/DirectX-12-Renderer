@@ -142,7 +142,7 @@ void Gui::RenderComponentDetails(MeshComponent* const component)
 		float itemWidth = std::clamp(availableWidth, 0.0f, maxWidth);
 		ImGui::PushItemWidth(itemWidth);
 
-		ImGui::ColorPicker4("##ColorPickerWidget", (float*)component->GetMaterial()->colorBuffer.get());
+		ImGui::ColorPicker3("##ColorPickerWidget", (float*)component->GetMaterial()->colorBuffer.get());
 
 		ImGui::PopItemWidth();
 	}

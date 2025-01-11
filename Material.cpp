@@ -11,8 +11,7 @@
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
-	{ ShaderSettings::Skybox, L"SkyboxPS.cso" },
-	{ ShaderSettings::Color, L"SolidPS.cso" },
+	{ ShaderSettings::Color, L"ColorPS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexPS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMPS.cso" },
@@ -23,7 +22,6 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 
 const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureHighestSlotMap =
 {
-	{ ShaderSettings::Skybox, -1 },
 	{ ShaderSettings::Color, -1 },
 	{ ShaderSettings::Color | ShaderSettings::Phong, 0 },
 	{ ShaderSettings::Phong | ShaderSettings::Texture, 2 },
@@ -81,11 +79,9 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::SpecularMap, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
 	}
-	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
-	{
-		roughnessBuffer = std::make_unique<Roughness>();
-		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
-	}
+
+	roughnessBuffer = std::make_unique<Roughness>();
+	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
 
 	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
 	{

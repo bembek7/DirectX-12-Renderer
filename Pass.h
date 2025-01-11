@@ -12,7 +12,7 @@ class Actor;
 
 enum class PassType
 {
-	RegularDrawing,
+	GPass,
 	ShadowMapGeneraration,
 	LightPerspective,
 	DepthPrePass,

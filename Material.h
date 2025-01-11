@@ -38,7 +38,7 @@ private:
 
 	struct Color
 	{
-		DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f};
 	};
 
 	std::unique_ptr<Color> colorBuffer = nullptr;

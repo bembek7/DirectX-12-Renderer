@@ -1,0 +1,1 @@
+Texture2D diffTex : register(t1);

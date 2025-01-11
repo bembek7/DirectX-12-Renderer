@@ -209,8 +209,9 @@
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="PipelineStatesPool.cpp" />
     <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="RegularDrawingPass.cpp" />
+    <ClCompile Include="GPass.cpp" />
     <ClCompile Include="RootSignature.cpp" />
+    <ClCompile Include="RTVHeap.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneComponent.cpp" />
     <ClCompile Include="ScissorRectangle.cpp" />
@@ -270,9 +271,10 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="PipelineStatesPool.h" />
     <ClInclude Include="PointLight.h" />
-    <ClInclude Include="RegularDrawingPass.h" />
+    <ClInclude Include="GPass.h" />
     <ClInclude Include="RootParametersDescription.h" />
     <ClInclude Include="RootSignature.h" />
+    <ClInclude Include="RTVHeap.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneComponent.h" />
     <ClInclude Include="ScissorRectangle.h" />
@@ -300,7 +302,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
-    <FxCompile Include="PhongColorVS.hlsl">
+    <FxCompile Include="NormalVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -396,19 +398,13 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="SkyboxPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="SolidPS.hlsl">
+    <FxCompile Include="ColorPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -432,10 +428,16 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ColorCB.hlsli" />
+    <None Include="DiffTex.hlsli" />
+    <None Include="GPassOut.hlsli" />
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
+    <None Include="RoughnessCB.hlsli" />
     <None Include="Shadow.hlsli" />
     <None Include="LightPerspectiveCB.hlsli" />
+    <None Include="SpecularMap.hlsli" />
+    <None Include="TextureSampler.hlsli" />
     <None Include="TransformCB.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

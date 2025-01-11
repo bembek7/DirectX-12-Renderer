@@ -13,6 +13,60 @@
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
 
+//static void LogToDebugOutput(const std::string& message)
+//{
+//	OutputDebugStringA(message.c_str());
+//}
+//
+//void AnalyzeBreadcrumbs(const D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT& breadcrumbsOutput)
+//{
+//	const D3D12_AUTO_BREADCRUMB_NODE* pNode = breadcrumbsOutput.pHeadAutoBreadcrumbNode;
+//	while (pNode)
+//	{
+//		std::ostringstream logStream;
+//		logStream << "Command List: " << (pNode->pCommandListDebugNameA ? pNode->pCommandListDebugNameA : "Unknown") << "\n";
+//		logStream << "Command Queue: " << (pNode->pCommandQueueDebugNameA ? pNode->pCommandQueueDebugNameA : "Unknown") << "\n";
+//		logStream << "Breadcrumb Contexts:\n";
+//
+//		for (UINT i = 0; i < pNode->BreadcrumbCount; ++i)
+//		{
+//			logStream << "  " << i << ": " << pNode->pCommandHistory[i] << "\n";
+//		}
+//
+//		LogToDebugOutput(logStream.str());
+//
+//		pNode = pNode->pNext;
+//	}
+//}
+//
+//void AnalyzePageFault(const D3D12_DRED_PAGE_FAULT_OUTPUT& pageFaultOutput)
+//{
+//	std::ostringstream logStream;
+//	logStream << "Page Fault Address: " << pageFaultOutput.PageFaultVA << "\n";
+//
+//	// Log existing allocation nodes
+//	const D3D12_DRED_ALLOCATION_NODE* pNode = pageFaultOutput.pHeadExistingAllocationNode;
+//	logStream << "Existing Allocations:\n";
+//	while (pNode)
+//	{
+//		logStream << "  Allocation Type: " << pNode->AllocationType << "\n";
+//		logStream << "  ObjectNameA: " << pNode->ObjectNameA << "\n";
+//		pNode = pNode->pNext;
+//	}
+//
+//	// Log recent freed allocation nodes
+//	pNode = pageFaultOutput.pHeadRecentFreedAllocationNode;
+//	logStream << "Recent Freed Allocations:\n";
+//	while (pNode)
+//	{
+//		logStream << "  Allocation Type: " << pNode->AllocationType << "\n";
+//		logStream << "  ObjectNameA: " << pNode->ObjectNameA << "\n";
+//		pNode = pNode->pNext;
+//	}
+//
+//	LogToDebugOutput(logStream.str());
+//}
+
 Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight) :
 	windowWidth(windowWidth),
 	windowHeight(windowHeight)
@@ -49,6 +103,15 @@ void Graphics::RenderEnd()
 	if (swapChain->Present(1, 0) < 0)
 	{
 		CHECK_HR(device->GetDeviceRemovedReason());
+
+		/*Wrl::ComPtr<ID3D12DeviceRemovedExtendedData> pDred;
+		CHECK_HR(device->QueryInterface(IID_PPV_ARGS(&pDred)));
+		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT DredAutoBreadcrumbsOutput;
+		D3D12_DRED_PAGE_FAULT_OUTPUT DredPageFaultOutput;
+		CHECK_HR(pDred->GetAutoBreadcrumbsOutput(&DredAutoBreadcrumbsOutput));
+		CHECK_HR(pDred->GetPageFaultAllocationOutput(&DredPageFaultOutput));
+		AnalyzeBreadcrumbs(DredAutoBreadcrumbsOutput);
+		AnalyzePageFault(DredPageFaultOutput);*/
 	}
 
 	const UINT64 currentFenceValue = fenceValues[curBufferIndex];
@@ -89,11 +152,16 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 	{
 #if defined(_DEBUG)
 		Wrl::ComPtr<ID3D12Debug1> debugController;
-		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
-		{
-			debugController->EnableDebugLayer();
-			//debugController->SetEnableGPUBasedValidation(true);
-		}
+		CHECK_HR(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+		
+		debugController->EnableDebugLayer();
+		//debugController->SetEnableGPUBasedValidation(true);
+
+		/*Wrl::ComPtr<ID3D12DeviceRemovedExtendedDataSettings> pDredSettings; not supported on my device
+		CHECK_HR(D3D12GetDebugInterface(IID_PPV_ARGS(&pDredSettings)));
+
+		pDredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+		pDredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);*/
 #endif
 	}
 

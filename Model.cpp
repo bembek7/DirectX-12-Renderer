@@ -15,7 +15,7 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model
 	{ ShaderSettings{}, L"SolidVS.cso"},
 	{ ShaderSettings::ShadowMapping, L"SolidVS.cso"},
 	{ ShaderSettings::Skybox, L"SkyboxVS.cso" },
-	{ ShaderSettings::Color, L"SolidVS.cso" },
+	{ ShaderSettings::Color, L"NormalVS.cso" },
 	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorVS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexVS.cso" },
 	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMVS.cso" },
@@ -72,7 +72,7 @@ Model::VertexLayout Model::GenerateVertexLayout(const aiMesh* const assignedMesh
 		elementOffset[VertexElement::Position] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
-	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
+	if (static_cast<bool>(shaderSettings & ShaderSettings::Color))
 	{
 		inputLayout.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Normal] = vertexSize;

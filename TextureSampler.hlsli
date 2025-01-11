@@ -1,0 +1,1 @@
+SamplerState texSampler : register(s1);

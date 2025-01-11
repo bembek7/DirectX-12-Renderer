@@ -162,7 +162,7 @@
     <ClCompile Include="Pass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="RegularDrawingPass.cpp">
+    <ClCompile Include="GPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="PipelineStatesPool.cpp">
@@ -197,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="ShadowMapGenerationPass.cpp">
       <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="RTVHeap.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -350,7 +353,7 @@
     <ClInclude Include="PipelineStatesPool.h">
       <Filter>Header Files\Pools</Filter>
     </ClInclude>
-    <ClInclude Include="RegularDrawingPass.h">
+    <ClInclude Include="GPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="BindablesPool.h">
@@ -383,6 +386,9 @@
     <ClInclude Include="ShadowMapGenerationPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="RTVHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PhongTexVS.hlsl">
@@ -391,7 +397,7 @@
     <FxCompile Include="PhongTexNMVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongColorVS.hlsl">
+    <FxCompile Include="NormalVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
     <FxCompile Include="SolidVS.hlsl">
@@ -412,13 +418,10 @@
     <FxCompile Include="PhongTexSMPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="SolidPS.hlsl">
+    <FxCompile Include="ColorPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="PhongTexNMSMATPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyboxPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
@@ -449,6 +452,24 @@
     </None>
     <None Include="LightPerspectiveCB.hlsli">
       <Filter>Resource Files\VertexShaders</Filter>
+    </None>
+    <None Include="ColorCB.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
+    <None Include="RoughnessCB.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
+    <None Include="DiffTex.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
+    <None Include="SpecularMap.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
+    <None Include="TextureSampler.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </None>
+    <None Include="GPassOut.hlsli">
+      <Filter>Resource Files\PixelShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

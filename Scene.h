@@ -2,7 +2,6 @@
 #include <memory>
 #include <vector>
 #include "Camera.h"
-#include "RegularDrawingPass.h"
 #include "LightPerspectivePass.h"
 #include "DepthPrePass.h"
 #include "Actor.h"
