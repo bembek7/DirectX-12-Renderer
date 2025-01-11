@@ -175,13 +175,6 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 	aiString specularTexFileName;
 	material->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
 
-	int shadingModel = 0;
-	material->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
-
-	if (shadingModel == aiShadingMode_Phong)
-	{
-		resolvedSettings |= ShaderSettings::Phong;
-	}
 	if (mesh->HasTextureCoords(0))
 	{
 		if (texFileName.length > 0)

@@ -12,23 +12,21 @@
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Material::psPaths =
 {
 	{ ShaderSettings::Color, L"ColorPS.cso" },
-	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorPS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexPS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMPS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PhongTexSMPS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMSMPS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"PhongTexNMSMATPS.cso" },
+	{ ShaderSettings::Texture, L"DTPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"DTNMPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"DTSMPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"DTNMSMPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
 };
 
 const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureHighestSlotMap =
 {
 	{ ShaderSettings::Color, -1 },
-	{ ShaderSettings::Color | ShaderSettings::Phong, 0 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture, 2 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, 3 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, 4 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, 4 },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting, 4 },
+	{ ShaderSettings::Texture, 1 },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap, 2 },
+	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, 2 },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, 3 },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting, 3 },
 };
 
 Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings)
@@ -51,6 +49,9 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 
 	const auto srvDescSize = graphics.GetCbvSrvDescriptorSize();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{};
+
+	roughnessBuffer = std::make_unique<Roughness>();
+	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
 
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
@@ -80,10 +81,7 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
 	}
 
-	roughnessBuffer = std::make_unique<Roughness>();
-	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
-
-	if (!static_cast<bool>(shaderSettings & (ShaderSettings::Texture | ShaderSettings::Skybox)))
+	if (static_cast<bool>(shaderSettings & ShaderSettings::Color))
 	{
 		colorBuffer = std::make_unique<Color>();
 		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Color>>(graphics, *colorBuffer, RPD::Color));

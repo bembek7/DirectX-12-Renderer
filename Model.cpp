@@ -12,15 +12,12 @@
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model::vsPaths =
 {
-	{ ShaderSettings{}, L"SolidVS.cso"},
-	{ ShaderSettings::ShadowMapping, L"SolidVS.cso"},
-	{ ShaderSettings::Skybox, L"SkyboxVS.cso" },
-	{ ShaderSettings::Color, L"NormalVS.cso" },
-	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PhongTexVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMVS.cso" },
+	{ ShaderSettings{}, L"PositionVS.cso"},
+	{ ShaderSettings::Color, L"PosNormalVS.cso" },
+	{ ShaderSettings::Texture, L"PosNormalTexCoordVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"PosNormalTexCoordTanBitanVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PosNormalTexCoordVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PosNormalTexCoordTanBitanVS.cso" },
 };
 
 Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer) :

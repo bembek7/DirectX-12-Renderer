@@ -409,16 +409,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PhongTexVS.hlsl">
+    <FxCompile Include="PosNormalTexCoordVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMVS.hlsl">
+    <FxCompile Include="PosNormalTexCoordTanBitanVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="NormalVS.hlsl">
+    <FxCompile Include="PosNormalVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="SolidVS.hlsl">
+    <FxCompile Include="PositionVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
     <FxCompile Include="DTNMPS.hlsl">
@@ -435,9 +435,6 @@
     </FxCompile>
     <FxCompile Include="DTNMSMATPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyboxVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
     <FxCompile Include="ShadowMapGenerationVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
