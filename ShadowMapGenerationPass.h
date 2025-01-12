@@ -7,7 +7,7 @@ class LightPerspectivePass;
 class ShadowMapGenerationPass : public Pass
 {
 public:
-	ShadowMapGenerationPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection, LightPerspectivePass* const connectedLPpass);
+	//ShadowMapGenerationPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection, LightPerspectivePass* const connectedLPpass);
 
 	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
 

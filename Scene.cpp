@@ -4,7 +4,6 @@
 #include "Graphics.h"
 #include "GPass.h"
 #include "DirectionalLight.h"
-#include "DepthPrePass.h"
 #include "ShadowMapGenerationPass.h"
 
 namespace Dx = DirectX;
@@ -26,7 +25,6 @@ Scene::Scene(Graphics& graphics)
 
 	Dx::XMStoreFloat4x4(&defaultProj, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
 	
-	//passes.push_back(std::make_unique<DepthPrePass>(graphics, mainCamera.get(), defaultProj));
 	passes.push_back(std::make_unique<GPass>(graphics, mainCamera.get(), defaultProj));
 }
 

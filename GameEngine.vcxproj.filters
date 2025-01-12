@@ -210,9 +210,6 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="DepthPrePass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
     <ClCompile Include="ShadowMapGenerationPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
@@ -397,9 +394,6 @@
     </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthPrePass.h">
-      <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="ShadowMapGenerationPass.h">
       <Filter>Header Files\Passes</Filter>

@@ -7,10 +7,13 @@
 #include "RootParametersDescription.h"
 #include <array>
 
+
+
 GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
-	Pass(camera, projection)
+	Pass(camera, projection, PassType::GPass, 
+		{ RPD::CBTypes::Transform, RPD::CBTypes::Roughness, RPD::CBTypes::Color },
+		{ RPD::TextureTypes::Diffuse, RPD::TextureTypes::NormalMap, RPD::TextureTypes::SpecularMap })
 {
-	type = PassType::GPass;
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
@@ -30,16 +33,18 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
-	rootParameters.resize(3);
+	CD3DX12_STATIC_SAMPLER_DESC staticSamplers[1]{};
 
-	for (const auto& cb : RPD::cbConsts)
-	{
-		rootParameters[cb.ParamIndex].InitAsConstants(cb.dataSize / 4, cb.slot, 0, cb.visibility); // binding transform buffer
-	}
-	rootParameters[RPD::ParamsIndexes::Roughness].InitAsConstantBufferView(0u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[RPD::ParamsIndexes::Color].InitAsConstantBufferView(1u, 0u, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootSignatureDesc.Init(3, rootParameters.data(), 0, nullptr, rootSignatureFlags);
+	// Anisotropic sampler
+	staticSamplers[0].Init(1u, D3D12_FILTER_ANISOTROPIC);
+	staticSamplers[0].ShaderRegister = 1u;
+	staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC;
+	staticSamplers[0].MaxAnisotropy = D3D12_REQ_MAXANISOTROPY;
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	
+	const auto& rootParameters = InitRootParameters();
+	rootSignatureDesc.Init((UINT)rootParameters.size(), rootParameters.data(), 1, staticSamplers, rootSignatureFlags);
 
 	rootSignature = std::make_unique<RootSignature>(graphics, rootSignatureDesc);
 

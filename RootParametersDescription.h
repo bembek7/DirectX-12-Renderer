@@ -1,56 +1,54 @@
 #pragma once
 #include "d3d12.h"
-#include <vector>
+#include <unordered_map>
 
 namespace RPD
 {
-	enum ParamsIndexes
+	enum class TextureTypes
 	{
-		Transform = 0u,
-		Roughness = Transform + 1u,
-		Color = Roughness + 1u,
-		DirectionalLight = Color + 1u,
-		PointLight = DirectionalLight + 1u,
-		SpotLight = PointLight + 1u,
-		TexturesDescTable = SpotLight + 1u // last of params
+		Diffuse,
+		NormalMap,
+		SpecularMap,
 	};
 
-	enum TextureSlots
+	enum class CBTypes
 	{
-		Diffuse = 1u,
-		NormalMap = 2u,
-		SpecularMap = 3u,
+		Transform,
+		Roughness,
+		Color,
 	};
 
-	struct CBV
+	namespace
 	{
-		UINT slot;
+		struct EnumClassesHash
+		{
+			template <typename T>
+			std::size_t operator()(T t) const
+			{
+				return static_cast<std::size_t>(t);
+			}
+		};
+	}
+
+	struct CBInfo
+	{
 		D3D12_SHADER_VISIBILITY visibility;
-		ParamsIndexes ParamIndex;
-	};
-
-	struct CBConst
-	{
 		UINT slot;
-		D3D12_SHADER_VISIBILITY visibility;
-		ParamsIndexes ParamIndex;
-		UINT dataSize;
+		UINT size = 0u;
 	};
-
-	static const std::vector<CBConst> cbConsts =
+	
+	static const std::unordered_map<TextureTypes, UINT, EnumClassesHash> texturesSlots =
 	{
-		{0u, D3D12_SHADER_VISIBILITY_VERTEX, Transform, 192u},
+		{TextureTypes::Diffuse, 0u},
+		{TextureTypes::NormalMap, 1u},
+		{TextureTypes::SpecularMap, 2u},
 	};
-	static const std::vector<CBV> cbvs =
+
+	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =
 	{
-		{0u, D3D12_SHADER_VISIBILITY_PIXEL, Roughness},
-		{1u, D3D12_SHADER_VISIBILITY_PIXEL, Color},
-		{2u, D3D12_SHADER_VISIBILITY_PIXEL, DirectionalLight},
-		{3u, D3D12_SHADER_VISIBILITY_PIXEL, PointLight},
-		{4u, D3D12_SHADER_VISIBILITY_PIXEL, SpotLight},
+		{CBTypes::Transform, {D3D12_SHADER_VISIBILITY_VERTEX, 0u, 192u}},
+		{CBTypes::Roughness, {D3D12_SHADER_VISIBILITY_PIXEL, 0u}},
+		{CBTypes::Color, {D3D12_SHADER_VISIBILITY_PIXEL, 1u}},
 	};
 
-	static constexpr UINT paramsNum = TexturesDescTable + 1;
-
-	static constexpr UINT texturesNum = 4u;
 }

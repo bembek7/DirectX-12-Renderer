@@ -69,7 +69,7 @@ Model::VertexLayout Model::GenerateVertexLayout(const aiMesh* const assignedMesh
 		elementOffset[VertexElement::Position] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
-	if (static_cast<bool>(shaderSettings & ShaderSettings::Color))
+	if (shaderSettings != ShaderSettings{})
 	{
 		inputLayout.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Normal] = vertexSize;

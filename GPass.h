@@ -17,7 +17,6 @@ public:
 
 	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
 private:
-	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<RTVHeap> rtvHeap;
 };

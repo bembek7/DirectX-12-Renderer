@@ -3,7 +3,6 @@
 #include <vector>
 #include "Camera.h"
 #include "LightPerspectivePass.h"
-#include "DepthPrePass.h"
 #include "Actor.h"
 
 class Graphics;

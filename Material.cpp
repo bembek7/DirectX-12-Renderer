@@ -16,12 +16,13 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"DTNMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"DTSMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"DTNMSMPS.cso" },
-	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMPS.cso" },
+	//{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
 };
 
 const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureHighestSlotMap =
 {
-	{ ShaderSettings::Color, -1 },
+	{ ShaderSettings::Color, 0 },
 	{ ShaderSettings::Texture, 1 },
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap, 2 },
 	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, 2 },
@@ -32,7 +33,7 @@ const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::text
 Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings)
 {
 	rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
-	const UINT descriptorsNum = textureHighestSlotMap.at(shaderSettings) + 1;
+	const UINT descriptorsNum = textureHighestSlotMap.at(shaderSettings);
 	// descriptor heap for the shader resource view
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuStartHandle{};
 	if (descriptorsNum > 0)
@@ -51,13 +52,13 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{};
 
 	roughnessBuffer = std::make_unique<Roughness>();
-	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, RPD::Roughness));
+	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, 1));
 
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::Diffuse, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 0u, srvDescSize);
 		auto diffTex = std::make_unique<Texture>(graphics, texFileName.C_Str(), srvCpuHandle);
 		if (diffTex->HasAlpha())
 		{
@@ -70,21 +71,22 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::NormalMap, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 1u, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, normalTexFileName.C_Str(), srvCpuHandle));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, RPD::SpecularMap, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 2u, srvDescSize);
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
 	}
 
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Color))
 	{
 		colorBuffer = std::make_unique<Color>();
-		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Color>>(graphics, *colorBuffer, RPD::Color));
+		const auto& colorInfo = RPD::cbsInfo.at(RPD::CBTypes::Color);
+		cBuffers.push_back(std::make_unique<ConstantBufferCBV<Color>>(graphics, *colorBuffer, 2));
 	}
 
 	std::wstring pixelShaderPath;
@@ -113,7 +115,7 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 	if (srvHeap)
 	{
 		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
-		commandList->SetGraphicsRootDescriptorTable(RPD::TexturesDescTable, srvHeap->GetGPUDescriptorHandleForHeapStart());
+		commandList->SetGraphicsRootDescriptorTable(3u, srvHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 }
 

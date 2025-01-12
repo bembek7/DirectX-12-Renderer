@@ -26,10 +26,9 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
 
 	ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
-	shaderSettings = ShaderSettings::Color;
-	lighted = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
 
-	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, RPD::Transform);
+	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
+	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
 
 	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
 
