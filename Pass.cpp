@@ -2,17 +2,13 @@
 #include "Graphics.h"
 #include "Camera.h"
 
-Pass::Pass(const Camera* const camera, DirectX::XMFLOAT4X4 projection, PassType type, 
-	const std::vector<RPD::CBTypes>& constantBuffers, const std::vector<RPD::TextureTypes>& textures) noexcept :
-	cameraUsed(camera), projection(projection), type(type), constantBuffers(constantBuffers), textures(textures)
+Pass::Pass(PassType type, const std::vector<RPD::CBTypes>& constantBuffers, const std::vector<RPD::TextureTypes>& textures) noexcept :
+	type(type), constantBuffers(constantBuffers), textures(textures)
 {
 }
 
-void Pass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
+void Pass::Execute(Graphics& graphics)
 {
-	graphics.SetProjection(projection);
-	graphics.SetCamera(cameraUsed->GetMatrix());
-
 	for (const auto& bindable : bindables)
 	{
 		bindable->Bind(graphics.GetMainCommandList());
@@ -59,7 +55,6 @@ std::vector<CD3DX12_ROOT_PARAMETER> Pass::InitRootParameters() noexcept
 		++index;
 	}
 
-	D3D12_DESCRIPTOR_RANGE{};
 	UINT texIndex = 0;
 	for (const auto& tex : textures)
 	{

@@ -16,15 +16,14 @@ enum class PassType
 	GPass,
 	ShadowMapGeneraration,
 	LightPerspective,
-	DepthPrePass,
+	FinalPass
 };
 
 class Pass
 {
 public:
-	Pass(const Camera* const camera, DirectX::XMFLOAT4X4 projection, PassType type, 
-		const std::vector<RPD::CBTypes>& constantBuffers = {}, const std::vector<RPD::TextureTypes>& textures = {}) noexcept;
-	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
+	Pass(PassType type, const std::vector<RPD::CBTypes>& constantBuffers = {}, const std::vector<RPD::TextureTypes>& textures = {}) noexcept;
+	void Execute(Graphics& graphics);
 	PipelineState::PipelineStateStream GetPSS() const { return pipelineStateStream; };
 	virtual void BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle) {};
 	virtual ID3D12DescriptorHeap* GetDescriptorHeap() noexcept { return srvHeap.Get(); };
@@ -40,8 +39,6 @@ protected:
 	PipelineState::PipelineStateStream pipelineStateStream;
 	std::unique_ptr<RootSignature> rootSignature;
 	PassType type{};
-	DirectX::XMFLOAT4X4 projection{};
-	const Camera* cameraUsed;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 	bool providesShaders = false;
 	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> vsBlob;

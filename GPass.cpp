@@ -10,9 +10,11 @@
 
 
 GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
-	Pass(camera, projection, PassType::GPass, 
+	Pass(PassType::GPass, 
 		{ RPD::CBTypes::Transform, RPD::CBTypes::Roughness, RPD::CBTypes::Color },
-		{ RPD::TextureTypes::Diffuse, RPD::TextureTypes::NormalMap, RPD::TextureTypes::SpecularMap })
+		{ RPD::TextureTypes::Diffuse, RPD::TextureTypes::NormalMap, RPD::TextureTypes::SpecularMap }),
+	cameraUsed(camera),
+	projection(projection)
 {
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
@@ -74,9 +76,11 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 
 void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
 {
-	Pass::Execute(graphics, actors);
+	Pass::Execute(graphics);
+	graphics.SetCamera(cameraUsed->GetMatrix());
+	graphics.SetProjection(projection);
 
-	graphics.ClearRenderTargetView();
+	graphics.ClearRenderTargetView(); // to move
 	auto rtv = rtvHeap->GetCPUHandle();
 	graphics.GetMainCommandList()->OMSetRenderTargets(3, &rtv, TRUE, graphics.GetDSVHandle());
 	for (auto& actor : actors)

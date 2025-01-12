@@ -56,24 +56,24 @@ namespace Dx = DirectX;
 //	pipelineStateStream.rasterizer = rasterizerDesc;
 //	pipelineStateStream.rootSignature = rootSignature->Get();
 //}
-
-void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
-{
-	Pass::Execute(graphics, actors);
-
-	namespace Dx = DirectX;
-	Dx::XMStoreFloat4x4(&lightPerspective, Dx::XMMatrixTranspose(cameraUsed->GetMatrix() * Dx::XMLoadFloat4x4(&projection)));
-
-	depthStencilView->Clear(graphics.GetMainCommandList());
-	
-	auto dsvHandle = depthStencilView->GetDsvHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
-
-	for (auto& actor : actors)
-	{
-		actor->Draw(graphics, GetType());
-	}
-}
+//
+//void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
+//{
+//	Pass::Execute(graphics, actors);
+//
+//	namespace Dx = DirectX;
+//	Dx::XMStoreFloat4x4(&lightPerspective, Dx::XMMatrixTranspose(cameraUsed->GetMatrix() * Dx::XMLoadFloat4x4(&projection)));
+//
+//	depthStencilView->Clear(graphics.GetMainCommandList());
+//	
+//	auto dsvHandle = depthStencilView->GetDsvHandle();
+//	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
+//
+//	for (auto& actor : actors)
+//	{
+//		actor->Draw(graphics, GetType());
+//	}
+//}
 
 ID3D12Resource* LightPerspectivePass::GetDepthBuffer()
 {

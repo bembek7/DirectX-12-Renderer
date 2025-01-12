@@ -98,19 +98,19 @@
 //
 //	lightPerspectiveCB = std::make_unique<ConstantBufferCBV<LightPerspectiveBuffer>>(graphics, lightPerspectiveBuffer, 1u);
 //}
-
-void ShadowMapGenerationPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
-{
-	Pass::Execute(graphics, actors);
-
-	graphics.ClearRenderTargetView();
-	auto rtv = graphics.GetRtvCpuHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, graphics.GetDSVHandle());
-	for (auto& actor : actors)
-	{
-		actor->Draw(graphics, GetType());
-	}
-}
+//
+//void ShadowMapGenerationPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
+//{
+//	Pass::Execute(graphics, actors);
+//
+//	graphics.ClearRenderTargetView();
+//	auto rtv = graphics.GetRtvCpuHandle();
+//	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, graphics.GetDSVHandle());
+//	for (auto& actor : actors)
+//	{
+//		actor->Draw(graphics, GetType());
+//	}
+//}
 
 void ShadowMapGenerationPass::BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle)
 {

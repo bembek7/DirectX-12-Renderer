@@ -7,16 +7,16 @@
 class Graphics;
 class Camera;
 class Actor;
-class Light;
-class DepthCubeTexture;
 
 class GPass : public Pass
 {
 public:
 	GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection);
 
-	virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
+	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<RTVHeap> rtvHeap;
+	DirectX::XMFLOAT4X4 projection{};
+	const Camera* cameraUsed;
 };

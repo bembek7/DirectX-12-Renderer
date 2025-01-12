@@ -2,7 +2,8 @@
 #include <memory>
 #include <vector>
 #include "Camera.h"
-#include "LightPerspectivePass.h"
+#include "GPass.h"
+#include "FinalPass.h"
 #include "Actor.h"
 
 class Graphics;
@@ -22,11 +23,10 @@ private:
 	void RenderControls(Graphics& graphics);
 
 private:
-	std::vector<std::unique_ptr<Pass>> passes;
-	std::vector<LightPerspectivePass*> lpPasses;
+	std::unique_ptr<GPass> gPass;
+	std::unique_ptr<FinalPass> finalPass;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<Light*> lights;
-	DirectionalLight* directionalLight = nullptr;
 	std::unique_ptr<Camera> mainCamera;
 	DirectX::XMFLOAT4X4 defaultProj;
 };
