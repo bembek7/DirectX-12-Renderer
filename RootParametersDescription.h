@@ -18,6 +18,11 @@ namespace RPD
 		Color,
 	};
 
+	enum class SamplerTypes
+	{
+		Anisotropic,
+	};
+
 	namespace
 	{
 		struct EnumClassesHash
@@ -36,6 +41,14 @@ namespace RPD
 		UINT slot;
 		UINT size = 0u;
 	};
+
+	struct SamplerInfo
+	{
+		D3D12_SHADER_VISIBILITY visibility;
+		UINT slot;
+		D3D12_FILTER filter;
+		UINT maxAnisotropy;
+	};
 	
 	static const std::unordered_map<TextureTypes, UINT, EnumClassesHash> texturesSlots =
 	{
@@ -51,4 +64,8 @@ namespace RPD
 		{CBTypes::Color, {D3D12_SHADER_VISIBILITY_PIXEL, 1u}},
 	};
 
+	static const std::unordered_map<SamplerTypes, SamplerInfo, EnumClassesHash> samplersInfo =
+	{
+		{SamplerTypes::Anisotropic, {D3D12_SHADER_VISIBILITY_PIXEL, 1u, D3D12_FILTER_ANISOTROPIC, D3D12_REQ_MAXANISOTROPY}},
+	};
 }

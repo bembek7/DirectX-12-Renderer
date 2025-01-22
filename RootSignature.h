@@ -1,5 +1,6 @@
 #pragma once
 #include "Bindable.h"
+#include "RootParametersDescription.h"
 #include <wrl/client.h>
 
 class Graphics;
@@ -7,10 +8,10 @@ class Graphics;
 class RootSignature : public Bindable
 {
 public:
-	RootSignature(Graphics& graphics, const std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters);
-	RootSignature(Graphics& graphics, const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc);
+	RootSignature(Graphics& graphics, const std::vector<RPD::CBTypes>& constantBuffers, const std::vector<RPD::TextureTypes>& textures, const std::vector<RPD::SamplerTypes>& samplers);
 	ID3D12RootSignature* Get() noexcept;
 	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override;
 private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+	std::vector<D3D12_DESCRIPTOR_RANGE> texesDescRanges;
 };

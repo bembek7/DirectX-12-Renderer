@@ -1,10 +1,19 @@
 #include "Pass.h"
 #include "Graphics.h"
 #include "Camera.h"
+#include "ScissorRectangle.h"
+#include "Viewport.h"
 
-Pass::Pass(PassType type, const std::vector<RPD::CBTypes>& constantBuffers, const std::vector<RPD::TextureTypes>& textures) noexcept :
-	type(type), constantBuffers(constantBuffers), textures(textures)
+
+Pass::Pass(Graphics& graphics, PassType type, const std::vector<RPD::CBTypes>& constantBuffers, const std::vector<RPD::TextureTypes>& textures, const std::vector<RPD::SamplerTypes>& samplers) :
+	type(type)
 {
+	rootSignature = std::make_unique<RootSignature>(graphics, constantBuffers, textures, samplers);
+
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+	bindables.push_back(std::make_unique<ScissorRectangle>());
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 }
 
 void Pass::Execute(Graphics& graphics)
@@ -27,42 +36,4 @@ PassType Pass::GetType() const noexcept
 RootSignature* Pass::GetRootSignature() noexcept
 {
 	return rootSignature.get();
-}
-
-std::vector<CD3DX12_ROOT_PARAMETER> Pass::InitRootParameters() noexcept
-{
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
-	auto rpSize = constantBuffers.size();
-	if (textures.size() > 0)
-	{
-		++rpSize;
-	}
-	rootParameters.resize(rpSize);
-
-	size_t index = 0;
-	for (const auto& cb : constantBuffers)
-	{
-		const auto& cbInfo = RPD::cbsInfo.at(cb);
-		if (cbInfo.size > 0) // assuming every cb that is supposed to be constant has size provided
-		{
-			rootParameters[index].InitAsConstants(cbInfo.size / 4, cbInfo.slot, 0u, cbInfo.visibility);
-		}
-		else
-		{
-			rootParameters[index].InitAsConstantBufferView(cbInfo.slot, 0u, cbInfo.visibility);
-		}
-
-		++index;
-	}
-
-	UINT texIndex = 0;
-	for (const auto& tex : textures)
-	{
-		texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, RPD::texturesSlots.at(tex), 0u, texIndex });
-
-		++texIndex;
-	}
-	rootParameters[index].InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
-
-	return rootParameters;
 }

@@ -10,45 +10,18 @@
 
 
 GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
-	Pass(PassType::GPass, 
+	Pass(graphics, PassType::GPass, 
 		{ RPD::CBTypes::Transform, RPD::CBTypes::Roughness, RPD::CBTypes::Color },
-		{ RPD::TextureTypes::Diffuse, RPD::TextureTypes::NormalMap, RPD::TextureTypes::SpecularMap }),
+		{ RPD::TextureTypes::Diffuse, RPD::TextureTypes::NormalMap, RPD::TextureTypes::SpecularMap },
+		{ RPD::SamplerTypes::Anisotropic }),
 	cameraUsed(camera),
 	projection(projection)
 {
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
-	bindables.push_back(std::make_unique<ScissorRectangle>());
-	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
-
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
 	graphics.SetDSVHandle(depthStencilView->GetDsvHandle());
-
-	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-
-	CD3DX12_STATIC_SAMPLER_DESC staticSamplers[1]{};
-
-	// Anisotropic sampler
-	staticSamplers[0].Init(1u, D3D12_FILTER_ANISOTROPIC);
-	staticSamplers[0].ShaderRegister = 1u;
-	staticSamplers[0].Filter = D3D12_FILTER_ANISOTROPIC;
-	staticSamplers[0].MaxAnisotropy = D3D12_REQ_MAXANISOTROPY;
-	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-	
-	const auto& rootParameters = InitRootParameters();
-	rootSignatureDesc.Init((UINT)rootParameters.size(), rootParameters.data(), 1, staticSamplers, rootSignatureFlags);
-
-	rootSignature = std::make_unique<RootSignature>(graphics, rootSignatureDesc);
 
 	constexpr auto rtvsNum = 3;
 
