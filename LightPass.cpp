@@ -2,10 +2,10 @@
 #include "ShadersPool.h"
 #include "RTVHeap.h"
 
-LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, Light* const light) :
+LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light) :
 	Pass(graphics, PassType::FinalPass,
 		{ RPD::CBTypes::LightProperties },
-		{ RPD::TextureTypes::SceneNormal_Roughness, RPD::TextureTypes::SceneSpecularColor },
+		{ RPD::TextureTypes::SceneNormal_Roughness, RPD::TextureTypes::SceneSpecularColor, RPD::TextureTypes::SceneViewPosition},
 		{ RPD::SamplerTypes::Anisotropic }),
 	light(light)
 {
@@ -56,7 +56,7 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 
 	const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 2,
+			.NumDescriptors = 3,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 	};
 	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
@@ -81,6 +81,16 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 	};
 	graphics.GetDevice()->CreateShaderResourceView(sceneSpecularColor, &specularColorSrvDesc, srvCpuHandle);
 
+	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
+
+	const D3D12_SHADER_RESOURCE_VIEW_DESC viewPositionSrvDesc = {
+		.Format = DXGI_FORMAT_R11G11B10_FLOAT, // TODO change to getter
+		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+		.Texture2D{.MipLevels = sceneViewPosition->GetDesc().MipLevels },
+	};
+	graphics.GetDevice()->CreateShaderResourceView(sceneViewPosition, &viewPositionSrvDesc, srvCpuHandle);
+
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());
 
@@ -101,4 +111,9 @@ void LightPass::Execute(Graphics& graphics)
 	graphics.ExecuteBundle(drawingBundle.Get());
 	light->Bind(graphics.GetMainCommandList());
 	graphics.GetMainCommandList()->DrawIndexedInstanced(indexBuffer->GetIndicesNumber(), 1, 0, 0, 0);
+}
+
+ID3D12Resource* LightPass::GetLightMap() noexcept
+{
+	return nullptr;
 }

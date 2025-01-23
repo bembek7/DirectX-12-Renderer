@@ -55,13 +55,15 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 	};
 	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
 
+	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{ srvHeap->GetCPUDescriptorHandleForHeapStart() };
+
 	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
 		.Format = DXGI_FORMAT_R11G11B10_FLOAT, // TODO change to getter
 		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D, 
 		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 		.Texture2D{.MipLevels = sceneColorTexture->GetDesc().MipLevels },
 	};
-	graphics.GetDevice()->CreateShaderResourceView(sceneColorTexture, &srvDesc, srvHeap->GetCPUDescriptorHandleForHeapStart());
+	graphics.GetDevice()->CreateShaderResourceView(sceneColorTexture, &srvDesc, srvCpuHandle);
 	
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());

@@ -3,11 +3,11 @@
 #include "TextureSampler.hlsli"
 #include "SceneNormal_Roughness.hlsli"
 #include "SceneSpecularColor.hlsli"
+#include "SceneViewPosition.hlsli"
 
 float3 main(float2 texCoord : TEX_COORD) : SV_TARGET
 {
-	// resolve viewPosition
-    const float3 viewPosition = float3(0.f, 0.f, 0.f);
+    const float3 viewPosition = sceneViewPositionTex.Sample(texSampler, texCoord).rgb;
     
     const float4 normal_roughness = sceneNormal_RoughnessTex.Sample(texSampler, texCoord);
     const float3 viewNormal = normal_roughness.rgb;

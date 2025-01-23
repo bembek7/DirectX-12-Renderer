@@ -525,5 +525,11 @@
     <None Include="SceneSpecularColor.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
+    <None Include="SceneViewPosition.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
   </ItemGroup>
 </Project>

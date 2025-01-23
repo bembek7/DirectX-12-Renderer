@@ -5,12 +5,12 @@
 #include "NormalMap.hlsli"
 #include "SpecularMap.hlsli"
 
-GPassPSOut main(float3 viewPos : VIEW_POS, float3 viewNormal : NORMAL, float2 texCoord : TEX_COORD, float3 tangent : TANGENT, float3 bitangent : BITANGENT)
+GPassPSOut main(float3 viewNormal : NORMAL, float2 texCoord : TEX_COORD, float3 tangent : TANGENT, float3 bitangent : BITANGENT, float3 viewPosition : VIEW_POSITION)
 {
     const float4 diffCol = diffTex.Sample(texSampler, texCoord);
     clip(diffCol.a < 0.05f ? -1 : 1);
     
-    if (dot(viewNormal, viewPos) >= 0.0f)
+    if (dot(viewNormal, viewPosition) >= 0.0f)
     {
         viewNormal = -viewNormal;
         tangent = -tangent;
@@ -19,5 +19,5 @@ GPassPSOut main(float3 viewPos : VIEW_POS, float3 viewNormal : NORMAL, float2 te
     
     const float3 realViewNormal = CalculateViewNormal(viewNormal, tangent, bitangent, nMap.Sample(texSampler, texCoord).xyz);
     
-    return ConstructGPassPSOut(diffCol.rgb, realViewNormal, RoughnessCB.roughness, specularMap.Sample(texSampler, texCoord).rgb);
+    return ConstructGPassPSOut(diffCol.rgb, realViewNormal, RoughnessCB.roughness, viewPosition, specularMap.Sample(texSampler, texCoord).rgb);
 }

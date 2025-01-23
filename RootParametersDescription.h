@@ -12,6 +12,7 @@ namespace RPD
 		SceneColor,
 		SceneNormal_Roughness,
 		SceneSpecularColor,
+		SceneViewPosition,
 	};
 
 	enum class CBTypes
@@ -65,6 +66,7 @@ namespace RPD
 		// LightPass
 		{TextureTypes::SceneNormal_Roughness, 0u},
 		{TextureTypes::SceneSpecularColor, 1u},
+		{TextureTypes::SceneViewPosition, 2u},
 	};
 
 	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =

@@ -23,7 +23,7 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 
 	pipelineStateStream.renderTargetFormats =
 	{
-		.RTFormats{ DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT },
+		.RTFormats{ DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT },
 		.NumRenderTargets = rtvsNum,
 	};
 	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
@@ -35,10 +35,11 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 	{
 		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R11G11B10_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D },
 		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R16G16B16A16_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D },
+		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R11G11B10_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D },
 		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R11G11B10_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D }
 	};
 
-	rtvHeap = std::make_unique<RTVHeap>(graphics, 3, rtvDescs.data());
+	rtvHeap = std::make_unique<RTVHeap>(graphics, rtvsNum, rtvDescs.data());
 }
 
 void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
@@ -57,7 +58,7 @@ void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>
 		graphics.GetMainCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	}
 	
-	graphics.GetMainCommandList()->OMSetRenderTargets(3, &rtv, TRUE, graphics.GetDSVHandle());
+	graphics.GetMainCommandList()->OMSetRenderTargets(rtvsNum, &rtv, TRUE, graphics.GetDSVHandle());
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());
@@ -77,4 +78,9 @@ ID3D12Resource* GPass::GetNormal_RoughnessTexture() noexcept
 ID3D12Resource* GPass::GetSpecularColorTexture() noexcept
 {
 	return rtvHeap->GetRenderTarget(2);
+}
+
+ID3D12Resource* GPass::GetViewPositionTexture() noexcept
+{
+	return rtvHeap->GetRenderTarget(3);
 }

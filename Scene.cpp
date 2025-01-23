@@ -40,7 +40,7 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 
 void Scene::AddPointLight(Graphics& graphics, std::unique_ptr<PointLight> lightToAdd)
 {
-	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(), lightToAdd.get());
+	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(), gPass->GetViewPositionTexture(), lightToAdd.get());
 	lightPasses.push_back(std::move(lightPass));
 	actors.push_back(std::move(lightToAdd));
 }

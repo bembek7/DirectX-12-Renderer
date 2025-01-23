@@ -443,6 +443,7 @@
     <None Include="DiffTex.hlsli" />
     <None Include="DirectionalLightPropertiesCB.hlsli" />
     <None Include="GPassOut.hlsli" />
+    <None Include="LightMap.hlsli" />
     <None Include="MainDepthBuffer.hlsli" />
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
@@ -451,6 +452,7 @@
     <None Include="SceneColor.hlsli" />
     <None Include="SceneNormal_Roughness.hlsli" />
     <None Include="SceneSpecularColor.hlsli" />
+    <None Include="SceneViewPosition.hlsli" />
     <None Include="Shadow.hlsli" />
     <None Include="LightPerspectiveCB.hlsli" />
     <None Include="SpecularMap.hlsli" />

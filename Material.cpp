@@ -16,8 +16,7 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"DTNMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"DTSMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"DTNMSMPS.cso" },
-	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMPS.cso" },
-	//{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
 };
 
 const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureHighestSlotMap =

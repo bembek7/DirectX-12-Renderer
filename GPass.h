@@ -18,10 +18,11 @@ public:
 	ID3D12Resource* GetColorTexture() noexcept;
 	ID3D12Resource* GetNormal_RoughnessTexture() noexcept;
 	ID3D12Resource* GetSpecularColorTexture() noexcept;
+	ID3D12Resource* GetViewPositionTexture() noexcept;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<RTVHeap> rtvHeap;
 	DirectX::XMFLOAT4X4 projection{};
 	const Camera* cameraUsed;
-	static constexpr UINT rtvsNum = 3;
+	static constexpr UINT rtvsNum = 4;
 };

@@ -1,8 +1,20 @@
 #include "TransformCB.hlsli"
 
-float4 main( float3 pos : POSITION ) : SV_POSITION
+struct VSOut
 {
-    const matrix modelViewProj = mul(mul(TransformCB.model, TransformCB.view), TransformCB.proj);
+    float3 viewPosition : VIEW_POSITION;
+    float4 pos : SV_POSITION;
+};
 
-    return mul(float4(pos, 1.0f), modelViewProj);
+VSOut main(float3 pos : POSITION)
+{
+    VSOut vsOut;
+    
+    const matrix modelView = mul(TransformCB.model, TransformCB.view);
+    const matrix modelViewProj = mul(modelView, TransformCB.proj);
+
+    vsOut.viewPosition = mul(float4(pos, 1.0f), modelView).xyz;
+    vsOut.pos = mul(float4(pos, 1.0f), modelViewProj);
+    
+    return vsOut;
 }

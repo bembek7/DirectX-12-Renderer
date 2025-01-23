@@ -1,0 +1,1 @@
+Texture2D sceneViewPositionTex : register(t2);

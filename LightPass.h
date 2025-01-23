@@ -8,9 +8,11 @@
 class LightPass : public Pass
 {
 public:
-	LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, Light* const light);
+	LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light);
 
 	void Execute(Graphics& graphics);
+
+	ID3D12Resource* GetLightMap() noexcept;
 private:
 	Light* light;
 	std::unique_ptr<PipelineState> pipelineState;
