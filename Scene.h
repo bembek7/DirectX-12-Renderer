@@ -5,6 +5,7 @@
 #include "GPass.h"
 #include "FinalPass.h"
 #include "Actor.h"
+#include "LightPass.h"
 
 class Graphics;
 class Light;
@@ -15,7 +16,7 @@ public:
 	Scene(Graphics& graphics);
 
 	void AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd);
-	void AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd);
+	void AddPointLight(Graphics& graphics, std::unique_ptr<PointLight> lightToAdd);
 	void Draw(Graphics& graphics);
 	void PrepareActorsForPasses(Graphics& graphics);
 	Camera* GetMainCamera();
@@ -26,7 +27,7 @@ private:
 	std::unique_ptr<GPass> gPass;
 	std::unique_ptr<FinalPass> finalPass;
 	std::vector<std::unique_ptr<Actor>> actors;
-	std::vector<Light*> lights;
+	std::vector<std::unique_ptr<LightPass>> lightPasses;
 	std::unique_ptr<Camera> mainCamera;
 	DirectX::XMFLOAT4X4 defaultProj;
 };

@@ -219,6 +219,9 @@
     <ClCompile Include="FinalPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
+    <ClCompile Include="LightPass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h">
@@ -407,6 +410,9 @@
     <ClInclude Include="FinalPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="LightPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PosNormalTexCoordVS.hlsl">
@@ -451,6 +457,15 @@
     <FxCompile Include="FinalPassPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="PointLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SpotLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shadow.hlsli">
@@ -493,6 +508,21 @@
       <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
     </None>
     <None Include="SceneColor.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="PointLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SpotLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="DirectionalLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SceneNormal_Roughness.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="SceneSpecularColor.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
   </ItemGroup>

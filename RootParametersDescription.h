@@ -10,6 +10,8 @@ namespace RPD
 		NormalMap,
 		SpecularMap,
 		SceneColor,
+		SceneNormal_Roughness,
+		SceneSpecularColor,
 	};
 
 	enum class CBTypes
@@ -17,6 +19,7 @@ namespace RPD
 		Transform,
 		Roughness,
 		Color,
+		LightProperties,
 	};
 
 	enum class SamplerTypes
@@ -59,13 +62,19 @@ namespace RPD
 		{TextureTypes::SpecularMap, 2u},
 		// FinalPass
 		{TextureTypes::SceneColor, 0u},
+		// LightPass
+		{TextureTypes::SceneNormal_Roughness, 0u},
+		{TextureTypes::SceneSpecularColor, 1u},
 	};
 
 	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =
 	{
+		// GPass
 		{CBTypes::Transform, {D3D12_SHADER_VISIBILITY_VERTEX, 0u, 192u}},
 		{CBTypes::Roughness, {D3D12_SHADER_VISIBILITY_PIXEL, 0u}},
 		{CBTypes::Color, {D3D12_SHADER_VISIBILITY_PIXEL, 1u}},
+		// LightPass
+		{CBTypes::LightProperties, {D3D12_SHADER_VISIBILITY_PIXEL, 0u}},
 	};
 
 	static const std::unordered_map<SamplerTypes, SamplerInfo, EnumClassesHash> samplersInfo =

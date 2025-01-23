@@ -1,0 +1,1 @@
+Texture2D sceneSpecularColorTex : register(t1);

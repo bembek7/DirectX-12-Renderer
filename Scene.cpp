@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "Light.h"
+#include "PointLight.h"
 #include <stdexcept>
 #include "Graphics.h"
 #include "GPass.h"
@@ -38,9 +38,10 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 	actors.push_back(std::move(actorToAdd));
 }
 
-void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
+void Scene::AddPointLight(Graphics& graphics, std::unique_ptr<PointLight> lightToAdd)
 {
-	lights.push_back(lightToAdd.get());
+	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(), lightToAdd.get());
+	lightPasses.push_back(std::move(lightPass));
 	actors.push_back(std::move(lightToAdd));
 }
 
@@ -52,6 +53,10 @@ void Scene::Draw(Graphics& graphics)
 	}
 
 	gPass->Execute(graphics, actors);
+	for(auto& lightPass : lightPasses)
+	{
+		lightPass->Execute(graphics);
+	}
 	finalPass->Execute(graphics);
 
 	RenderControls(graphics);

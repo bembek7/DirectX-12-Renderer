@@ -68,3 +68,13 @@ ID3D12Resource* GPass::GetColorTexture() noexcept
 {
 	return rtvHeap->GetRenderTarget(0);
 }
+
+ID3D12Resource* GPass::GetNormal_RoughnessTexture() noexcept
+{
+	return rtvHeap->GetRenderTarget(1);
+}
+
+ID3D12Resource* GPass::GetSpecularColorTexture() noexcept
+{
+	return rtvHeap->GetRenderTarget(2);
+}

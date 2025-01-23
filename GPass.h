@@ -16,6 +16,8 @@ public:
 	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
 
 	ID3D12Resource* GetColorTexture() noexcept;
+	ID3D12Resource* GetNormal_RoughnessTexture() noexcept;
+	ID3D12Resource* GetSpecularColorTexture() noexcept;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<RTVHeap> rtvHeap;

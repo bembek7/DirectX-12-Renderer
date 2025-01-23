@@ -201,6 +201,7 @@
     <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LightPass.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshActor.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LightPass.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MeshActor.h" />
     <ClInclude Include="MeshComponent.h" />
@@ -292,6 +294,12 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="DirectionalLightPassPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="FinalPassPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -303,6 +311,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="PointLightPassPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="PosNormalVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -416,20 +430,31 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(WorkDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+    <FxCompile Include="SpotLightPassPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ColorCB.hlsli" />
     <None Include="ComparisonSampler.hlsli" />
     <None Include="DiffTex.hlsli" />
+    <None Include="DirectionalLightPropertiesCB.hlsli" />
     <None Include="GPassOut.hlsli" />
     <None Include="MainDepthBuffer.hlsli" />
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
+    <None Include="PointLightPropertiesCB.hlsli" />
     <None Include="RoughnessCB.hlsli" />
     <None Include="SceneColor.hlsli" />
+    <None Include="SceneNormal_Roughness.hlsli" />
+    <None Include="SceneSpecularColor.hlsli" />
     <None Include="Shadow.hlsli" />
     <None Include="LightPerspectiveCB.hlsli" />
     <None Include="SpecularMap.hlsli" />
+    <None Include="SpotLightPropertiesCB.hlsli" />
     <None Include="TextureSampler.hlsli" />
     <None Include="TransformCB.hlsli" />
   </ItemGroup>
