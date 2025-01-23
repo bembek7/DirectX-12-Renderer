@@ -445,6 +445,12 @@
     <FxCompile Include="ColorPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
+    <FxCompile Include="PixelOnlyVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="FinalPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shadow.hlsli">
@@ -485,6 +491,9 @@
     </None>
     <None Include="LightPerspectiveCB.hlsli">
       <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SceneColor.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
   </ItemGroup>
 </Project>

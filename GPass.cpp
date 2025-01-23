@@ -7,8 +7,6 @@
 #include "RootParametersDescription.h"
 #include <array>
 
-
-
 GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
 	Pass(graphics, PassType::GPass, 
 		{ RPD::CBTypes::Transform, RPD::CBTypes::Roughness, RPD::CBTypes::Color },
@@ -23,9 +21,6 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
 	graphics.SetDSVHandle(depthStencilView->GetDsvHandle());
 
-	constexpr auto rtvsNum = 3;
-
-	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateStream.renderTargetFormats =
 	{
 		.RTFormats{ DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT },
@@ -35,7 +30,6 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
 	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
 	pipelineStateStream.depthStencil = dsDesc;
-	pipelineStateStream.rootSignature = rootSignature->Get();
 
 	std::array<D3D12_RENDER_TARGET_VIEW_DESC, rtvsNum> rtvDescs =
 	{
@@ -53,11 +47,24 @@ void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>
 	graphics.SetCamera(cameraUsed->GetMatrix());
 	graphics.SetProjection(projection);
 
-	graphics.ClearRenderTargetView(); // to move
+	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto rtv = rtvHeap->GetCPUHandle();
+	
+	for (UINT i = 0; i < rtvsNum; ++i)
+	{
+		auto rtvHandle = rtvHeap->GetCPUHandle(i);
+		const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		graphics.GetMainCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	}
+	
 	graphics.GetMainCommandList()->OMSetRenderTargets(3, &rtv, TRUE, graphics.GetDSVHandle());
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());
 	}
+}
+
+ID3D12Resource* GPass::GetColorTexture() noexcept
+{
+	return rtvHeap->GetRenderTarget(0);
 }

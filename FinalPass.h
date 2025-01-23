@@ -1,5 +1,7 @@
 #pragma once
 #include "Pass.h"
+#include "IndexBuffer.h"
+#include "VertexBuffer.h"
 
 class Graphics;
 class Actor;
@@ -8,10 +10,14 @@ class Actor;
 class FinalPass : public Pass
 {
 public:
-	FinalPass(Graphics& graphics);
+	FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture);
 
 	void Execute(Graphics& graphics);
 private:
-
+	std::unique_ptr<PipelineState> pipelineState;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
+	std::unique_ptr<IndexBuffer> indexBuffer;
+	std::unique_ptr<VertexBuffer> vertexBuffer;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
 };
 

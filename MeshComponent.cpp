@@ -99,17 +99,11 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 	}
 	
 	pss.inputLayout = model->GetInputLayout();
-	if (!pass->ProvidesShaders())
-	{
-		pss.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
-	}
+	pss.vertexShader = CD3DX12_SHADER_BYTECODE(model->GetVSBlob());
 	
 	if (material)
 	{
-		if (!pass->ProvidesShaders())
-		{
-			pss.pixelShader = CD3DX12_SHADER_BYTECODE(material->GetPSBlob());
-		}
+		pss.pixelShader = CD3DX12_SHADER_BYTECODE(material->GetPSBlob());
 		pss.rasterizer = material->GetRasterizerDesc();
 	}
 
@@ -130,11 +124,6 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 		material->Bind(graphics, drawingBundle.Get());
 
 		descriptorHeap = material->GetDescriptorHeap();
-	}
-
-	if (!descriptorHeap)
-	{
-		descriptorHeap = pass->GetDescriptorHeap();
 	}
 
 	pass->BindPassSpecificRootParams(drawingBundle.Get());

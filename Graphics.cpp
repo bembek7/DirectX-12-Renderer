@@ -262,10 +262,8 @@ void Graphics::ClearRenderTargetView()
 	// transition buffer resource to render target state
 	const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(renderTargets[curBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandList->ResourceBarrier(1, &barrier);
-	// calculate clear color
-	const FLOAT clearColor[] = { 0.13f, 0.05f, 0.05f, 1.0f };
 	// clear rtv
-	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	commandList->ClearRenderTargetView(rtv, Graphics::clearColor4.data(), 0, nullptr);
 }
 
 CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetRtvCpuHandle() const noexcept

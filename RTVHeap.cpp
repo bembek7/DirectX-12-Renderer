@@ -51,3 +51,8 @@ CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHeap::GetCPUHandle(const INT bufferIndex) noexc
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE { rtvHeap->GetCPUDescriptorHandleForHeapStart(), bufferIndex, rtvDescriptorSize };
 }
+
+ID3D12Resource* RTVHeap::GetRenderTarget(const UINT rtIndex) noexcept
+{
+	return renderTargets[rtIndex].Get();
+}

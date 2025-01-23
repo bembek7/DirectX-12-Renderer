@@ -66,19 +66,16 @@ CD3DX12_CPU_DESCRIPTOR_HANDLE DepthStencilView::GetDsvHandle() const noexcept
 
 void DepthStencilView::Clear(ID3D12GraphicsCommandList* const commandList)
 {
-	UINT clearFlags = 0;
+	D3D12_CLEAR_FLAGS clearFlags = D3D12_CLEAR_FLAG_DEPTH;
 	switch (usage)
 	{
 	case Usage::DepthStencil:
-		clearFlags = D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL;
-		break;
-	case Usage::Depth:
-		clearFlags = D3D12_CLEAR_FLAG_DEPTH;
+		clearFlags |= D3D12_CLEAR_FLAG_STENCIL;
 		break;
 	default:
 		break;
 	}
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, clearValue, 0, 0, nullptr);
+	commandList->ClearDepthStencilView(dsvHandle, clearFlags, clearValue, 0, 0, nullptr);
 }
 
 ID3D12Resource* DepthStencilView::GetBuffer() noexcept

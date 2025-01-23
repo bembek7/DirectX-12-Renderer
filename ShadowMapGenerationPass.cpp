@@ -118,6 +118,6 @@ void ShadowMapGenerationPass::BindPassSpecificRootParams(ID3D12GraphicsCommandLi
 	lightPerspectiveCB->Update();
 	lightPerspectiveCB->Bind(drawingBundle);
 
-	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
-	drawingBundle->SetGraphicsRootDescriptorTable(2, srvHeap->GetGPUDescriptorHandleForHeapStart());
+	//drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+	//drawingBundle->SetGraphicsRootDescriptorTable(2, srvHeap->GetGPUDescriptorHandleForHeapStart());
 }

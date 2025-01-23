@@ -9,6 +9,7 @@ namespace RPD
 		Diffuse,
 		NormalMap,
 		SpecularMap,
+		SceneColor,
 	};
 
 	enum class CBTypes
@@ -52,9 +53,12 @@ namespace RPD
 	
 	static const std::unordered_map<TextureTypes, UINT, EnumClassesHash> texturesSlots =
 	{
+		// GPass
 		{TextureTypes::Diffuse, 0u},
 		{TextureTypes::NormalMap, 1u},
 		{TextureTypes::SpecularMap, 2u},
+		// FinalPass
+		{TextureTypes::SceneColor, 0u},
 	};
 
 	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =

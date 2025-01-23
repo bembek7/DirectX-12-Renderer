@@ -115,6 +115,7 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 	if (srvHeap)
 	{
 		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+		// TODO get rid of magic number
 		commandList->SetGraphicsRootDescriptorTable(3u, srvHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 }

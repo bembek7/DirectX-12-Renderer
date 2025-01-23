@@ -62,6 +62,8 @@ private:
 
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	static constexpr std::array<FLOAT, 4> clearColor4 = { 0.13f, 0.05f, 0.05f, 1.0f };
+	static constexpr std::array<FLOAT, 3> clearColor3 = { 0.13f, 0.05f, 0.05f };
 
 private:
 	float windowWidth;

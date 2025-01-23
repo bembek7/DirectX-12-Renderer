@@ -26,6 +26,7 @@ Scene::Scene(Graphics& graphics)
 	Dx::XMStoreFloat4x4(&defaultProj, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
 	
 	gPass = std::make_unique<GPass>(graphics, mainCamera.get(), defaultProj);
+	finalPass = std::make_unique<FinalPass>(graphics, gPass->GetColorTexture());
 }
 
 void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
@@ -51,13 +52,13 @@ void Scene::Draw(Graphics& graphics)
 	}
 
 	gPass->Execute(graphics, actors);
+	finalPass->Execute(graphics);
 
 	RenderControls(graphics);
 }
 
 void Scene::PrepareActorsForPasses(Graphics& graphics)
 {
-
 	for (const auto& actor : actors)
 	{
 		actor->PrepareForPass(graphics, gPass.get());

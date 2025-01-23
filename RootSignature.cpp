@@ -19,45 +19,55 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<RPD::CBTypes>
 	rootParameters.resize(rpSize);
 
 	size_t index = 0;
-	for (const auto& cb : constantBuffers)
+	if (constantBuffers.size() > 0)
 	{
-		const auto& cbInfo = RPD::cbsInfo.at(cb);
-		if (cbInfo.size > 0) // assuming every cb that is supposed to be constant has size provided
+		for (const auto& cb : constantBuffers)
 		{
-			rootParameters[index].InitAsConstants(cbInfo.size / 4, cbInfo.slot, 0u, cbInfo.visibility);
-		}
-		else
-		{
-			rootParameters[index].InitAsConstantBufferView(cbInfo.slot, 0u, cbInfo.visibility);
-		}
+			const auto& cbInfo = RPD::cbsInfo.at(cb);
+			if (cbInfo.size > 0) // assuming every cb that is supposed to be constant has size provided
+			{
+				rootParameters[index].InitAsConstants(cbInfo.size / 4, cbInfo.slot, 0u, cbInfo.visibility);
+			}
+			else
+			{
+				rootParameters[index].InitAsConstantBufferView(cbInfo.slot, 0u, cbInfo.visibility);
+			}
 
-		++index;
+			++index;
+		}
 	}
-
-	UINT texIndex = 0;
-	for (const auto& tex : textures)
+	
+	if (textures.size() > 0)
 	{
-		texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, RPD::texturesSlots.at(tex), 0u, texIndex });
+		UINT texIndex = 0;
+		for (const auto& tex : textures)
+		{
+			texesDescRanges.push_back(D3D12_DESCRIPTOR_RANGE{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1u, RPD::texturesSlots.at(tex), 0u, texIndex });
 
-		++texIndex;
+			++texIndex;
+		}
+		rootParameters[index].InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
+		descriptorTableIndex = (UINT)index;
 	}
-	rootParameters[index].InitAsDescriptorTable((UINT)texesDescRanges.size(), texesDescRanges.data(), D3D12_SHADER_VISIBILITY_PIXEL);
 
 	const UINT samplersNum = (UINT)samplers.size();
-
 	std::vector<CD3DX12_STATIC_SAMPLER_DESC> staticSamplers;
-	staticSamplers.resize(samplersNum);
-
-	size_t samplerIndex = 0;
-	for (const auto& sampler : samplers)
+	if (samplersNum > 0)
 	{
-		const auto& samplerInfo = RPD::samplersInfo.at(sampler);
+		staticSamplers.resize(samplersNum);
 
-		staticSamplers[samplerIndex].Init(samplerInfo.slot, samplerInfo.filter);
-		staticSamplers[samplerIndex].ShaderVisibility = samplerInfo.visibility;
-		staticSamplers[samplerIndex].MaxAnisotropy = samplerInfo.maxAnisotropy;
-		++samplerIndex;
+		size_t samplerIndex = 0;
+		for (const auto& sampler : samplers)
+		{
+			const auto& samplerInfo = RPD::samplersInfo.at(sampler);
+
+			staticSamplers[samplerIndex].Init(samplerInfo.slot, samplerInfo.filter);
+			staticSamplers[samplerIndex].ShaderVisibility = samplerInfo.visibility;
+			staticSamplers[samplerIndex].MaxAnisotropy = samplerInfo.maxAnisotropy;
+			++samplerIndex;
+		}
 	}
+
 
 	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -98,4 +108,9 @@ ID3D12RootSignature* RootSignature::Get() noexcept
 void RootSignature::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
+}
+
+UINT RootSignature::GetDescriptorTableIndex() const noexcept
+{
+	return descriptorTableIndex;
 }
