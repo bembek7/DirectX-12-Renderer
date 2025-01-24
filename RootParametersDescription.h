@@ -13,6 +13,7 @@ namespace RPD
 		SceneNormal_Roughness,
 		SceneSpecularColor,
 		SceneViewPosition,
+		LightMap
 	};
 
 	enum class CBTypes
@@ -63,6 +64,7 @@ namespace RPD
 		{TextureTypes::SpecularMap, 2u},
 		// FinalPass
 		{TextureTypes::SceneColor, 0u},
+		{TextureTypes::LightMap, 1u},
 		// LightPass
 		{TextureTypes::SceneNormal_Roughness, 0u},
 		{TextureTypes::SceneSpecularColor, 1u},

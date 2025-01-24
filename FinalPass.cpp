@@ -4,10 +4,10 @@
 #include "Viewport.h"
 #include "ShadersPool.h"
 
-FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture) :
+FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture) :
 	Pass(graphics, PassType::FinalPass,
 		{  },
-		{ RPD::TextureTypes::SceneColor },
+		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap },
 		{ RPD::SamplerTypes::Anisotropic })
 {
 	pipelineStateStream.renderTargetFormats =
@@ -50,21 +50,19 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 
 	const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 1,
+			.NumDescriptors = 2u,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 	};
 	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{ srvHeap->GetCPUDescriptorHandleForHeapStart() };
 
-	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
-		.Format = DXGI_FORMAT_R11G11B10_FLOAT, // TODO change to getter
-		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D, 
-		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-		.Texture2D{.MipLevels = sceneColorTexture->GetDesc().MipLevels },
-	};
-	graphics.GetDevice()->CreateShaderResourceView(sceneColorTexture, &srvDesc, srvCpuHandle);
+	graphics.CreateSRV(sceneColorTexture, srvCpuHandle);
 	
+	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
+
+	graphics.CreateSRV(lightMapTexture, srvCpuHandle);
+
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());
 

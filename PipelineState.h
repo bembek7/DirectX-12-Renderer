@@ -17,6 +17,7 @@ public:
 		CD3DX12_PIPELINE_STATE_STREAM_RASTERIZER rasterizer;
 		CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT dsvFormat;
 		CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL depthStencil;
+		CD3DX12_PIPELINE_STATE_STREAM_BLEND_DESC blendDesc;
 	};
 
 	PipelineState(Graphics& graphics, PipelineStateStream& pipelineStateStream);

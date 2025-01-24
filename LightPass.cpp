@@ -1,6 +1,5 @@
 #include "LightPass.h"
 #include "ShadersPool.h"
-#include "RTVHeap.h"
 
 LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light) :
 	Pass(graphics, PassType::FinalPass,
@@ -9,18 +8,21 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 		{ RPD::SamplerTypes::Anisotropic }),
 	light(light)
 {
-	std::array<D3D12_RENDER_TARGET_VIEW_DESC, 1> rtvDescs =
-	{
-		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R11G11B10_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D }
-	};
-
-	rtvHeap = std::make_unique<RTVHeap>(graphics, 1, rtvDescs.data());
-
 	pipelineStateStream.renderTargetFormats =
 	{
 		.RTFormats{ DXGI_FORMAT_R11G11B10_FLOAT },
 		.NumRenderTargets = 1u,
 	};
+	auto blendDesc = CD3DX12_BLEND_DESC(CD3DX12_DEFAULT{});
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	pipelineStateStream.blendDesc = blendDesc;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout =
 	{
 		{ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u },
@@ -63,33 +65,15 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{ srvHeap->GetCPUDescriptorHandleForHeapStart() };
 
-	const D3D12_SHADER_RESOURCE_VIEW_DESC normal_roughnessSrvDesc = {
-		.Format = DXGI_FORMAT_R16G16B16A16_FLOAT, // TODO change to getter
-		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
-		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-		.Texture2D{.MipLevels = sceneNormal_RoughnessTexture->GetDesc().MipLevels },
-	};
-	graphics.GetDevice()->CreateShaderResourceView(sceneNormal_RoughnessTexture, &normal_roughnessSrvDesc, srvCpuHandle);
+	graphics.CreateSRV(sceneNormal_RoughnessTexture, srvCpuHandle);
 
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
-	const D3D12_SHADER_RESOURCE_VIEW_DESC specularColorSrvDesc = {
-		.Format = DXGI_FORMAT_R11G11B10_FLOAT, // TODO change to getter
-		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
-		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-		.Texture2D{.MipLevels = sceneSpecularColor->GetDesc().MipLevels },
-	};
-	graphics.GetDevice()->CreateShaderResourceView(sceneSpecularColor, &specularColorSrvDesc, srvCpuHandle);
+	graphics.CreateSRV(sceneSpecularColor, srvCpuHandle);
 
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
-	const D3D12_SHADER_RESOURCE_VIEW_DESC viewPositionSrvDesc = {
-		.Format = DXGI_FORMAT_R11G11B10_FLOAT, // TODO change to getter
-		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
-		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-		.Texture2D{.MipLevels = sceneViewPosition->GetDesc().MipLevels },
-	};
-	graphics.GetDevice()->CreateShaderResourceView(sceneViewPosition, &viewPositionSrvDesc, srvCpuHandle);
+	graphics.CreateSRV(sceneViewPosition, srvCpuHandle);
 
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());
@@ -97,15 +81,11 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 	CHECK_HR(drawingBundle->Close());
 }
 
-void LightPass::Execute(Graphics& graphics)
+void LightPass::Execute(Graphics& graphics, const CD3DX12_CPU_DESCRIPTOR_HANDLE& lightMapRtvHandle)
 {
 	Pass::Execute(graphics);
-
-	auto rtv = rtvHeap->GetCPUHandle();
-	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	graphics.GetMainCommandList()->ClearRenderTargetView(rtvHeap->GetCPUHandle(), clearColor, 0, nullptr);
 	
-	graphics.GetMainCommandList()->OMSetRenderTargets(1, &rtv, TRUE, nullptr);
+	graphics.GetMainCommandList()->OMSetRenderTargets(1, &lightMapRtvHandle, TRUE, nullptr);
 
 	graphics.GetMainCommandList()->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	graphics.ExecuteBundle(drawingBundle.Get());

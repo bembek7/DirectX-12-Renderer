@@ -24,9 +24,16 @@ Scene::Scene(Graphics& graphics)
 	const float windowHeight = graphics.GetWindowHeight();
 
 	Dx::XMStoreFloat4x4(&defaultProj, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
-	
+
+	std::array<D3D12_RENDER_TARGET_VIEW_DESC, 1> lightMapRtvDescs =
+	{
+		D3D12_RENDER_TARGET_VIEW_DESC{ DXGI_FORMAT_R11G11B10_FLOAT, D3D12_RTV_DIMENSION_TEXTURE2D }
+	};
+
+	lightMapRtv = std::make_unique<RTVHeap>(graphics, 1, lightMapRtvDescs.data());
+
 	gPass = std::make_unique<GPass>(graphics, mainCamera.get(), defaultProj);
-	finalPass = std::make_unique<FinalPass>(graphics, gPass->GetColorTexture());
+	finalPass = std::make_unique<FinalPass>(graphics, gPass->GetColorTexture(), lightMapRtv->GetRenderTarget(0));
 }
 
 void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
@@ -53,9 +60,12 @@ void Scene::Draw(Graphics& graphics)
 	}
 
 	gPass->Execute(graphics, actors);
+
+	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	graphics.GetMainCommandList()->ClearRenderTargetView(lightMapRtv->GetCPUHandle(), clearColor, 0, nullptr);
 	for(auto& lightPass : lightPasses)
 	{
-		lightPass->Execute(graphics);
+		lightPass->Execute(graphics, lightMapRtv->GetCPUHandle());
 	}
 	finalPass->Execute(graphics);
 

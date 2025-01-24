@@ -30,4 +30,5 @@ private:
 	std::vector<std::unique_ptr<LightPass>> lightPasses;
 	std::unique_ptr<Camera> mainCamera;
 	DirectX::XMFLOAT4X4 defaultProj;
+	std::unique_ptr<RTVHeap> lightMapRtv;
 };

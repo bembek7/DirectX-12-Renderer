@@ -56,6 +56,8 @@ public:
 
 	Gui* const GetGui() noexcept;
 
+	void CreateSRV(ID3D12Resource* const resource, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle);
+
 private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();

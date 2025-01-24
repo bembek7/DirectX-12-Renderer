@@ -384,3 +384,15 @@ Gui* const Graphics::GetGui() noexcept
 {
 	return gui.get();
 }
+
+void Graphics::CreateSRV(ID3D12Resource* const resource, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle)
+{
+	auto resourceDesc = resource->GetDesc();
+	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
+		.Format = resourceDesc.Format,
+		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+		.Texture2D{.MipLevels = resourceDesc.MipLevels },
+	};
+	device->CreateShaderResourceView(resource, &srvDesc, srvCpuHandle);
+}
