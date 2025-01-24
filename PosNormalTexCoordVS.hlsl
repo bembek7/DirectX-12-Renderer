@@ -15,7 +15,7 @@ VSOut main(float3 position : POSITION, float3 normal : NORMAL, float2 texCoord :
     VSOut vsout;
     vsout.viewNormal = mul(normal, (float3x3) modelView);
     vsout.texCoord = texCoord;
-    vsout.viewPosition = mul(float4(position, 1.0f), modelView).xyz;
+    vsout.viewPosition = mul(position, (float3x3) modelView);
     vsout.pos = mul(float4(position, 1.0f), modelViewProj);
     
     return vsout;

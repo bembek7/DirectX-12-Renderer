@@ -54,6 +54,8 @@ void Scene::AddPointLight(Graphics& graphics, std::unique_ptr<PointLight> lightT
 
 void Scene::Draw(Graphics& graphics)
 {
+	graphics.SetCamera(mainCamera->GetMatrix());
+	graphics.SetProjection(Dx::XMLoadFloat4x4(&defaultProj));
 	for (auto& actor : actors)
 	{
 		actor->Update(graphics);

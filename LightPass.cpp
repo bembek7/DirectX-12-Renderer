@@ -8,6 +8,7 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 		{ RPD::SamplerTypes::Anisotropic }),
 	light(light)
 {
+	// TODO change render targets states
 	pipelineStateStream.renderTargetFormats =
 	{
 		.RTFormats{ DXGI_FORMAT_R11G11B10_FLOAT },
