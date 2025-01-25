@@ -1,8 +1,15 @@
 #include "LightPass.h"
 #include "ShadersPool.h"
 
+std::unordered_map<LightType, std::wstring> LightPass::shaderPaths =
+{
+	{ LightType::Point, L"PointLightPassPS.cso" },
+	{ LightType::Spot, L"SpotLightPassPS.cso" },
+	{ LightType::Directional, L"DirectionalLightPassPS.cso" }
+};
+
 LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light) :
-	Pass(graphics, PassType::FinalPass,
+	Pass(graphics, PassType::LightPass,
 		{ RPD::CBTypes::LightProperties },
 		{ RPD::TextureTypes::SceneNormal_Roughness, RPD::TextureTypes::SceneSpecularColor, RPD::TextureTypes::SceneViewPosition},
 		{ RPD::SamplerTypes::Anisotropic }),
@@ -33,7 +40,7 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 	pipelineStateStream.rasterizer = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
 	auto& shadersPool = ShadersPool::GetInstance();
 	auto vertexShaderBlob = shadersPool.GetShaderBlob(L"PixelOnlyVS.cso");
-	auto pixelShaderBlob = shadersPool.GetShaderBlob(L"PointLightPassPS.cso");
+	auto pixelShaderBlob = shadersPool.GetShaderBlob(shaderPaths[light->GetType()]);
 	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob->Get());
 	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob->Get());
 	pipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEPTH_STENCIL_DESC{ .DepthEnable = FALSE, .StencilEnable = FALSE });

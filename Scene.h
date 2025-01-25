@@ -16,7 +16,7 @@ public:
 	Scene(Graphics& graphics);
 
 	void AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd);
-	void AddPointLight(Graphics& graphics, std::unique_ptr<PointLight> lightToAdd);
+	void AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd);
 	void Draw(Graphics& graphics);
 	void PrepareActorsForPasses(Graphics& graphics);
 	Camera* GetMainCamera();

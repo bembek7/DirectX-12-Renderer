@@ -19,5 +19,6 @@ private:
 	std::unique_ptr<IndexBuffer> indexBuffer;
 	std::unique_ptr<VertexBuffer> vertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+	static std::unordered_map<LightType, std::wstring> shaderPaths;
 };
 

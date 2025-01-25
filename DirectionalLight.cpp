@@ -4,9 +4,9 @@
 #include "Camera.h"
 
 DirectionalLight::DirectionalLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
-	Light(graphics, fileName, actorName)
+	Light(graphics, fileName, actorName, LightType::Directional)
 {
-	//constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, RPD::DirectionalLight));
+	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, 0u)); // TODO get rid of mgic number
 
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();

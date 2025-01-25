@@ -14,6 +14,7 @@ class Actor;
 enum class PassType
 {
 	GPass,
+	LightPass,
 	ShadowMapGeneraration,
 	LightPerspective,
 	FinalPass

@@ -2,8 +2,9 @@
 #include "Camera.h"
 #include "RootParametersDescription.h"
 
-Light::Light(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
-	MeshActor(graphics, fileName, actorName)
+Light::Light(Graphics& graphics, const std::string& fileName, const std::string& actorName, const LightType type) :
+	MeshActor(graphics, fileName, actorName),
+	type(type)
 {
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
@@ -36,4 +37,9 @@ const Camera* Light::GetLightCamera() const noexcept
 DirectX::XMFLOAT4X4 Light::GetLightProjection() const noexcept
 {
 	return projection;
+}
+
+LightType Light::GetType() const noexcept
+{
+	return type;
 }
