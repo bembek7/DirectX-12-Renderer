@@ -5,7 +5,7 @@
 #include "SceneSpecularColor.hlsli"
 #include "SceneViewPosition.hlsli"
 
-float3 main(float2 texCoord : TEX_COORD) : SV_TARGET
+float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
 {
     const float3 viewPosition = sceneViewPositionTex.Sample(texSampler, texCoord).rgb;
     

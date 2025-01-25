@@ -13,7 +13,7 @@ VSOut main(float3 pos : POSITION)
     const matrix modelView = mul(TransformCB.model, TransformCB.view);
     const matrix modelViewProj = mul(modelView, TransformCB.proj);
 
-    vsOut.viewPosition = mul(pos, (float3x3) modelView);
+    vsOut.viewPosition = mul(float4(pos, 1.0f), modelView).xyz;
     vsOut.pos = mul(float4(pos, 1.0f), modelViewProj);
     
     return vsOut;
