@@ -1,25 +1,38 @@
 #include "SpotLightPropertiesCB.hlsli"
+#include "Phong.hlsli"
+#include "TextureSampler.hlsli"
+#include "SceneNormal_Roughness.hlsli"
+#include "SceneSpecularColor.hlsli"
+#include "SceneViewPosition.hlsli"
 
-//float CalculateSpotFactor(const SpotLight lightParams, const float3 directionToLight)
-//{
-//    return pow(max(dot(-directionToLight, lightParams.lightDirection), 0.0f), lightParams.spotPower);
-//}
-
-float4 main() : SV_TARGET
+float CalculateSpotFactor(const float3 lightDirection, const float3 spotPower, const float3 directionToLight)
 {
-	//    const LightVectorData lightVector = CalculateLightVectorData(lightParams.lightViewPos, viewPos);
-    
-//    float attenuation = Attenuate(lightParams.attenuationConst, lightParams.attenuationLin, lightParams.attenuationQuad, lightVector.distanceToLight);
-    
-//    const float spotFactor = CalculateSpotFactor(lightParams, lightVector.directionToLight);
+    return pow(max(dot(-directionToLight, lightDirection), 0.0f), spotPower).x;
+}
 
-//    attenuation *= spotFactor;
+float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
+{
+    const float3 viewPosition = sceneViewPositionTex.Sample(texSampler, texCoord).rgb;
+    const float4 normal_roughness = sceneNormal_RoughnessTex.Sample(texSampler, texCoord);
+    const float3 viewNormal = normal_roughness.rgb;
+    const float roughness = normal_roughness.a;
+    const float3 specularColor = sceneSpecularColorTex.Sample(texSampler, texCoord).rgb;
     
-//    const float3 diffuse = Diffuse(lightParams.diffuseColor, lightParams.diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
+    const LightVectorData lightVector = CalculateLightVectorData(SpotLightPropertiesCB.lightViewPos, viewPosition);
+    
+    
+    float attenuation = Attenuate(SpotLightPropertiesCB.attenuationConst, SpotLightPropertiesCB.attenuationLin, 
+                                   SpotLightPropertiesCB.attenuationQuad, lightVector.distanceToLight);
+    
+    const float spotFactor = CalculateSpotFactor(SpotLightPropertiesCB.lightDirection, SpotLightPropertiesCB.spotPower, lightVector.directionToLight);
+
+    attenuation *= spotFactor;
+    
+    const float3 diffuse = Diffuse(SpotLightPropertiesCB.diffuseColor, SpotLightPropertiesCB.diffuseIntensity, attenuation, 
+                                    lightVector.directionToLight, viewNormal);
 	
-//    const float3 specular = Speculate(specularColor, lightParams.diffuseIntensity * lightParams.specularIntensity, realViewNormal,
-//                                    lightVector.vectorToLight, viewPos, attenuation, RoughnessCB.roughness);
+    const float3 specular = Speculate(specularColor, SpotLightPropertiesCB.diffuseIntensity * SpotLightPropertiesCB.specularIntensity, viewNormal,
+                                    lightVector.vectorToLight, viewPosition, attenuation, roughness);
     
-//    return saturate(diffuse + lightParams.ambient + specular);
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    return saturate(diffuse + SpotLightPropertiesCB.ambient + specular);
 }
