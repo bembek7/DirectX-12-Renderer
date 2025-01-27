@@ -27,5 +27,5 @@ private:
 	std::unique_ptr<RTVHeap> rtvHeap;
 	DirectX::XMFLOAT4X4 projection{};
 	const Camera* cameraUsed;
-	static constexpr UINT rtvsNum = 4;
+	static constexpr UINT rtvsNum = 5;
 };
