@@ -73,6 +73,12 @@
     <Filter Include="Source Files\Actor\Bindables">
       <UniqueIdentifier>{731723db-7ee2-4ea2-909a-f007590dc7f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\VertexShaders\GPass">
+      <UniqueIdentifier>{535e10dc-e18c-48a9-9c5d-103926fcac36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\GPass">
+      <UniqueIdentifier>{4380523d-2389-4cbb-8b32-49ff7b6758c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -201,16 +207,13 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="LightPerspectivePass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
     <ClCompile Include="DepthStencilView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowPass.cpp">
+    <ClCompile Include="LightPerspectivePass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="RTVHeap.cpp">
@@ -395,13 +398,10 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="LightPerspectivePass.h">
-      <Filter>Header Files\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowPass.h">
+    <ClInclude Include="LightPerspectivePass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="RTVHeap.h">
@@ -415,42 +415,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PosNormalTexCoordVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PosNormalTexCoordTanBitanVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PosNormalVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="PositionVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DTNMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DTNMSMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DTPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DTSMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DTNMSMATPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ShadowMapGenerationVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ShadowPassPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
     <FxCompile Include="PixelOnlyVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
@@ -466,8 +430,38 @@
     <FxCompile Include="SpotLightPassPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
-    <FxCompile Include="ShadowPassVS.hlsl">
+    <FxCompile Include="LightPerspectivePassVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PosNormalVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="PositionVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="PosNormalTexCoordTanBitanVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="PosNormalTexCoordVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DTNMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DTNMSMATPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DTNMSMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DTPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DTSMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

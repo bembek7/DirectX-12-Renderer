@@ -1,28 +1,22 @@
 #pragma once
 #include "Pass.h"
-#include "DepthStencilView.h"
-#include "PipelineState.h"
 #include "ConstantBuffer.h"
-
-class Actor;
-class PointLight;
-class DepthCubeTexture;
-class Camera;
-class Light;
-class DirectionalLight;
-class ConstantBuffer;
+#include "DepthStencilView.h"
 
 class LightPerspectivePass : public Pass
 {
 public:
-	//LightPerspectivePass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection);
+	LightPerspectivePass(Graphics& graphics, const Camera* camera, const DirectX::XMFLOAT4X4 projection);
 
-	//virtual void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors) override;
+	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
 
-	ID3D12Resource* GetDepthBuffer();
-	DirectX::XMFLOAT4X4 GetLightPerspective() const noexcept;
+	virtual void BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle) override;
+
+	ID3D12Resource* GetDepthBuffer() noexcept;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
-
-	DirectX::XMFLOAT4X4 lightPerspective{};
+	DirectX::XMFLOAT4X4 projection{};
+	const Camera* cameraUsed;
+	std::unique_ptr<PipelineState> pipelineState;
 };
+

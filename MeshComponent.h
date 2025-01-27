@@ -35,7 +35,7 @@ private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
 	void PrepareForGPass(Graphics& graphics, Pass* const pass);
-	void PrepareForShadowPass(Graphics& graphics, Pass* const pass);
+	void PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass);
 
 	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
 

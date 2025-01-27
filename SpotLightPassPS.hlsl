@@ -18,6 +18,8 @@ float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
     const float roughness = normal_roughness.a;
     const float3 specularColor = sceneSpecularColorTex.Sample(texSampler, texCoord).rgb;
     
+    const float lighting = 1.f; //CalculateLighting();
+    
     const LightVectorData lightVector = CalculateLightVectorData(SpotLightPropertiesCB.lightViewPos, viewPosition);
     
     
@@ -34,5 +36,5 @@ float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
     const float3 specular = Speculate(specularColor, SpotLightPropertiesCB.diffuseIntensity * SpotLightPropertiesCB.specularIntensity, viewNormal,
                                     lightVector.vectorToLight, viewPosition, attenuation, roughness);
     
-    return saturate(diffuse + SpotLightPropertiesCB.ambient + specular);
+    return saturate((diffuse + specular) * lighting + SpotLightPropertiesCB.ambient);
 }

@@ -1,86 +1,73 @@
 #include "LightPerspectivePass.h"
-#include "Viewport.h"
-#include "Graphics.h"
-#include "ScissorRectangle.h"
-#include "Actor.h"
-#include "Camera.h"
-#include "DirectionalLight.h"
 #include "RootParametersDescription.h"
+#include "Actor.h"
+#include "ThrowMacros.h"
+#include "ShadersPool.h"
+#include "Graphics.h"
+#include "Camera.h"
 
-namespace Dx = DirectX;
-
-//LightPerspectivePass::LightPerspectivePass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 projection) :
-//	Pass(camera, projection)
-//{
-//	type = PassType::LightPerspective;
-//
-//	const float windowWidth = graphics.GetWindowWidth();
-//	const float windowHeight = graphics.GetWindowHeight();
-//
-//	bindables.push_back(std::make_unique<ScissorRectangle>());
-//	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
-//
-//	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::DepthShadowMapping, 1.f, UINT(windowWidth), UINT(windowHeight));
-//
-//	const D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-//		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-//		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-//	// define empty root signature
-//	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-//
-//	std::vector<CD3DX12_ROOT_PARAMETER> rootParameters;
-//	rootParameters.resize(1);
-//
-//	for (const auto& cb : RPD::cbConsts)
-//	{
-//		rootParameters[cb.ParamIndex].InitAsConstants(cb.dataSize / 4, cb.slot, 0, cb.visibility); // binding transform buffer
-//	}
-//	rootSignatureDesc.Init(1, rootParameters.data(), 0, nullptr, rootSignatureFlags);
-//
-//	rootSignature = std::make_unique<RootSignature>(graphics, rootSignatureDesc);
-//
-//	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-//	pipelineStateStream.renderTargetFormats =
-//	{
-//		.NumRenderTargets = 0,
-//	};
-//	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
-//	pipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
-//	auto rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
-//	rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-//	pipelineStateStream.rasterizer = rasterizerDesc;
-//	pipelineStateStream.rootSignature = rootSignature->Get();
-//}
-//
-//void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
-//{
-//	Pass::Execute(graphics, actors);
-//
-//	namespace Dx = DirectX;
-//	Dx::XMStoreFloat4x4(&lightPerspective, Dx::XMMatrixTranspose(cameraUsed->GetMatrix() * Dx::XMLoadFloat4x4(&projection)));
-//
-//	depthStencilView->Clear(graphics.GetMainCommandList());
-//	
-//	auto dsvHandle = depthStencilView->GetDsvHandle();
-//	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsvHandle);
-//
-//	for (auto& actor : actors)
-//	{
-//		actor->Draw(graphics, GetType());
-//	}
-//}
-
-ID3D12Resource* LightPerspectivePass::GetDepthBuffer()
+LightPerspectivePass::LightPerspectivePass(Graphics& graphics, const Camera* camera, const DirectX::XMFLOAT4X4 projection) :
+	Pass(graphics, PassType::LightPerspectivePass,
+		{ RPD::CBTypes::Transform }),
+	cameraUsed(camera),
+	projection(projection)
 {
-	return depthStencilView->GetBuffer();
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+
+	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
+
+	pipelineStateStream.renderTargetFormats =
+	{
+		.RTFormats{ },
+		.NumRenderTargets = 0u,
+	};
+
+	pipelineStateStream.dsvFormat = DXGI_FORMAT_D32_FLOAT;
+	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
+	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	pipelineStateStream.depthStencil = dsDesc;
+	auto rasterizer = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
+	rasterizer.CullMode = D3D12_CULL_MODE_FRONT;
+	pipelineStateStream.rasterizer = rasterizer;
+
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout =
+	{
+		{ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u },
+	};
+	pipelineStateStream.inputLayout = { inputLayout.data(), (UINT)inputLayout.size() };
+
+	auto& shadersPool = ShadersPool::GetInstance();
+	auto vertexShaderBlob = shadersPool.GetShaderBlob(L"LightPerspectivePassVS.cso");
+	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob->Get());
+
+	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
 }
 
-DirectX::XMFLOAT4X4 LightPerspectivePass::GetLightPerspective() const noexcept
+void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
 {
-	return lightPerspective;
+	Pass::Execute(graphics);
+	graphics.SetCamera(cameraUsed->GetMatrix());
+	graphics.SetProjection(projection);
+
+	depthStencilView->Clear(graphics.GetMainCommandList());
+	auto dsv = depthStencilView->GetDsvHandle();
+	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsv);
+	for (auto& actor : actors)
+	{
+		actor->Draw(graphics, GetType());
+	}
+}
+
+void LightPerspectivePass::BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle)
+{
+	Pass::BindPassSpecific(drawingBundle);
+
+	pipelineState->Bind(drawingBundle);
+	rootSignature->Bind(drawingBundle);
+}
+
+ID3D12Resource* LightPerspectivePass::GetDepthBuffer() noexcept
+{
+	return depthStencilView->GetBuffer();
 }

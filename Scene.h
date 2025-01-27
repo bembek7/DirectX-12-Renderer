@@ -6,7 +6,7 @@
 #include "FinalPass.h"
 #include "Actor.h"
 #include "LightPass.h"
-#include "ShadowPass.h"
+#include "LightPerspectivePass.h"
 
 class Graphics;
 class Light;
@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<FinalPass> finalPass;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<std::unique_ptr<LightPass>> lightPasses;
+	std::vector<std::unique_ptr<LightPerspectivePass>> lightPerspectivePasses;
 	std::unique_ptr<Camera> mainCamera;
 	DirectX::XMFLOAT4X4 defaultProj;
 	std::unique_ptr<RTVHeap> lightMapRtv;

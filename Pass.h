@@ -16,7 +16,7 @@ enum class PassType
 	GPass,
 	LightPass,
 	ShadowPass,
-	LightPerspective,
+	LightPerspectivePass,
 	FinalPass
 };
 

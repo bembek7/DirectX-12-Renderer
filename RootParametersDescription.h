@@ -15,7 +15,6 @@ namespace RPD
 		SceneViewPosition,
 		LightMap,
 		DepthBuffer,
-		ShadowMap
 	};
 
 	enum class CBTypes
@@ -71,13 +70,10 @@ namespace RPD
 		// FinalPass
 		{TextureTypes::SceneColor, 0u},
 		{TextureTypes::LightMap, 1u},
-		{TextureTypes::ShadowMap, 2u},
 		// LightPass
 		{TextureTypes::SceneNormal_Roughness, 0u},
 		{TextureTypes::SceneSpecularColor, 1u},
 		{TextureTypes::SceneViewPosition, 2u},
-		// ShadowPass
-		{TextureTypes::DepthBuffer, 0u},
 	};
 
 	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =

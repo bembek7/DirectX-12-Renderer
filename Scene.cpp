@@ -4,7 +4,7 @@
 #include "Graphics.h"
 #include "GPass.h"
 #include "DirectionalLight.h"
-#include "ShadowPass.h"
+#include "LightPerspectivePass.h"
 
 namespace Dx = DirectX;
 
@@ -47,6 +47,8 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 
 void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
+	auto lpp = std::make_unique<LightPerspectivePass>(graphics, lightToAdd->GetLightCamera(), lightToAdd->GetLightProjection());
+	lightPerspectivePasses.push_back(std::move(lpp));
 	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(), gPass->GetViewPositionTexture(), lightToAdd.get());
 	lightPasses.push_back(std::move(lightPass));
 	actors.push_back(std::move(lightToAdd));
@@ -65,9 +67,15 @@ void Scene::Draw(Graphics& graphics)
 
 	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	graphics.GetMainCommandList()->ClearRenderTargetView(lightMapRtv->GetCPUHandle(), clearColor, 0, nullptr);
-	for(auto& lightPass : lightPasses)
+
+	if (lightPerspectivePasses.size() != lightPasses.size())
 	{
-		lightPass->Execute(graphics, lightMapRtv->GetCPUHandle());
+		throw std::runtime_error("Every light pass needs respective light perspective pass");
+	}
+	for (size_t i = 0; i < lightPerspectivePasses.size(); ++i)
+	{
+		lightPerspectivePasses[i]->Execute(graphics, actors);
+		lightPasses[i]->Execute(graphics, lightMapRtv->GetCPUHandle());
 	}
 	finalPass->Execute(graphics);
 
@@ -79,6 +87,10 @@ void Scene::PrepareActorsForPasses(Graphics& graphics)
 	for (const auto& actor : actors)
 	{
 		actor->PrepareForPass(graphics, gPass.get());
+		for(auto& lpp : lightPerspectivePasses)
+		{
+			actor->PrepareForPass(graphics, lpp.get());
+		}
 	}
 }
 

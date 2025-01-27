@@ -74,8 +74,8 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 	case PassType::GPass: 
 		PrepareForGPass(graphics, pass);
 		break;
-	case PassType::ShadowPass:
-		PrepareForShadowPass(graphics, pass);
+	case PassType::LightPerspectivePass:
+		PrepareForLightPerspectivePass(graphics, pass);
 		break;
 	default:
 		break;
@@ -105,7 +105,7 @@ void MeshComponent::PrepareForGPass(Graphics& graphics, Pass* const pass)
 	drawingBundles[pass->GetType()] = std::move(drawingBundle);
 }
 
-void MeshComponent::PrepareForShadowPass(Graphics& graphics, Pass* const pass)
+void MeshComponent::PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass)
 {
 	auto drawingBundle = graphics.CreateBundle();
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
