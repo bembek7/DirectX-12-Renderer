@@ -28,7 +28,7 @@ public:
 	PipelineState::PipelineStateStream GetPSS() const { return pipelineStateStream; };
 	virtual ~Pass() = default;
 	PassType GetType() const noexcept;
-	RootSignature* GetRootSignature() noexcept;
+	virtual void BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle);
 protected:
 	std::vector<std::unique_ptr<Bindable>> bindables;
 	std::vector<std::shared_ptr<Bindable>> sharedBindables;

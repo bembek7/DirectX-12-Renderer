@@ -10,6 +10,7 @@ public:
 
 	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const CD3DX12_CPU_DESCRIPTOR_HANDLE& shadowMapRtvHandle);
 
+	virtual void BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle) override;
 	//virtual void BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle) override;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;

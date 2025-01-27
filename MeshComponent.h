@@ -34,13 +34,17 @@ protected:
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
+	void PrepareForGPass(Graphics& graphics, Pass* const pass);
+	void PrepareForShadowPass(Graphics& graphics, Pass* const pass);
+
 	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
 
 private:
 	std::unique_ptr<Model> mainModel;
+	std::unique_ptr<Model> primitiveModel;
 	std::unique_ptr<Material> mainMaterial;
 	std::unique_ptr<PipelineState> mainPipelineState;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
+	std::unordered_map<PassType, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>> drawingBundles;
 
 	struct TransformBuffer
 	{

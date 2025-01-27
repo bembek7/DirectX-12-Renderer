@@ -36,7 +36,6 @@ PassType Pass::GetType() const noexcept
 	return type;
 }
 
-RootSignature* Pass::GetRootSignature() noexcept
+void Pass::BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle)
 {
-	return rootSignature.get();
 }

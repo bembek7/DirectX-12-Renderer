@@ -15,6 +15,8 @@ public:
 
 	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors);
 
+	virtual void BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle) override;
+
 	ID3D12Resource* GetColorTexture() noexcept;
 	ID3D12Resource* GetNormal_RoughnessTexture() noexcept;
 	ID3D12Resource* GetSpecularColorTexture() noexcept;

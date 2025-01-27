@@ -12,7 +12,7 @@ DirectionalLight::DirectionalLight(Graphics& graphics, const std::string& fileNa
 	const float windowHeight = graphics.GetWindowHeight();
 
 	namespace Dx = DirectX;
-	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 0.5f, 700.0f));
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixOrthographicLH(300.0f, 300 * windowHeight / windowWidth, 700.0f, 0.5f));
 }
 
 void DirectionalLight::Update(Graphics& graphics)

@@ -534,5 +534,8 @@
     <None Include="LightMap.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
+    <None Include="ShadowMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
   </ItemGroup>
 </Project>

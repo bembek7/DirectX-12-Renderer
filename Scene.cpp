@@ -40,7 +40,7 @@ Scene::Scene(Graphics& graphics)
 	shadowMapRtv = std::make_unique<RTVHeap>(graphics, 1, shadowMapRtvDescs.data());
 
 	gPass = std::make_unique<GPass>(graphics, mainCamera.get(), defaultProj);
-	finalPass = std::make_unique<FinalPass>(graphics, gPass->GetColorTexture(), lightMapRtv->GetRenderTarget(0));
+	finalPass = std::make_unique<FinalPass>(graphics, gPass->GetColorTexture(), lightMapRtv->GetRenderTarget(0u), shadowMapRtv->GetRenderTarget(0u));
 }
 
 void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
@@ -56,8 +56,8 @@ void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
 	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(), gPass->GetViewPositionTexture(), lightToAdd.get());
 	lightPasses.push_back(std::move(lightPass));
-	//auto shadowPass = std::make_unique<ShadowPass>(graphics, lightToAdd->GetLightCamera(), defaultProj, gPass->GetDepthBuffer());
-	//shadowPasses.push_back(std::move(shadowPass));
+	auto shadowPass = std::make_unique<ShadowPass>(graphics, lightToAdd->GetLightCamera(), lightToAdd->GetLightProjection(), gPass->GetDepthBuffer());
+	shadowPasses.push_back(std::move(shadowPass));
 	actors.push_back(std::move(lightToAdd));
 }
 
@@ -93,6 +93,10 @@ void Scene::PrepareActorsForPasses(Graphics& graphics)
 	for (const auto& actor : actors)
 	{
 		actor->PrepareForPass(graphics, gPass.get());
+		if(shadowPasses.size() > 0)
+		{
+			actor->PrepareForPass(graphics, shadowPasses[0].get());
+		}
 	}
 }
 

@@ -16,7 +16,6 @@ DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const 
 		break;
 	case Usage::Depth:
 		format = DXGI_FORMAT_D32_FLOAT;
-		resourceFlags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 		break;
 	case Usage::DepthShadowMapping:
 		format = DXGI_FORMAT_D32_FLOAT;

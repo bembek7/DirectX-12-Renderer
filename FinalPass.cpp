@@ -4,10 +4,10 @@
 #include "Viewport.h"
 #include "ShadersPool.h"
 
-FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture) :
+FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture, ID3D12Resource* const shadowMapTexture) :
 	Pass(graphics, PassType::FinalPass,
 		{  },
-		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap },
+		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap, RPD::TextureTypes::ShadowMap },
 		{ RPD::SamplerTypes::Anisotropic })
 {
 	pipelineStateStream.renderTargetFormats =
@@ -50,7 +50,7 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 
 	const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 2u,
+			.NumDescriptors = 3u,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 	};
 	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
@@ -62,6 +62,10 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
 	graphics.CreateSRV(lightMapTexture, srvCpuHandle);
+
+	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
+
+	graphics.CreateSRV(shadowMapTexture, srvCpuHandle);
 
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());

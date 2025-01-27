@@ -64,6 +64,13 @@ void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>
 		actor->Draw(graphics, GetType());
 	}
 }
+void GPass::BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle)
+{
+	Pass::BindPassSpecific(drawingBundle);
+
+	rootSignature->Bind(drawingBundle);
+}
+
 
 ID3D12Resource* GPass::GetColorTexture() noexcept
 {

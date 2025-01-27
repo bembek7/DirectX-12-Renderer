@@ -86,8 +86,24 @@ void ShadowPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<A
 	
 	auto dsv = depthStencilView->GetDsvHandle(); 
 	graphics.GetMainCommandList()->OMSetRenderTargets(1, &shadowMapRtvHandle, TRUE, &dsv);
-	/*for (auto& actor : actors)
+	graphics.GetMainCommandList()->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());
-	}*/
+	}
 }
+
+void ShadowPass::BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle)
+{
+	Pass::BindPassSpecific(drawingBundle);
+
+	pipelineState->Bind(drawingBundle);
+	rootSignature->Bind(drawingBundle);
+
+	//bind cb if there will be any
+
+	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+	// TODO get rid of magic number
+	drawingBundle->SetGraphicsRootDescriptorTable(1u, srvHeap->GetGPUDescriptorHandleForHeapStart());
+}
+

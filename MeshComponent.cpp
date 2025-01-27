@@ -30,7 +30,8 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
 	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
 
-	mainModel = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, nullptr);
+	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
+	mainModel = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, primitiveModel->ShareIndexBuffer());
 	
 	mainMaterial = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
 }
@@ -50,8 +51,13 @@ void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
 {
 	SceneComponent::Draw(graphics, passType);
 	
-	mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
-	graphics.ExecuteBundle(drawingBundle.Get());
+	if (passType == PassType::GPass)
+	{
+		mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+	}
+
+	graphics.ExecuteBundle(drawingBundles[passType].Get());
+
 	UpdateTransformBuffer(graphics);
 	transformConstantBuffer->Bind(graphics.GetMainCommandList());
 	graphics.GetMainCommandList()->DrawIndexedInstanced(mainModel->GetIndicesNumber(), 1, 0, 0, 0);
@@ -61,6 +67,23 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 {
 	SceneComponent::PrepareForPass(graphics, pass);
 
+	auto passType = pass->GetType();
+
+	switch (passType)
+	{
+	case PassType::GPass: 
+		PrepareForGPass(graphics, pass);
+		break;
+	case PassType::ShadowPass:
+		PrepareForShadowPass(graphics, pass);
+		break;
+	default:
+		break;
+	}
+}
+
+void MeshComponent::PrepareForGPass(Graphics& graphics, Pass* const pass)
+{
 	auto pss = pass->GetPSS();
 	pss.inputLayout = mainModel->GetInputLayout();
 	pss.vertexShader = CD3DX12_SHADER_BYTECODE(mainModel->GetVSBlob());
@@ -69,17 +92,30 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 
 	mainPipelineState = std::make_unique<PipelineState>(graphics, pss);
 
-	drawingBundle = graphics.CreateBundle();
+	auto drawingBundle = graphics.CreateBundle();
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	mainPipelineState->Bind(drawingBundle.Get());
-	pass->GetRootSignature()->Bind(drawingBundle.Get());
+	pass->BindPassSpecific(drawingBundle.Get());
 
 	mainModel->Bind(drawingBundle.Get());
 
 	mainMaterial->Bind(graphics, drawingBundle.Get());
 
 	CHECK_HR(drawingBundle->Close());
+	drawingBundles[pass->GetType()] = std::move(drawingBundle);
 }
+
+void MeshComponent::PrepareForShadowPass(Graphics& graphics, Pass* const pass)
+{
+	auto drawingBundle = graphics.CreateBundle();
+	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pass->BindPassSpecific(drawingBundle.Get());
+	primitiveModel->Bind(drawingBundle.Get());
+
+	CHECK_HR(drawingBundle->Close());
+	drawingBundles[pass->GetType()] = std::move(drawingBundle);
+}
+
 
 void MeshComponent::Update(Graphics& graphics)
 {

@@ -461,6 +461,7 @@
     <None Include="SceneViewPosition.hlsli" />
     <None Include="Shadow.hlsli" />
     <None Include="LightPerspectiveCB.hlsli" />
+    <None Include="ShadowMap.hlsli" />
     <None Include="SpecularMap.hlsli" />
     <None Include="SpotLightPropertiesCB.hlsli" />
     <None Include="TextureSampler.hlsli" />
