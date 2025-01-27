@@ -20,7 +20,6 @@ class MeshComponent : public SceneComponent
 {
 public:
 	static std::unique_ptr<MeshComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
-	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights) override;
 	virtual void Draw(Graphics& graphics, const PassType& passType) override;
 	void PrepareForPass(Graphics& graphics, Pass* const pass);
 	virtual void Update(Graphics& graphics) override;
@@ -39,8 +38,9 @@ private:
 
 private:
 	std::unique_ptr<Model> mainModel;
-	std::unique_ptr<Model> primitiveModel;
 	std::unique_ptr<Material> mainMaterial;
+	std::unique_ptr<PipelineState> mainPipelineState;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
 
 	struct TransformBuffer
 	{
@@ -55,13 +55,4 @@ private:
 	std::unique_ptr<ConstantBufferConstants<TransformBuffer>> transformConstantBuffer;
 
 	bool lighted = false;
-
-	struct PassSpecificSettings
-	{
-		std::unique_ptr<PipelineState> pipelineState;
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> drawingBundle;
-		Model* model = nullptr;
-		ID3D12DescriptorHeap* descriptorHeap = nullptr;
-	};
-	std::unordered_map<PassType, PassSpecificSettings> passSpecificSettings;
 };

@@ -13,7 +13,8 @@ namespace RPD
 		SceneNormal_Roughness,
 		SceneSpecularColor,
 		SceneViewPosition,
-		LightMap
+		LightMap,
+		DepthBuffer
 	};
 
 	enum class CBTypes
@@ -27,6 +28,7 @@ namespace RPD
 	enum class SamplerTypes
 	{
 		Anisotropic,
+		Comparison
 	};
 
 	namespace
@@ -54,6 +56,9 @@ namespace RPD
 		UINT slot;
 		D3D12_FILTER filter;
 		UINT maxAnisotropy;
+		D3D12_TEXTURE_ADDRESS_MODE addressMode;
+		D3D12_STATIC_BORDER_COLOR borderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
+		D3D12_COMPARISON_FUNC comparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	};
 	
 	static const std::unordered_map<TextureTypes, UINT, EnumClassesHash> texturesSlots =
@@ -69,6 +74,8 @@ namespace RPD
 		{TextureTypes::SceneNormal_Roughness, 0u},
 		{TextureTypes::SceneSpecularColor, 1u},
 		{TextureTypes::SceneViewPosition, 2u},
+		// ShadowPass
+		{TextureTypes::DepthBuffer, 0u},
 	};
 
 	static const std::unordered_map<CBTypes, CBInfo, EnumClassesHash> cbsInfo =
@@ -79,10 +86,12 @@ namespace RPD
 		{CBTypes::Color, {D3D12_SHADER_VISIBILITY_PIXEL, 1u}},
 		// LightPass
 		{CBTypes::LightProperties, {D3D12_SHADER_VISIBILITY_PIXEL, 0u}},
+		// ShadowPass
 	};
 
 	static const std::unordered_map<SamplerTypes, SamplerInfo, EnumClassesHash> samplersInfo =
 	{
-		{SamplerTypes::Anisotropic, {D3D12_SHADER_VISIBILITY_PIXEL, 1u, D3D12_FILTER_ANISOTROPIC, D3D12_REQ_MAXANISOTROPY}},
+		{SamplerTypes::Anisotropic, {D3D12_SHADER_VISIBILITY_PIXEL, 1u, D3D12_FILTER_ANISOTROPIC, D3D12_REQ_MAXANISOTROPY, D3D12_TEXTURE_ADDRESS_MODE_WRAP}},
+		{SamplerTypes::Comparison, {D3D12_SHADER_VISIBILITY_PIXEL, 0u, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D12_REQ_MAXANISOTROPY, D3D12_TEXTURE_ADDRESS_MODE_BORDER, D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK, D3D12_COMPARISON_FUNC_LESS_EQUAL}},
 	};
 }

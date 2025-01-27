@@ -64,6 +64,11 @@ RootSignature::RootSignature(Graphics& graphics, const std::vector<RPD::CBTypes>
 			staticSamplers[samplerIndex].Init(samplerInfo.slot, samplerInfo.filter);
 			staticSamplers[samplerIndex].ShaderVisibility = samplerInfo.visibility;
 			staticSamplers[samplerIndex].MaxAnisotropy = samplerInfo.maxAnisotropy;
+			staticSamplers[samplerIndex].AddressU = samplerInfo.addressMode;
+			staticSamplers[samplerIndex].AddressV = samplerInfo.addressMode;
+			staticSamplers[samplerIndex].AddressW = samplerInfo.addressMode;
+			staticSamplers[samplerIndex].BorderColor = samplerInfo.borderColor;
+			staticSamplers[samplerIndex].ComparisonFunc = samplerInfo.comparisonFunc;
 			++samplerIndex;
 		}
 	}

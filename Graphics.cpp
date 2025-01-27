@@ -275,16 +275,6 @@ CD3DX12_CPU_DESCRIPTOR_HANDLE Graphics::GetRtvCpuHandle() const noexcept
 	};
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE* Graphics::GetDSVHandle() noexcept
-{
-	return &dethPrePassDSVHandle;
-}
-
-void Graphics::SetDSVHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE& dsvHandle) noexcept
-{
-	dethPrePassDSVHandle = dsvHandle;
-}
-
 ID3D12GraphicsCommandList* Graphics::GetMainCommandList()
 {
 	return commandList.Get();
@@ -388,8 +378,13 @@ Gui* const Graphics::GetGui() noexcept
 void Graphics::CreateSRV(ID3D12Resource* const resource, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle)
 {
 	auto resourceDesc = resource->GetDesc();
+	auto format = resourceDesc.Format;
+	if (format == DXGI_FORMAT_D32_FLOAT)
+	{
+		format = DXGI_FORMAT_R32_FLOAT;
+	}
 	const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {
-		.Format = resourceDesc.Format,
+		.Format = format,
 		.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
 		.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 		.Texture2D{.MipLevels = resourceDesc.MipLevels },

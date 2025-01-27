@@ -19,7 +19,7 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
 };
 
-const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureHighestSlotMap =
+const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::textureNumMap =
 {
 	{ ShaderSettings::Color, 0 },
 	{ ShaderSettings::Texture, 1 },
@@ -32,14 +32,14 @@ const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> Material::text
 Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings)
 {
 	rasterizerDesc = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
-	const UINT descriptorsNum = textureHighestSlotMap.at(shaderSettings);
+	texturesNum = textureNumMap.at(shaderSettings);
 	// descriptor heap for the shader resource view
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuStartHandle{};
-	if (descriptorsNum > 0)
+	if (texturesNum > 0)
 	{
 		const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = descriptorsNum,
+			.NumDescriptors = texturesNum,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 		};
 		CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
@@ -119,9 +119,12 @@ void Material::Bind(Graphics& graphics, ID3D12GraphicsCommandList* const command
 	}
 }
 
-ID3D12DescriptorHeap* Material::GetDescriptorHeap() noexcept
+void Material::BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	return srvHeap.Get();
+	if (srvHeap)
+	{
+		commandList->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+	}
 }
 
 void Material::Update()

@@ -19,7 +19,7 @@ class Material
 public:
 	Material(Graphics& graphics, const aiMaterial* const assignedMaterial, ShaderSettings& shaderSettings);
 	void Bind(Graphics& graphics, ID3D12GraphicsCommandList* const commandList) noexcept;
-	ID3D12DescriptorHeap* GetDescriptorHeap() noexcept;
+	void BindDescriptorHeap(ID3D12GraphicsCommandList* const commandList) noexcept;
 	void Update();
 	ID3DBlob* GetPSBlob() const noexcept;
 	CD3DX12_RASTERIZER_DESC GetRasterizerDesc() const noexcept;
@@ -29,6 +29,8 @@ private:
 	std::vector<std::unique_ptr<Texture>> textures;
 	std::shared_ptr<Microsoft::WRL::ComPtr<ID3DBlob>> pixelShaderBlob;
 	CD3DX12_RASTERIZER_DESC rasterizerDesc;
+
+	UINT texturesNum = 0;
 	struct Roughness
 	{
 		alignas(16) float roughness = 0.8f;
@@ -44,5 +46,5 @@ private:
 	std::unique_ptr<Color> colorBuffer = nullptr;
 
 	static const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> psPaths;
-	static const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> textureHighestSlotMap;
+	static const std::unordered_map<ShaderSettings, INT, ShaderSettingsHash> textureNumMap;
 };

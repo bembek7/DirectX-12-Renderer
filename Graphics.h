@@ -30,8 +30,6 @@ public:
 	void ExecuteBundle(ID3D12GraphicsCommandList* const bundle);
 	void ClearRenderTargetView();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetRtvCpuHandle() const noexcept;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE* GetDSVHandle() noexcept;
-	void SetDSVHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE& dsvHandle) noexcept;
 
 	ID3D12GraphicsCommandList* GetMainCommandList();
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CreateBundle();

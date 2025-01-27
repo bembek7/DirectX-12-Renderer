@@ -15,7 +15,7 @@ enum class PassType
 {
 	GPass,
 	LightPass,
-	ShadowMapGeneraration,
+	ShadowPass,
 	LightPerspective,
 	FinalPass
 };
@@ -26,7 +26,6 @@ public:
 	Pass(Graphics& graphics, PassType type, const std::vector<RPD::CBTypes>& constantBuffers = {}, const std::vector<RPD::TextureTypes>& textures = {}, const std::vector<RPD::SamplerTypes>& samplers = {});
 	void Execute(Graphics& graphics);
 	PipelineState::PipelineStateStream GetPSS() const { return pipelineStateStream; };
-	virtual void BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle) {};
 	virtual ~Pass() = default;
 	PassType GetType() const noexcept;
 	RootSignature* GetRootSignature() noexcept;

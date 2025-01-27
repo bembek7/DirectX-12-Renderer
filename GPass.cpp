@@ -19,7 +19,6 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 	const float windowHeight = graphics.GetWindowHeight();
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
-	graphics.SetDSVHandle(depthStencilView->GetDsvHandle());
 
 	pipelineStateStream.renderTargetFormats =
 	{
@@ -58,7 +57,8 @@ void GPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>
 		graphics.GetMainCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	}
 	
-	graphics.GetMainCommandList()->OMSetRenderTargets(rtvsNum, &rtv, TRUE, graphics.GetDSVHandle());
+	auto dsvHandle = depthStencilView->GetDsvHandle();
+	graphics.GetMainCommandList()->OMSetRenderTargets(rtvsNum, &rtv, TRUE, &dsvHandle);
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());
@@ -83,4 +83,9 @@ ID3D12Resource* GPass::GetSpecularColorTexture() noexcept
 ID3D12Resource* GPass::GetViewPositionTexture() noexcept
 {
 	return rtvHeap->GetRenderTarget(3);
+}
+
+ID3D12Resource* GPass::GetDepthBuffer() noexcept
+{
+	return depthStencilView->GetBuffer();
 }

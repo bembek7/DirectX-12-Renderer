@@ -1,1 +1,1 @@
-SamplerComparisonState shadowSampler : register(s0);
+SamplerComparisonState comparisonSampler : register(s0);

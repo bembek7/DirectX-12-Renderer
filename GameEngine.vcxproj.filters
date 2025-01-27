@@ -210,7 +210,7 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowMapGenerationPass.cpp">
+    <ClCompile Include="ShadowPass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="RTVHeap.cpp">
@@ -401,7 +401,7 @@
     <ClInclude Include="DepthStencilView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMapGenerationPass.h">
+    <ClInclude Include="ShadowPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
     <ClInclude Include="RTVHeap.h">
@@ -445,7 +445,7 @@
     <FxCompile Include="ShadowMapGenerationVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="ShadowMapGenerationPS.hlsl">
+    <FxCompile Include="ShadowPassPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
     </FxCompile>
     <FxCompile Include="ColorPS.hlsl">
@@ -465,6 +465,9 @@
     </FxCompile>
     <FxCompile Include="SpotLightPassPS.hlsl">
       <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowPassVS.hlsl">
+      <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

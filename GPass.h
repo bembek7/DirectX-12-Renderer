@@ -19,6 +19,7 @@ public:
 	ID3D12Resource* GetNormal_RoughnessTexture() noexcept;
 	ID3D12Resource* GetSpecularColorTexture() noexcept;
 	ID3D12Resource* GetViewPositionTexture() noexcept;
+	ID3D12Resource* GetDepthBuffer() noexcept;
 private:
 	std::unique_ptr<DepthStencilView> depthStencilView;
 	std::unique_ptr<RTVHeap> rtvHeap;
