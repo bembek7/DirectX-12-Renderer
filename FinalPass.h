@@ -10,7 +10,7 @@ class Actor;
 class FinalPass : public Pass
 {
 public:
-	FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture, ID3D12Resource* const shadowMapTexture);
+	FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture);
 
 	void Execute(Graphics& graphics);
 private:

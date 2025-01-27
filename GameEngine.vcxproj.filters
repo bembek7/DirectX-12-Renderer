@@ -34,9 +34,6 @@
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{859d35fc-75e1-4413-9886-757538205901}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Bindables">
-      <UniqueIdentifier>{731723db-7ee2-4ea2-909a-f007590dc7f0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Actor">
       <UniqueIdentifier>{14ffc659-dc4a-4889-bde6-0e446f55feb8}</UniqueIdentifier>
     </Filter>
@@ -72,6 +69,9 @@
     </Filter>
     <Filter Include="Resource Files\VertexShaders\Headers\CBs">
       <UniqueIdentifier>{2ac45b1f-79e2-40b4-9050-9a326098dda4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor\Bindables">
+      <UniqueIdentifier>{731723db-7ee2-4ea2-909a-f007590dc7f0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -118,31 +118,31 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Bindable.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="RootSignature.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="ScissorRectangle.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="SceneComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="PipelineState.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
@@ -528,13 +528,16 @@
     <None Include="SceneSpecularColor.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
-    <None Include="SceneViewPosition.hlsli">
-      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
-    </None>
     <None Include="LightMap.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
     <None Include="ShadowMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="MainPerspectiveCB.hlsli">
+      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SceneViewPosition.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
   </ItemGroup>

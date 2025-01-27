@@ -8,7 +8,8 @@ class ShadowPass : public Pass
 public:
 	ShadowPass(Graphics& graphics, const Camera* camera, const DirectX::XMFLOAT4X4 projection, ID3D12Resource* const mainDepthBuffer);
 
-	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const CD3DX12_CPU_DESCRIPTOR_HANDLE& shadowMapRtvHandle);
+	void Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const CD3DX12_CPU_DESCRIPTOR_HANDLE& shadowMapRtvHandle,
+				const Camera* const mainCamera, const DirectX::XMFLOAT4X4 mainProjection);
 
 	virtual void BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle) override;
 	//virtual void BindPassSpecificRootParams(ID3D12GraphicsCommandList* const drawingBundle) override;
@@ -18,5 +19,11 @@ private:
 	const Camera* cameraUsed;
 	std::unique_ptr<PipelineState> pipelineState;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap;
+	struct MainPerspectiveBuffer
+	{
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
+	} mainPerspectiveBuffer{};
+	std::unique_ptr<ConstantBufferCBV<MainPerspectiveBuffer>> mainPerspectiveCB;
 };
 

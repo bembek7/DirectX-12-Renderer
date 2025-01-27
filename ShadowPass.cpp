@@ -19,7 +19,7 @@
 
 ShadowPass::ShadowPass(Graphics& graphics, const Camera* camera, const DirectX::XMFLOAT4X4 projection, ID3D12Resource* const mainDepthBuffer) :
 	Pass(graphics, PassType::ShadowPass,
-		{ RPD::CBTypes::Transform },
+		{ RPD::CBTypes::Transform},
 		{ RPD::TextureTypes::DepthBuffer },
 		{ RPD::SamplerTypes::Comparison }),
 	cameraUsed(camera),
@@ -29,6 +29,8 @@ ShadowPass::ShadowPass(Graphics& graphics, const Camera* camera, const DirectX::
 	const float windowHeight = graphics.GetWindowHeight();
 
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
+
+	mainPerspectiveCB = std::make_unique<ConstantBufferCBV<MainPerspectiveBuffer>>(graphics, mainPerspectiveBuffer, 1u);
 
 	pipelineStateStream.renderTargetFormats =
 	{
@@ -40,6 +42,9 @@ ShadowPass::ShadowPass(Graphics& graphics, const Camera* camera, const DirectX::
 	auto dsDesc = CD3DX12_DEPTH_STENCIL_DESC(CD3DX12_DEFAULT{});
 	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
 	pipelineStateStream.depthStencil = dsDesc;
+	auto rasterizer = CD3DX12_RASTERIZER_DESC(CD3DX12_DEFAULT{});
+	rasterizer.CullMode = D3D12_CULL_MODE_FRONT;
+	pipelineStateStream.rasterizer = rasterizer;
 
 	auto blendDesc = CD3DX12_BLEND_DESC(CD3DX12_DEFAULT{});
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -78,7 +83,8 @@ ShadowPass::ShadowPass(Graphics& graphics, const Camera* camera, const DirectX::
 	graphics.CreateSRV(mainDepthBuffer, srvCpuHandle);
 }
 
-void ShadowPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const CD3DX12_CPU_DESCRIPTOR_HANDLE& shadowMapRtvHandle)
+void ShadowPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const CD3DX12_CPU_DESCRIPTOR_HANDLE& shadowMapRtvHandle,
+						const Camera* const mainCamera, const DirectX::XMFLOAT4X4 mainProjection)
 {
 	Pass::Execute(graphics);
 	graphics.SetCamera(cameraUsed->GetMatrix());
@@ -87,6 +93,11 @@ void ShadowPass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<A
 	auto dsv = depthStencilView->GetDsvHandle(); 
 	graphics.GetMainCommandList()->OMSetRenderTargets(1, &shadowMapRtvHandle, TRUE, &dsv);
 	graphics.GetMainCommandList()->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
+
+	namespace Dx = DirectX;
+	Dx::XMStoreFloat4x4(&mainPerspectiveBuffer.view, mainCamera->GetMatrix());
+	mainPerspectiveBuffer.projection = mainProjection;
+	mainPerspectiveCB->Update();
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());
@@ -100,10 +111,10 @@ void ShadowPass::BindPassSpecific(ID3D12GraphicsCommandList* const drawingBundle
 	pipelineState->Bind(drawingBundle);
 	rootSignature->Bind(drawingBundle);
 
-	//bind cb if there will be any
+	mainPerspectiveCB->Bind(drawingBundle);
 
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	// TODO get rid of magic number
-	drawingBundle->SetGraphicsRootDescriptorTable(1u, srvHeap->GetGPUDescriptorHandleForHeapStart());
+	drawingBundle->SetGraphicsRootDescriptorTable(2u, srvHeap->GetGPUDescriptorHandleForHeapStart());
 }
 

@@ -451,6 +451,7 @@
     <None Include="GPassOut.hlsli" />
     <None Include="LightMap.hlsli" />
     <None Include="MainDepthBuffer.hlsli" />
+    <None Include="MainPerspectiveCB.hlsli" />
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
     <None Include="PointLightPropertiesCB.hlsli" />
