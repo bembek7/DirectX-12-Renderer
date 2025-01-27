@@ -8,7 +8,7 @@ Light::Light(Graphics& graphics, const std::string& fileName, const std::string&
 {
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
 
-	//constantBuffers.push_back(std::make_unique<ConstantBufferCBV<ShadowMapBuffer>>(graphics, shadowMapBuffer, RPD::ShadowMapping));
+	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightPerspectiveBuffer>>(graphics, lightPerspectiveBuffer, 1u)); // TODO removeMagicNumber
 }
 
 void Light::Bind(ID3D12GraphicsCommandList* const commandList)
@@ -22,6 +22,9 @@ void Light::Bind(ID3D12GraphicsCommandList* const commandList)
 void Light::Update(Graphics& graphics)
 {
 	Actor::Update(graphics);
+
+	DirectX::XMStoreFloat4x4(&lightPerspectiveBuffer.view, shadowMapCamera->GetMatrix());
+	lightPerspectiveBuffer.projection = projection;
 
 	for (auto& cB : constantBuffers)
 	{

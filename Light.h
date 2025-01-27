@@ -31,4 +31,10 @@ protected:
 	DirectX::XMFLOAT4X4 projection{};
 	Camera* shadowMapCamera;
 	LightType type;
+
+	struct LightPerspectiveBuffer
+	{
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
+	} lightPerspectiveBuffer{};
 };

@@ -1,6 +1,8 @@
 #include "LightPass.h"
 #include "ShadersPool.h"
 
+using namespace RPD;
+
 std::unordered_map<LightType, std::wstring> LightPass::shaderPaths =
 {
 	{ LightType::Point, L"PointLightPassPS.cso" },
@@ -8,11 +10,13 @@ std::unordered_map<LightType, std::wstring> LightPass::shaderPaths =
 	{ LightType::Directional, L"DirectionalLightPassPS.cso" }
 };
 
-LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light) :
+LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor,
+	ID3D12Resource* const sceneViewPosition, ID3D12Resource* const sceneWorldPosition, ID3D12Resource* const lightDepthBuffer,
+	Light* const light) :
 	Pass(graphics, PassType::LightPass,
-		{ RPD::CBTypes::LightProperties },
-		{ RPD::TextureTypes::SceneNormal_Roughness, RPD::TextureTypes::SceneSpecularColor, RPD::TextureTypes::SceneViewPosition},
-		{ RPD::SamplerTypes::Anisotropic }),
+		{ CBTypes::LightProperties, CBTypes::LightPerspective },
+		{ TextureTypes::SceneNormal_Roughness, TextureTypes::SceneSpecularColor, TextureTypes::SceneViewPosition, TextureTypes::SceneWorldPosition, TextureTypes::LightDepthBuffer },
+		{ SamplerTypes::Anisotropic, SamplerTypes::Comparison }),
 	light(light)
 {
 	// TODO change render targets states
@@ -66,7 +70,7 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 
 	const D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 3,
+			.NumDescriptors = 5,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 	};
 	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&srvHeap)));
@@ -82,6 +86,14 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
 	graphics.CreateSRV(sceneViewPosition, srvCpuHandle);
+
+	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
+
+	graphics.CreateSRV(sceneWorldPosition, srvCpuHandle);
+
+	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
+
+	graphics.CreateSRV(lightDepthBuffer, srvCpuHandle);
 
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());

@@ -1,9 +1,5 @@
 #include "SpotLightPropertiesCB.hlsli"
-#include "Phong.hlsli"
-#include "TextureSampler.hlsli"
-#include "SceneNormal_Roughness.hlsli"
-#include "SceneSpecularColor.hlsli"
-#include "SceneViewPosition.hlsli"
+#include "LightPass.hlsli"
 
 float CalculateSpotFactor(const float3 lightDirection, const float3 spotPower, const float3 directionToLight)
 {
@@ -17,11 +13,13 @@ float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
     const float3 viewNormal = normal_roughness.rgb;
     const float roughness = normal_roughness.a;
     const float3 specularColor = sceneSpecularColorTex.Sample(texSampler, texCoord).rgb;
+    const float3 worldPosition = sceneWorldPositionTex.Sample(texSampler, texCoord).rgb;
+   
+    const float4 lightPerspectivePosition = mul(mul(float4(worldPosition, 1.0f), LightPerspectiveCB.view), LightPerspectiveCB.proj);
     
-    const float lighting = 1.f; //CalculateLighting();
+    const float lighting = CalculateLighting(lightPerspectivePosition);
     
     const LightVectorData lightVector = CalculateLightVectorData(SpotLightPropertiesCB.lightViewPos, viewPosition);
-    
     
     float attenuation = Attenuate(SpotLightPropertiesCB.attenuationConst, SpotLightPropertiesCB.attenuationLin, 
                                    SpotLightPropertiesCB.attenuationQuad, lightVector.distanceToLight);

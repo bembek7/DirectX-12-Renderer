@@ -1,6 +1,7 @@
 struct LightPerspective
 {
-    matrix lightPerspective;
+    matrix view;
+    matrix proj;
 };
 
 ConstantBuffer<LightPerspective> LightPerspectiveCB : register(b1);

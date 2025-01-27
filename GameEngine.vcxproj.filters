@@ -501,9 +501,6 @@
     <None Include="TransformCB.hlsli">
       <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
     </None>
-    <None Include="LightPerspectiveCB.hlsli">
-      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
-    </None>
     <None Include="SceneColor.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
@@ -528,11 +525,20 @@
     <None Include="ShadowMap.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
-    <None Include="MainPerspectiveCB.hlsli">
-      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
-    </None>
     <None Include="SceneViewPosition.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightPass.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="SceneWorldPosition.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightDepthBuffer.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightPerspectiveCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -17,7 +17,7 @@ SpotLight::SpotLight(Graphics& graphics, const std::string& fileName, const std:
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
-	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 200.0f) * reverseZ);
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 100.0f) * reverseZ);
 }
 
 void SpotLight::Update(Graphics& graphics)

@@ -1,0 +1,1 @@
+Texture2D lightDepthBuffer : register(t4);

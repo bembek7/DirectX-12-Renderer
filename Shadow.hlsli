@@ -1,6 +1,5 @@
-
-Texture2D shadowMap : register(t0);
-SamplerComparisonState shadowSampler : register(s0);
+#include "ComparisonSampler.hlsli"
+#include "LightDepthBuffer.hlsli"
 
 //static const float zf = 200.0f;
 //static const float zn = 0.5f;
@@ -21,11 +20,9 @@ SamplerComparisonState shadowSampler : register(s0);
 
 float CalculateLighting(float4 lightPerspectivePos)
 {
-    float2 shadowTexCoords;
-    shadowTexCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
-    shadowTexCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
+    float2 texCoords;
+    texCoords.x = 0.5f + (lightPerspectivePos.x / lightPerspectivePos.w * 0.5f);
+    texCoords.y = 0.5f - (lightPerspectivePos.y / lightPerspectivePos.w * 0.5f);
     float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
-    // Depth in NDC space.
-    float depth = lightPerspectivePos.z;
-    return shadowMap.SampleCmpLevelZero(shadowSampler, shadowTexCoords, pixelDepth).r;
+    return lightDepthBuffer.SampleCmpLevelZero(comparisonSampler, texCoords, pixelDepth).r;
 }

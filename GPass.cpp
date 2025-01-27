@@ -93,7 +93,7 @@ ID3D12Resource* GPass::GetViewPositionTexture() noexcept
 	return rtvHeap->GetRenderTarget(3);
 }
 
-ID3D12Resource* GPass::GetDepthBuffer() noexcept
+ID3D12Resource* GPass::GetWorldPositionTexture() noexcept
 {
-	return depthStencilView->GetBuffer();
+	return rtvHeap->GetRenderTarget(4);
 }

@@ -7,7 +7,9 @@
 class LightPass : public Pass
 {
 public:
-	LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor, ID3D12Resource* const sceneViewPosition, Light* const light);
+	LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_RoughnessTexture, ID3D12Resource* const sceneSpecularColor,
+		ID3D12Resource* const sceneViewPosition, ID3D12Resource* const sceneWorldPosition, ID3D12Resource* const lightDepthBuffer,
+		Light* const light);
 
 	void Execute(Graphics& graphics, const CD3DX12_CPU_DESCRIPTOR_HANDLE& lightMapRtvHandle);
 

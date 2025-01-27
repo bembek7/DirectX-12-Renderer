@@ -1,9 +1,5 @@
 #include "PointLightPropertiesCB.hlsli"
-#include "Phong.hlsli"
-#include "TextureSampler.hlsli"
-#include "SceneNormal_Roughness.hlsli"
-#include "SceneSpecularColor.hlsli"
-#include "SceneViewPosition.hlsli"
+#include "LightPass.hlsli"
 
 float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
 {
