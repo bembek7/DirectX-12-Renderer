@@ -495,9 +495,6 @@
     <None Include="ComparisonSampler.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Samplers</Filter>
     </None>
-    <None Include="MainDepthBuffer.hlsli">
-      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
-    </None>
     <None Include="TransformCB.hlsli">
       <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
     </None>

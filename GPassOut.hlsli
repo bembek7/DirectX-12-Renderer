@@ -7,13 +7,13 @@ struct GPassPSOut
     float4 worldPosition : SV_TARGET4;
 };
 
-GPassPSOut ConstructGPassPSOut(float3 color, float3 viewNormal, float roughness, float3 viewPosition, float3 worldPosition, float3 specularColor = float3(1.0f, 1.0f, 1.0f))
+GPassPSOut ConstructGPassPSOut(float3 color, float3 viewNormal, float roughness, float3 viewPosition, float4 worldPosition, float3 specularColor = float3(1.0f, 1.0f, 1.0f))
 {
     GPassPSOut psOut;
     psOut.color = color;
     psOut.viewNormal_roughness = float4(viewNormal, roughness);
     psOut.viewPosition = float4(viewPosition, 1.f);
-    psOut.worldPosition = float4(worldPosition, 1.f);
+    psOut.worldPosition = worldPosition;
     psOut.specColor = specularColor;
     return psOut;
 }

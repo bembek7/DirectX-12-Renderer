@@ -1,1 +1,0 @@
-Texture2D mainDepthBuffer : register(t0);

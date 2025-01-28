@@ -23,8 +23,9 @@ void Light::Update(Graphics& graphics)
 {
 	Actor::Update(graphics);
 
-	DirectX::XMStoreFloat4x4(&lightPerspectiveBuffer.view, shadowMapCamera->GetMatrix());
-	lightPerspectiveBuffer.projection = projection;
+	DirectX::XMStoreFloat4x4(&lightPerspectiveBuffer.view, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
+	auto projectionMatrix = DirectX::XMLoadFloat4x4(&projection);
+	DirectX::XMStoreFloat4x4(&lightPerspectiveBuffer.projection, DirectX::XMMatrixTranspose(projectionMatrix));
 
 	for (auto& cB : constantBuffers)
 	{
