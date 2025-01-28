@@ -7,7 +7,7 @@ class DirectionalLight : public Light
 {
 	friend class Gui;
 public:
-	DirectionalLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Directional Light");
+	DirectionalLight(Graphics& graphics, const std::string& actorName = "Directional Light");
 	virtual void Update(Graphics& graphics) override;
 
 protected:

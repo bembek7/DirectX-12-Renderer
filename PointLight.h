@@ -6,7 +6,7 @@ class PointLight : public Light
 {
 	friend class Gui;
 public:
-	PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Point Light");
+	PointLight(Graphics& graphics, const std::string& actorName = "Point Light");
 	virtual void Update(Graphics& graphics) override;
 
 protected:

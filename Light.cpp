@@ -2,12 +2,12 @@
 #include "Camera.h"
 #include "RootParametersDescription.h"
 
-Light::Light(Graphics& graphics, const std::string& fileName, const std::string& actorName, const LightType type) :
-	MeshActor(graphics, fileName, actorName),
+Light::Light(Graphics& graphics, const std::string& actorName, const LightType type) :
+	Actor(actorName),
 	type(type)
 {
+	SetRootComponent<SceneComponent>(SceneComponent::CreateComponent("Root Component"));
 	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
-
 	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightPerspectiveBuffer>>(graphics, lightPerspectiveBuffer, 1u)); // TODO removeMagicNumber
 }
 

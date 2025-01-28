@@ -1,8 +1,8 @@
 #include "PointLight.h"
 #include "RootParametersDescription.h"
 
-PointLight::PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
-	Light(graphics, fileName, actorName, LightType::Point)
+PointLight::PointLight(Graphics& graphics, const std::string& actorName) :
+	Light(graphics, actorName, LightType::Point)
 {
 	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, 0u));
 }

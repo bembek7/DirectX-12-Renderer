@@ -1,8 +1,8 @@
 #include "SpotLight.h"
 #include "RootParametersDescription.h"
 
-SpotLight::SpotLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
-	Light(graphics, fileName, actorName, LightType::Spot)
+SpotLight::SpotLight(Graphics& graphics, const std::string& actorName) :
+	Light(graphics, actorName, LightType::Spot)
 {
 	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, 0u));
 
@@ -17,7 +17,7 @@ SpotLight::SpotLight(Graphics& graphics, const std::string& fileName, const std:
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
-	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, windowHeight / windowWidth, 0.5f, 100.0f) * reverseZ);
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, 1.0f, 0.1f, 100.0f) * reverseZ);
 }
 
 void SpotLight::Update(Graphics& graphics)

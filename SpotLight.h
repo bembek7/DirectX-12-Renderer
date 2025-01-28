@@ -4,7 +4,7 @@ class SpotLight : public Light
 {
 	friend class Gui;
 public:
-	SpotLight(Graphics& graphics, const std::string& fileName, const std::string& actorName = "Spot Light");
+	SpotLight(Graphics& graphics, const std::string& actorName = "Spot Light");
 	virtual void Update(Graphics& graphics) override;
 
 protected:

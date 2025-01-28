@@ -27,6 +27,7 @@ float CalculateLighting(float4 lightPerspectivePos)
     {
         return 0.f;
     }
+    
     float pixelDepth = lightPerspectivePos.z / lightPerspectivePos.w;
     return lightDepthBuffer.SampleCmpLevelZero(comparisonSampler, texCoords, pixelDepth).r;
 }
