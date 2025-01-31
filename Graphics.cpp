@@ -75,6 +75,7 @@ Graphics::Graphics(const HWND& hWnd, const float windowWidth, const float window
 	LoadAssets();
 
 	cbvSrvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	dsvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	gui = std::make_unique<Gui>(hWnd, device.Get(), bufferCount, renderTargetDxgiFormat);
 }
@@ -295,6 +296,11 @@ ID3D12Device2* Graphics::GetDevice()
 UINT Graphics::GetCbvSrvDescriptorSize() const noexcept
 {
 	return cbvSrvDescriptorSize;
+}
+
+UINT Graphics::GetDsvDescriptorSize() const noexcept
+{
+	return dsvDescriptorSize;
 }
 
 float Graphics::GetWindowWidth() const noexcept

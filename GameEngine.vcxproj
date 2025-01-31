@@ -146,6 +146,7 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d11.lib;d3d12.lib;dxguid.lib;dxgi.lib;winmm.lib;d3dcompiler.lib;assimp-vc140-mt.lib;DirectXTex.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <Profile>false</Profile>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(WorkDir)%(Filename).cso</ObjectFileOutput>

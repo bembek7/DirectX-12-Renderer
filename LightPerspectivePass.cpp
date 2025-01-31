@@ -5,17 +5,27 @@
 #include "ShadersPool.h"
 #include "Graphics.h"
 #include "Camera.h"
+#include "Viewport.h"
 
-LightPerspectivePass::LightPerspectivePass(Graphics& graphics, const Camera* camera, const DirectX::XMFLOAT4X4 projection) :
+LightPerspectivePass::LightPerspectivePass(Graphics& graphics, Camera* camera, const DirectX::XMFLOAT4X4 projection, const LightType lightType) :
 	Pass(graphics, PassType::LightPerspectivePass,
 		{ RPD::CBTypes::Transform }),
 	cameraUsed(camera),
 	projection(projection)
 {
-	const float windowWidth = graphics.GetWindowWidth();
-	const float windowHeight = graphics.GetWindowHeight();
+	float dsvWidth = graphics.GetWindowWidth();
+	float dsvHeight = graphics.GetWindowHeight();
 
-	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
+	auto dsvUsage = DepthStencilView::Usage::Depth;
+	if (lightType == LightType::Point)
+	{
+		usesDepthCube = true;
+		dsvUsage = DepthStencilView::Usage::DepthCube;
+		dsvWidth = 1024.f;
+		dsvHeight = 1024.f;
+	}
+	bindables.push_back(std::make_unique<Viewport>(dsvWidth, dsvHeight));
+	depthStencilView = std::make_unique<DepthStencilView>(graphics, dsvUsage, 0.f, UINT(dsvWidth), UINT(dsvHeight));
 
 	pipelineStateStream.renderTargetFormats =
 	{
@@ -47,12 +57,38 @@ LightPerspectivePass::LightPerspectivePass(Graphics& graphics, const Camera* cam
 void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors)
 {
 	Pass::Execute(graphics);
-	graphics.SetCamera(cameraUsed->GetMatrix());
 	graphics.SetProjection(projection);
-
+	
+	namespace Dx = DirectX;
 	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto dsv = depthStencilView->GetDsvHandle();
-	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, &dsv);
+	//front
+	RenderFace(graphics, actors, Dx::XMFLOAT3{ 0.f, 0.f, 0.f }, &dsv);
+	dsv.Offset(graphics.GetDsvDescriptorSize());
+
+	if (usesDepthCube)
+	{
+		constexpr std::array<Dx::XMFLOAT3, 5> otherRotations =
+		{
+			Dx::XMFLOAT3{ 0.f, 180.f, 0.f },
+			Dx::XMFLOAT3{ 0.f, 90.f, 0.f },
+			Dx::XMFLOAT3{ 0.f, 270.f, 0.f },
+			Dx::XMFLOAT3{ 90.f, 0.f, 0.f },
+			Dx::XMFLOAT3{ 270.f, 0.f, 0.f }
+		};
+		for (const auto& rot : otherRotations)
+		{
+			RenderFace(graphics, actors, rot, &dsv);
+			dsv.Offset(graphics.GetDsvDescriptorSize());
+		}
+	}
+}
+
+void LightPerspectivePass::RenderFace(Graphics& graphics, const std::vector<std::unique_ptr<Actor>>& actors, const DirectX::XMFLOAT3& cameraRotation, const D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle)
+{
+	cameraUsed->SetRelativeRotation(cameraRotation);
+	graphics.SetCamera(cameraUsed->GetMatrix());
+	graphics.GetMainCommandList()->OMSetRenderTargets(0, nullptr, TRUE, dsvHandle);
 	for (auto& actor : actors)
 	{
 		actor->Draw(graphics, GetType());

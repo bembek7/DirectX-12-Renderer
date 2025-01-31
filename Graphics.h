@@ -36,6 +36,7 @@ public:
 	ID3D12Device2* GetDevice();
 
 	UINT GetCbvSrvDescriptorSize() const noexcept;
+	UINT GetDsvDescriptorSize() const noexcept;
 
 	float GetWindowWidth() const noexcept;
 	float GetWindowHeight() const noexcept;
@@ -71,6 +72,7 @@ private:
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
 	UINT cbvSrvDescriptorSize = 0;
+	UINT dsvDescriptorSize = 0;
 	static constexpr UINT bufferCount = 2;
 
 	std::unique_ptr<Gui> gui;

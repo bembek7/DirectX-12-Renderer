@@ -10,10 +10,10 @@ public:
 	{
 		DepthStencil,
 		Depth,
-		DepthShadowMapping
+		DepthCube
 	};
 	DepthStencilView(Graphics& graphics, const Usage usage, const float clearValue, const UINT width, const UINT height);
-	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() const noexcept;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvHandle(const UINT bufferIndex = 0) noexcept;
 	void Clear(ID3D12GraphicsCommandList* const commandList);
 	ID3D12Resource* GetBuffer() noexcept;
 
@@ -22,5 +22,5 @@ private:
 	Usage usage;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+	UINT descSize = 0;
 };

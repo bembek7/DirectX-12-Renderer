@@ -33,7 +33,7 @@ void Light::Update(Graphics& graphics)
 	}
 }
 
-const Camera* Light::GetLightCamera() const noexcept
+Camera* Light::GetLightCamera() noexcept
 {
 	return shadowMapCamera;
 }

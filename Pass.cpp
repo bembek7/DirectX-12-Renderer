@@ -10,10 +10,7 @@ Pass::Pass(Graphics& graphics, PassType type, const std::vector<RPD::CBTypes>& c
 {
 	rootSignature = std::make_unique<RootSignature>(graphics, constantBuffers, textures, samplers);
 
-	const float windowWidth = graphics.GetWindowWidth();
-	const float windowHeight = graphics.GetWindowHeight();
 	bindables.push_back(std::make_unique<ScissorRectangle>());
-	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 
 	pipelineStateStream.primitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	pipelineStateStream.rootSignature = rootSignature->Get();

@@ -1,5 +1,6 @@
 #include "LightPass.h"
 #include "ShadersPool.h"
+#include "Viewport.h"
 
 using namespace RPD;
 
@@ -19,6 +20,10 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 		{ SamplerTypes::Anisotropic, SamplerTypes::Comparison }),
 	light(light)
 {
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
+
 	// TODO change render targets states
 	pipelineStateStream.renderTargetFormats =
 	{

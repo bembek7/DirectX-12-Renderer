@@ -47,7 +47,7 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 
 void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
-	auto lpp = std::make_unique<LightPerspectivePass>(graphics, lightToAdd->GetLightCamera(), lightToAdd->GetLightProjection());
+	auto lpp = std::make_unique<LightPerspectivePass>(graphics, lightToAdd->GetLightCamera(), lightToAdd->GetLightProjection(), lightToAdd->GetType());
 	
 	auto lightPass = std::make_unique<LightPass>(graphics, gPass->GetNormal_RoughnessTexture(), gPass->GetSpecularColorTexture(),
 												gPass->GetViewPositionTexture(), gPass->GetWorldPositionTexture(), lpp->GetDepthBuffer(),

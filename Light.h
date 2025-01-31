@@ -17,7 +17,7 @@ class Light : public Actor
 public:
 	void Bind(ID3D12GraphicsCommandList* const commandList);
 	virtual void Update(Graphics& graphics) override;
-	const Camera* GetLightCamera() const noexcept;
+	Camera* GetLightCamera() noexcept;
 	DirectX::XMFLOAT4X4 GetLightProjection() const noexcept;
 
 	LightType GetType() const noexcept;

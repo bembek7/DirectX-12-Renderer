@@ -17,7 +17,7 @@ GPass::GPass(Graphics& graphics, const Camera* camera, DirectX::XMFLOAT4X4 proje
 {
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
-
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
 	depthStencilView = std::make_unique<DepthStencilView>(graphics, DepthStencilView::Usage::Depth, 0.f, UINT(windowWidth), UINT(windowHeight));
 
 	pipelineStateStream.renderTargetFormats =

@@ -10,6 +10,10 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap},
 		{ RPD::SamplerTypes::Anisotropic })
 {
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+	bindables.push_back(std::make_unique<Viewport>(windowWidth, windowHeight));
+
 	pipelineStateStream.renderTargetFormats =
 	{
 		.RTFormats{ Graphics::renderTargetDxgiFormat },
