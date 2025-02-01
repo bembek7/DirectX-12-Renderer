@@ -1,5 +1,6 @@
 #include "PointLightPropertiesCB.hlsli"
 #include "LightPass.hlsli"
+#include "PointShadow.hlsli"
 
 float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
 {
@@ -12,7 +13,7 @@ float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
    
     const float4 lightPerspectivePosition = mul(mul(worldPosition, LightPerspectiveCB.view), LightPerspectiveCB.proj);
     
-    const float lighting = CalculateLighting(lightPerspectivePosition);
+    const float lighting = CalculateLightingCube(lightPerspectivePosition);
     
     const LightVectorData lightVector = CalculateLightVectorData(PointLightPropertiesCB.lightViewPos, viewPosition);
   

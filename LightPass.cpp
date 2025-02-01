@@ -98,7 +98,14 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
-	graphics.CreateSRV(lightDepthBuffer, srvCpuHandle);
+	if (light->GetType() == LightType::Point)
+	{
+		graphics.CreateSRV(lightDepthBuffer, srvCpuHandle, D3D12_SRV_DIMENSION_TEXTURECUBE);
+	}
+	else
+	{
+		graphics.CreateSRV(lightDepthBuffer, srvCpuHandle);
+	}
 
 	drawingBundle->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());
 	drawingBundle->SetGraphicsRootDescriptorTable(rootSignature->GetDescriptorTableIndex(), srvHeap->GetGPUDescriptorHandleForHeapStart());

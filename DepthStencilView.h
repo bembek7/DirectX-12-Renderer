@@ -22,5 +22,6 @@ private:
 	Usage usage;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
+	UINT texturesNum = 0;
 	UINT descSize = 0;
 };

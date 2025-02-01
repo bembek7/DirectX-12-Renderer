@@ -437,11 +437,13 @@
     <None Include="DirectionalLightPropertiesCB.hlsli" />
     <None Include="GPassOut.hlsli" />
     <None Include="LightDepthBuffer.hlsli" />
+    <None Include="LightDepthBufferCube.hlsli" />
     <None Include="LightMap.hlsli" />
     <None Include="LightPass.hlsli" />
     <None Include="NormalMap.hlsli" />
     <None Include="Phong.hlsli" />
     <None Include="PointLightPropertiesCB.hlsli" />
+    <None Include="PointShadow.hlsli" />
     <None Include="RoughnessCB.hlsli" />
     <None Include="SceneColor.hlsli" />
     <None Include="SceneNormal_Roughness.hlsli" />

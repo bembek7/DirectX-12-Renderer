@@ -1,5 +1,6 @@
 #include "SpotLightPropertiesCB.hlsli"
 #include "LightPass.hlsli"
+#include "Shadow.hlsli"
 
 float CalculateSpotFactor(const float3 lightDirection, const float3 spotPower, const float3 directionToLight)
 {

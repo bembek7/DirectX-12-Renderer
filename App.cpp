@@ -31,8 +31,7 @@ void App::InitializeScene(Graphics& graphics)
 
 	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
-	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	//directionalLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 0.0f });
+	sphere->SetActorTransform({ -10.f, -5.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
 	pointLight->SetActorLocation(Dx::XMFLOAT3{ -10.f, 0.f, 0.0f });
 

@@ -1,0 +1,1 @@
+TextureCube lightDepthBufferCube : register(t4);

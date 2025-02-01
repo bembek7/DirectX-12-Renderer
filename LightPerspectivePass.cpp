@@ -62,25 +62,27 @@ void LightPerspectivePass::Execute(Graphics& graphics, const std::vector<std::un
 	namespace Dx = DirectX;
 	depthStencilView->Clear(graphics.GetMainCommandList());
 	auto dsv = depthStencilView->GetDsvHandle();
-	//front
-	RenderFace(graphics, actors, Dx::XMFLOAT3{ 0.f, 0.f, 0.f }, &dsv);
-	dsv.Offset(graphics.GetDsvDescriptorSize());
-
 	if (usesDepthCube)
 	{
-		constexpr std::array<Dx::XMFLOAT3, 5> otherRotations =
+		constexpr std::array<Dx::XMFLOAT3, 6> cubeMapFaceRotations =
 		{
-			Dx::XMFLOAT3{ 0.f, 180.f, 0.f },
-			Dx::XMFLOAT3{ 0.f, 90.f, 0.f },
-			Dx::XMFLOAT3{ 0.f, 270.f, 0.f },
-			Dx::XMFLOAT3{ 90.f, 0.f, 0.f },
-			Dx::XMFLOAT3{ 270.f, 0.f, 0.f }
+			Dx::XMFLOAT3{ 0.f,   90.f,  0.f }, 
+			Dx::XMFLOAT3{ 0.f,   270.f, 0.f },
+			Dx::XMFLOAT3{ 270.f, 0.f,   0.f }, 
+			Dx::XMFLOAT3{ 90.f,  0.f,   0.f }, 
+			Dx::XMFLOAT3{ 0.f,   0.f,   0.f },
+			Dx::XMFLOAT3{ 0.f,   180.f, 0.f } 
 		};
-		for (const auto& rot : otherRotations)
+		for (const auto& rot : cubeMapFaceRotations)
 		{
 			RenderFace(graphics, actors, rot, &dsv);
 			dsv.Offset(graphics.GetDsvDescriptorSize());
 		}
+		cameraUsed->SetRelativeRotation(Dx::XMFLOAT3{ 0.f,  0.f,  0.f });
+	}
+	else
+	{
+		RenderFace(graphics, actors, Dx::XMFLOAT3{ 0.f, 0.f, 0.f }, &dsv);
 	}
 }
 

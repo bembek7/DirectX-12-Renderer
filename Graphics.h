@@ -55,7 +55,7 @@ public:
 
 	Gui* const GetGui() noexcept;
 
-	void CreateSRV(ID3D12Resource* const resource, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle);
+	void CreateSRV(ID3D12Resource* const resource, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle, const D3D12_SRV_DIMENSION viewDimension = D3D12_SRV_DIMENSION_TEXTURE2D);
 
 private:
 	void LoadPipeline(const HWND& hWnd);

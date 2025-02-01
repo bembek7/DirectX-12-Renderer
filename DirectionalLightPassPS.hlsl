@@ -1,5 +1,6 @@
 #include "DirectionalLightPropertiesCB.hlsli"
 #include "LightPass.hlsli"
+#include "Shadow.hlsli"
 
 float3 main(const float2 texCoord : TEX_COORD) : SV_TARGET
 {

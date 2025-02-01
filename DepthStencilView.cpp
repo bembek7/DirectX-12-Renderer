@@ -9,7 +9,7 @@ DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const 
 	descSize = graphics.GetDsvDescriptorSize();
 	auto resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 	DXGI_FORMAT format{};
-	UINT texturesNum = 1;
+	texturesNum = 1;
 	switch (usage)
 	{
 	case Usage::DepthStencil:
@@ -92,7 +92,12 @@ void DepthStencilView::Clear(ID3D12GraphicsCommandList* const commandList)
 	default:
 		break;
 	}
-	commandList->ClearDepthStencilView(dsvHeap->GetCPUDescriptorHandleForHeapStart(), clearFlags, clearValue, 0, 0, nullptr);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE{ dsvHeap->GetCPUDescriptorHandleForHeapStart() };
+	for (UINT i = 0; i < texturesNum; ++i)
+	{
+		commandList->ClearDepthStencilView(dsvHandle, clearFlags, clearValue, 0, 0, nullptr);
+		dsvHandle.Offset(descSize);
+	}
 }
 
 ID3D12Resource* DepthStencilView::GetBuffer() noexcept
