@@ -6,6 +6,7 @@ struct PointLightProperties
     float specularIntensity;
     float3 lightViewPos;
     float attenuationConst;
+    float3 lightWorldPos;
     float attenuationLin;
     float attenuationQuad;
 };

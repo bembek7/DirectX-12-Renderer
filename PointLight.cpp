@@ -17,13 +17,13 @@ PointLight::PointLight(Graphics& graphics, const std::string& actorName) :
 	const float windowWidth = graphics.GetWindowWidth();
 	const float windowHeight = graphics.GetWindowHeight();
 
-	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(Dx::XM_PIDIV2, 1.0f, 0.5f, 100.0f) * reverseZ);
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, 1.0f, 0.5f, 100.0f) * reverseZ);
 }
 
 void PointLight::Update(Graphics& graphics)
 {
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
-
+	lightBuffer.lightWorldLocation = GetActorLocation();
 	Light::Update(graphics);
 }
 

@@ -166,6 +166,10 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 			resolvedSettings |= ShaderSettings::SpecularMap;
 		}
 	}
+	else
+	{
+		resolvedSettings |= ShaderSettings::Color;
+	}
 
 	return resolvedSettings;
 }

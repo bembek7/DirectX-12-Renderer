@@ -1,5 +1,6 @@
 #include "ComparisonSampler.hlsli"
 #include "LightDepthBuffer.hlsli"
+#include "LightPerspectiveCB.hlsli"
 
 float CalculateLighting(float4 lightPerspectivePos)
 {

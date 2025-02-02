@@ -17,9 +17,28 @@ void App::InitializeScene(Graphics& graphics)
 	//auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics());
 	auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
 	//auto spotLight = std::make_unique<SpotLight>(window.GetGraphics());
-
-	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "Brick Wall");
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+	/*auto sphere2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
+	auto sphere3 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere3");
+	auto sphere4 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere4");
+	auto left = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Left");
+	auto right = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Right");
+	auto front = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Front");
+	auto back = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Back");*/
+	/*sphere2->SetActorTransform({ 10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	sphere3->SetActorTransform({ 0.f, 0.f, -10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	sphere4->SetActorTransform({ 0.f, 0.f, 10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	left->SetActorTransform({ -15.f, 0.f, 0.0f }, zeroVec, { 0.1f, 30.5f, 30.5f });
+	right->SetActorTransform({ 15.f, 0.f, 0.0f }, zeroVec, { 0.5f, 30.5f, 30.5f });
+	front->SetActorTransform({ 0.f, 0.f, 15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });
+	back->SetActorTransform({ 0.f, 0.f, -15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });*/
+	/*scene->AddActor(graphics, std::move(sphere2));
+	scene->AddActor(graphics, std::move(sphere3));
+	scene->AddActor(graphics, std::move(sphere4));
+	scene->AddActor(graphics, std::move(left));
+	scene->AddActor(graphics, std::move(right));
+	scene->AddActor(graphics, std::move(front));
+	scene->AddActor(graphics, std::move(back));*/
 
 	auto last = std::chrono::steady_clock::now();
 	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
@@ -30,14 +49,14 @@ void App::InitializeScene(Graphics& graphics)
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 
 	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
-	brickWall->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 2.5f });
-	sphere->SetActorTransform({ -10.f, -5.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	sphere->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	
 	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
-	pointLight->SetActorLocation(Dx::XMFLOAT3{ -10.f, 0.f, 0.0f });
+	pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 0.0f });
 
 	scene->AddActor(graphics, std::move(sponza));
 	scene->AddActor(graphics, std::move(sphere));
-	scene->AddActor(graphics, std::move(brickWall));
+	
 	scene->AddLight(graphics, std::move(pointLight));
 	//scene->AddLight(graphics, std::move(spotLight));
 	//scene->AddLight(graphics, std::move(directionalLight));

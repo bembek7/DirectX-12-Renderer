@@ -4,4 +4,3 @@
 #include "SceneSpecularColor.hlsli"
 #include "SceneViewPosition.hlsli"
 #include "SceneWorldPosition.hlsli"
-#include "LightPerspectiveCB.hlsli"
