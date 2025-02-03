@@ -19,6 +19,7 @@ The renderer is structured into four passes:
 The renderer allows real-time material property adjustments via a GUI. It supports three types of light (directional, point, spot) and utilizes techniques such as Phong lighting, normal mapping, specular mapping, and a reverse Z-buffer. There is still significant room for optimization and improvements.
 
 Demo video:
+
 [![Alt text](https://img.youtube.com/vi/J-55XKMLEYs/0.jpg)](https://youtu.be/J-55XKMLEYs).
 
 ## Technology used
