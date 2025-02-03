@@ -24,6 +24,7 @@
     <ProjectGuid>{6719d7d1-7cc8-4e78-b4a9-0e22277cd1cf}</ProjectGuid>
     <RootNamespace>Rythm</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Renderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
