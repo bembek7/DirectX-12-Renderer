@@ -2,31 +2,32 @@
 #include "Bindable.h"
 #include "Graphics.h"
 #include "ThrowMacros.h"
+#include "BufferLoader.h"
 
-IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices)
+namespace Dx = DirectX;
+namespace Wrl = Microsoft::WRL;
+
+IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices)
 {
-	indicesNum = indices.size();
+	// set the index count
+	indicesNum = (UINT)indices.size();
 
-	D3D11_BUFFER_DESC indexBufferDesc = {};
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.CPUAccessFlags = 0u;
-	indexBufferDesc.MiscFlags = 0u;
-	indexBufferDesc.ByteWidth = (UINT)indices.size() * sizeof(unsigned int);
-	indexBufferDesc.StructureByteStride = sizeof(unsigned int);
+	indexBuffer = std::move(BufferLoader::GenerateBufferFromData(graphics, indices, D3D12_RESOURCE_STATE_INDEX_BUFFER));
 
-	D3D11_SUBRESOURCE_DATA indexBufferData = {};
-	indexBufferData.pSysMem = indices.data();
-
-	CHECK_HR(GetDevice(graphics)->CreateBuffer(&indexBufferDesc, &indexBufferData, &indexBuffer));
+	indexBufferView =
+	{
+		.BufferLocation = indexBuffer->GetGPUVirtualAddress(),
+		.SizeInBytes = indicesNum * (UINT)sizeof(WORD),
+		.Format = DXGI_FORMAT_R16_UINT,
+	};
 }
 
-void IndexBuffer::Bind(Graphics& graphics) noexcept
+void IndexBuffer::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetContext(graphics)->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+	commandList->IASetIndexBuffer(&indexBufferView);
 }
 
-size_t IndexBuffer::GetIndicesNumber() const noexcept
+UINT IndexBuffer::GetIndicesNumber() const noexcept
 {
 	return indicesNum;
 }

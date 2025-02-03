@@ -1,60 +1,99 @@
 #include "App.h"
 #include <chrono>
+#include <numbers>
 #include "MeshActor.h"
 #include "PointLight.h"
-#include <numbers>
-#include "Camera.h"
-#include "DirectXMath.h"
-#include "Skybox.h"
+#include "DirectionalLight.h"
+#include "SpotLight.h"
 
-void App::InitializeScene()
+namespace Dx = DirectX;
+
+void App::InitializeScene(Graphics& graphics)
 {
 	const std::string meshesPath = "Meshes\\";
-	auto brickWall = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
-	auto sponza = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
-	sponza->SetActorScale(DirectX::XMFLOAT3{ 0.1f, 0.1f, 0.1f });
-
-	auto sphere = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
-	auto sphere2 = std::make_shared<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
-
-	auto pointLight = std::make_shared<PointLight>(window.GetGraphics(), meshesPath + "lightSphere.obj", "Point Light");
-
-	DirectX::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
-	sphere->SetActorTransform({ 2.f, 0.f, 6.5f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	sphere2->SetActorTransform({ -5.f, 13.f, 21.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	pointLight->SetActorTransform({ -5.f, 13.f, 13.0f }, zeroVec, { 0.1f, 0.1f, 0.1f });
-	brickWall->SetActorTransform(DirectX::XMFLOAT3{ 5.f, 5.f, 5.f }, zeroVec, { 2.f, 2.f, 2.f });
 
 	scene = std::make_unique<Scene>(window.GetGraphics());
-	scene->AddLight(std::move(pointLight));
-	scene->AddActor(std::move(sphere));
-	scene->AddActor(std::move(sphere2));
-	scene->AddActor(std::move(sponza));
-	scene->AddActor(std::move(brickWall));
-	scene->AddSkybox(std::make_unique<Skybox>(window.GetGraphics(), meshesPath + "skybox.obj"));
+
+	//auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics());
+	auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
+	//auto spotLight = std::make_unique<SpotLight>(window.GetGraphics());
+	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+	/*auto sphere2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
+	auto sphere3 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere3");
+	auto sphere4 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere4");
+	auto left = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Left");
+	auto right = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Right");
+	auto front = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Front");
+	auto back = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Back");*/
+	/*sphere2->SetActorTransform({ 10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	sphere3->SetActorTransform({ 0.f, 0.f, -10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	sphere4->SetActorTransform({ 0.f, 0.f, 10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	left->SetActorTransform({ -15.f, 0.f, 0.0f }, zeroVec, { 0.1f, 30.5f, 30.5f });
+	right->SetActorTransform({ 15.f, 0.f, 0.0f }, zeroVec, { 0.5f, 30.5f, 30.5f });
+	front->SetActorTransform({ 0.f, 0.f, 15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });
+	back->SetActorTransform({ 0.f, 0.f, -15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });*/
+	/*scene->AddActor(graphics, std::move(sphere2));
+	scene->AddActor(graphics, std::move(sphere3));
+	scene->AddActor(graphics, std::move(sphere4));
+	scene->AddActor(graphics, std::move(left));
+	scene->AddActor(graphics, std::move(right));
+	scene->AddActor(graphics, std::move(front));
+	scene->AddActor(graphics, std::move(back));*/
+
+	auto last = std::chrono::steady_clock::now();
+	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
+	std::stringstream ss = {};
+	ss << "Initalizing sponza took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
+	OutputDebugString(ss.str().c_str());
+
+	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
+
+	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
+	sphere->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	
+	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
+	pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 0.0f });
+
+	scene->AddActor(graphics, std::move(sponza));
+	scene->AddActor(graphics, std::move(sphere));
+	
+	scene->AddLight(graphics, std::move(pointLight));
+	//scene->AddLight(graphics, std::move(spotLight));
+	//scene->AddLight(graphics, std::move(directionalLight));
+
+	scene->PrepareActorsForPasses(graphics);
 }
 
 int App::Run()
 {
-	InitializeScene();
+	auto& graphics = window.GetGraphics();
+	auto const gui = graphics.GetGui();
+
+	auto last = std::chrono::steady_clock::now();
+	InitializeScene(graphics);
+	std::stringstream ss;
+	ss << "Scene initialization took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds";
+	OutputDebugString(ss.str().c_str());
+	last = std::chrono::steady_clock::now();
 
 	while (true)
 	{
+		const float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+		last = std::chrono::steady_clock::now();
+
 		if (const auto ecode = Window::ProcessMessages())
 		{
 			return *ecode;
 		}
 
 		HandleInput();
-
-		window.GetGraphics().BeginFrame();
-
-		scene->Draw(window.GetGraphics());
-
-		scene->RenderControls(window.GetGraphics());
-
-		window.GetGraphics().EndFrame();
+		graphics.RenderBegin();
+		scene->Draw(graphics);
+		gui->RenderPerformanceInfo(unsigned int(1.0f / deltaTime), deltaTime * 1000.0f);
+		graphics.RenderEnd();
 	}
+
+	graphics.OnDestroy();
 
 	return 0;
 }

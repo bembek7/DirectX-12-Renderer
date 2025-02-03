@@ -4,12 +4,15 @@
 #include <DirectXMath.h>
 #include <wrl/client.h>
 
+class Graphics;
+
 class VertexBuffer : public Bindable
 {
 public:
-	VertexBuffer(Graphics& graphics, const std::vector<float>& vertices, const unsigned int vertexSize);
-	virtual void Bind(Graphics& graphics) noexcept override;
+	VertexBuffer(Graphics& graphics, const std::vector<float>& verticesData, const UINT vertexSize, const UINT verticesNum);
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override;
+
 private:
-	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
-	unsigned int vertexSize;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 };

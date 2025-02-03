@@ -68,6 +68,11 @@ void SceneComponent::RenderComponentDetails(Gui& gui)
 	gui.RenderComponentDetails(this);
 }
 
+std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)
+{
+	return std::unique_ptr<SceneComponent>(new SceneComponent(componentName));
+}
+
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {
 	return std::unique_ptr<SceneComponent>(new SceneComponent(graphics, node, scene));
@@ -107,19 +112,35 @@ std::unique_ptr<SceneComponent> SceneComponent::LoadComponent(Graphics& graphics
 	return std::unique_ptr<SceneComponent>();
 }
 
-void SceneComponent::Draw(Graphics& graphics)
+void SceneComponent::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	for (auto& child : children)
 	{
-		child->Draw(graphics);
+		child->Draw(graphics, lights);
 	}
 }
 
-void SceneComponent::RenderShadowMap(Graphics& graphics)
+void SceneComponent::Draw(Graphics& graphics, const PassType& passType)
 {
 	for (auto& child : children)
 	{
-		child->RenderShadowMap(graphics);
+		child->Draw(graphics, passType);
+	}
+}
+
+void SceneComponent::Update(Graphics& graphics)
+{
+	for (auto& child : children)
+	{
+		child->Update(graphics);
+	}
+}
+
+void SceneComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
+{
+	for (auto& child : children)
+	{
+		child->PrepareForPass(graphics, pass);
 	}
 }
 

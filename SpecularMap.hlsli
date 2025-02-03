@@ -1,0 +1,1 @@
+Texture2D specularMap : register(t2);

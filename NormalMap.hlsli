@@ -1,4 +1,4 @@
-Texture2D nMap : register(t2);
+Texture2D nMap : register(t1);
 
 float3 CalculateViewNormal(const float3 viewNormal, const float3 tangent, const float3 bitangent, const float3 normalSample)
 {

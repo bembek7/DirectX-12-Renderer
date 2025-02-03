@@ -2,54 +2,72 @@
 #include "ThrowMacros.h"
 #include "Bindable.h"
 #include "Graphics.h"
+#include "d3dx12\d3dx12.h"
+#include "BufferLoader.h"
 
-enum class BufferType
-{
-	Pixel,
-	Vertex
-};
-
-template<typename Structure>
 class ConstantBuffer : public Bindable
 {
 public:
-	ConstantBuffer(Graphics& graphics, const Structure& data, const BufferType bufferType, const UINT slot) :
-		bufferData(&data),
-		bufferType(bufferType),
-		slot(slot)
-	{
-		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bufferDesc.ByteWidth = sizeof(data);
-		D3D11_SUBRESOURCE_DATA subData = {};
-		subData.pSysMem = &data;
+	virtual void Update() = 0;
+};
 
-		CHECK_HR(GetDevice(graphics)->CreateBuffer(&bufferDesc, &subData, &constantBuffer));
-	}
-	virtual void Update(Graphics& graphics) override
+template<typename Structure>
+class ConstantBufferCBV : public ConstantBuffer
+{
+public:
+	ConstantBufferCBV(Graphics& graphics, const Structure& data, const UINT rootParameterIndex) :
+		bufferData(&data),
+		rootParameterIndex(rootParameterIndex)
 	{
-		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-		CHECK_HR(GetContext(graphics)->Map(constantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedSubresource));
-		memcpy(mappedSubresource.pData, bufferData, sizeof(*bufferData));
-		GetContext(graphics)->Unmap(constantBuffer.Get(), 0u);
+		const CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(data));
+		CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
+			nullptr,
+			IID_PPV_ARGS(&uploadBuffer)));
 	}
-	virtual void Bind(Graphics& graphics) noexcept override
+
+	virtual void Update() override
 	{
-		switch (bufferType)
+		BYTE* mappedData = nullptr;
+		CHECK_HR(uploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData)));
+		memcpy(mappedData, bufferData, sizeof(Structure));
+		if (uploadBuffer)
 		{
-		case BufferType::Pixel:
-			GetContext(graphics)->PSSetConstantBuffers(slot, 1u, constantBuffer.GetAddressOf());
-			break;
-		case BufferType::Vertex:
-			GetContext(graphics)->VSSetConstantBuffers(slot, 1u, constantBuffer.GetAddressOf());
-			break;
+			uploadBuffer->Unmap(0, nullptr);
 		}
 	}
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override
+	{
+		commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, uploadBuffer->GetGPUVirtualAddress());
+	}
 private:
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> uploadBuffer;
 	const Structure* const bufferData;
-	UINT slot;
-	BufferType bufferType;
+	UINT rootParameterIndex;
+};
+
+template<typename Structure>
+class ConstantBufferConstants : public ConstantBuffer
+{
+public:
+	ConstantBufferConstants(const Structure& data, const UINT rootParameterIndex) :
+		bufferData(&data),
+		rootParameterIndex(rootParameterIndex)
+	{}
+
+	virtual void Update() override
+	{
+		;
+	}
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override
+	{
+		commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, sizeof(Structure) / 4, bufferData, 0);
+	}
+private:
+	const Structure* const bufferData;
+	UINT rootParameterIndex;
 };

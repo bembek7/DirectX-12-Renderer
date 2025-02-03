@@ -7,6 +7,10 @@
 #include "Bindable.h"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "PipelineStatesPool.h"
+#include "RootParametersDescription.h"
+#include "Light.h"
+#include <d3d12.h>
 
 MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
 	SceneComponent(graphics, node, scene)
@@ -21,19 +25,15 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
 	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
 
-	const ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
+	ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
 
-	generatesShadow = static_cast<bool>(shaderSettings & ShaderSettings::Phong);
+	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
+	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
 
-	model = std::make_unique<Model>(graphics, assignedMesh, shaderSettings);
-	material = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
-
-	transformConstantBuffer = std::make_unique<ConstantBuffer<TransformBuffer>>(graphics, transformBuffer, BufferType::Vertex, 0u);
-
-	if (generatesShadow)
-	{
-		modelForShadowMapping = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{}, model->ShareIndexBuffer());
-	}
+	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
+	mainModel = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, primitiveModel->ShareIndexBuffer());
+	
+	mainMaterial = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
 }
 
 void MeshComponent::RenderComponentDetails(Gui& gui)
@@ -47,43 +47,93 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 	return std::unique_ptr<MeshComponent>(new MeshComponent(graphics, node, scene));
 }
 
-void MeshComponent::Draw(Graphics& graphics)
+void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
 {
+	SceneComponent::Draw(graphics, passType);
+	
+	if (passType == PassType::GPass)
+	{
+		mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+	}
+
+	graphics.ExecuteBundle(drawingBundles[passType].Get());
+
 	UpdateTransformBuffer(graphics);
-
-	model->Bind(graphics);
-	material->Bind(graphics);
-	transformConstantBuffer->Update(graphics);
-	transformConstantBuffer->Bind(graphics);
-
-	graphics.DrawIndexed(model->GetIndicesNumber());
+	transformConstantBuffer->Bind(graphics.GetMainCommandList());
+	graphics.GetMainCommandList()->DrawIndexedInstanced(mainModel->GetIndicesNumber(), 1, 0, 0, 0);
 }
 
-void MeshComponent::RenderShadowMap(Graphics& graphics)
+void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 {
-	if (generatesShadow)
+	SceneComponent::PrepareForPass(graphics, pass);
+
+	auto passType = pass->GetType();
+
+	switch (passType)
 	{
-		UpdateTransformBuffer(graphics);
-		modelForShadowMapping->Bind(graphics);
-
-		transformConstantBuffer->Update(graphics);
-		transformConstantBuffer->Bind(graphics);
-
-		graphics.DrawIndexed(modelForShadowMapping->GetIndicesNumber());
+	case PassType::GPass: 
+		PrepareForGPass(graphics, pass);
+		break;
+	case PassType::LightPerspectivePass:
+		PrepareForLightPerspectivePass(graphics, pass);
+		break;
+	default:
+		break;
 	}
+}
+
+void MeshComponent::PrepareForGPass(Graphics& graphics, Pass* const pass)
+{
+	auto pss = pass->GetPSS();
+	pss.inputLayout = mainModel->GetInputLayout();
+	pss.vertexShader = CD3DX12_SHADER_BYTECODE(mainModel->GetVSBlob());
+	pss.pixelShader = CD3DX12_SHADER_BYTECODE(mainMaterial->GetPSBlob());
+	pss.rasterizer = mainMaterial->GetRasterizerDesc();
+
+	mainPipelineState = std::make_unique<PipelineState>(graphics, pss);
+
+	auto drawingBundle = graphics.CreateBundle();
+	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mainPipelineState->Bind(drawingBundle.Get());
+	pass->BindPassSpecific(drawingBundle.Get());
+
+	mainModel->Bind(drawingBundle.Get());
+
+	mainMaterial->Bind(graphics, drawingBundle.Get());
+
+	CHECK_HR(drawingBundle->Close());
+	drawingBundles[pass->GetType()] = std::move(drawingBundle);
+}
+
+void MeshComponent::PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass)
+{
+	auto drawingBundle = graphics.CreateBundle();
+	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pass->BindPassSpecific(drawingBundle.Get());
+	primitiveModel->Bind(drawingBundle.Get());
+
+	CHECK_HR(drawingBundle->Close());
+	drawingBundles[pass->GetType()] = std::move(drawingBundle);
+}
+
+
+void MeshComponent::Update(Graphics& graphics)
+{
+	SceneComponent::Update(graphics);
+	mainMaterial->Update();
 }
 
 Material* MeshComponent::GetMaterial() noexcept
 {
-	return material.get();
+	return mainMaterial.get();
 }
 
 void MeshComponent::UpdateTransformBuffer(Graphics& graphics)
 {
-	DirectX::XMMATRIX transformMatrix = GetTransformMatrix();
-	DirectX::XMMATRIX transformView = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera());
-	DirectX::XMMATRIX transformViewProjection = DirectX::XMMatrixTranspose(transformMatrix * graphics.GetCamera() * graphics.GetProjection());
-	transformBuffer = TransformBuffer(std::move(DirectX::XMMatrixTranspose(transformMatrix)), std::move(transformView), std::move(transformViewProjection));
+	DirectX::XMMATRIX transform = DirectX::XMMatrixTranspose(GetTransformMatrix());
+	DirectX::XMMATRIX view = DirectX::XMMatrixTranspose(graphics.GetCamera());
+	DirectX::XMMATRIX projection = DirectX::XMMatrixTranspose(graphics.GetProjection());
+	transformBuffer = TransformBuffer(std::move(transform), std::move(view), std::move(projection));
 }
 
 ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material)
@@ -97,13 +147,6 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 	aiString specularTexFileName;
 	material->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
 
-	int shadingModel = 0;
-	material->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
-
-	if (shadingModel == aiShadingMode_Phong)
-	{
-		resolvedSettings |= ShaderSettings::Phong;
-	}
 	if (mesh->HasTextureCoords(0))
 	{
 		if (texFileName.length > 0)
@@ -123,13 +166,17 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 			resolvedSettings |= ShaderSettings::SpecularMap;
 		}
 	}
+	else
+	{
+		resolvedSettings |= ShaderSettings::Color;
+	}
 
 	return resolvedSettings;
 }
 
-MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newTransformView, const DirectX::XMMATRIX newTransformViewProjection)
+MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newView, const DirectX::XMMATRIX newProjection)
 {
 	DirectX::XMStoreFloat4x4(&transform, newTransform);
-	DirectX::XMStoreFloat4x4(&transformView, newTransformView);
-	DirectX::XMStoreFloat4x4(&transformViewProjection, newTransformViewProjection);
+	DirectX::XMStoreFloat4x4(&view, newView);
+	DirectX::XMStoreFloat4x4(&projection, newProjection);
 }

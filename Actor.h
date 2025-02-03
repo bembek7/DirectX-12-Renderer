@@ -3,7 +3,9 @@
 #include "SceneComponent.h"
 #include <string>
 
+class Pass;
 class Graphics;
+class Light;
 
 class Actor
 {
@@ -31,10 +33,15 @@ public:
 	DirectX::XMFLOAT3 GetActorLocation() const noexcept;
 	DirectX::XMVECTOR GetActorScaleVector() const noexcept;
 	DirectX::XMVECTOR GetActorRotationVector() const noexcept;
+	DirectX::XMVECTOR GetActorRotationRadians() const noexcept;
 	DirectX::XMVECTOR GetActorLocationVector() const noexcept;
+	DirectX::XMVECTOR GetActorForwardVector() const noexcept;
+	DirectX::XMVECTOR GetActorUpVector() const noexcept;
 
-	void Draw(Graphics& graphics);
-	void RenderShadowMap(Graphics& graphics);
+	void Draw(Graphics& graphics, const std::vector<Light*>& lights);
+	void Draw(Graphics& graphics, const PassType& passType);
+	void PrepareForPass(Graphics& graphics, Pass* const pass);
+	virtual void Update(Graphics& graphics);
 
 	std::string GetActorFullName();
 

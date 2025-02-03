@@ -8,10 +8,12 @@ class Graphics;
 class IndexBuffer : public Bindable
 {
 public:
-	IndexBuffer(Graphics& graphics, const std::vector<unsigned int>& indices);
-	virtual void Bind(Graphics& graphics) noexcept override;
-	size_t GetIndicesNumber() const noexcept;
+	IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices);
+	virtual void Bind(ID3D12GraphicsCommandList* const commandList) noexcept override;
+	UINT GetIndicesNumber() const noexcept;
+
 private:
-	size_t indicesNum = 0;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	UINT indicesNum = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer;
 };

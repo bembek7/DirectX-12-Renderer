@@ -1,26 +1,27 @@
 #pragma once
-#include "Bindable.h"
+#include "d3dx12\d3dx12.h"
 
-class DepthStencilView : public Bindable
+class Graphics;
+
+class DepthStencilView
 {
 public:
 	enum class Usage
 	{
 		DepthStencil,
-		Depth
+		Depth,
+		DepthCube
 	};
-	DepthStencilView(Graphics& graphics, const Usage usage, const UINT width, const UINT height);
-	DepthStencilView(Graphics& graphics, Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, const UINT face);
-	void Bind(Graphics& graphics) noexcept override;
-	virtual void Update(Graphics& graphics) override;
-	ID3D11DepthStencilView* Get() noexcept;
-	ID3D11Texture2D* GetTexture() noexcept;
+	DepthStencilView(Graphics& graphics, const Usage usage, const float clearValue, const UINT width, const UINT height);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvHandle(const UINT bufferIndex = 0) noexcept;
+	void Clear(ID3D12GraphicsCommandList* const commandList);
+	ID3D12Resource* GetBuffer() noexcept;
 
 private:
-	void Clear(Graphics& graphics);
-
-private:
+	float clearValue = 0.f;
 	Usage usage;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuffer;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
+	UINT texturesNum = 0;
+	UINT descSize = 0;
 };

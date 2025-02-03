@@ -100,24 +100,55 @@ DirectX::XMVECTOR Actor::GetActorRotationVector() const noexcept
 	return rootComponent->GetRelativeRotationVector();
 }
 
+DirectX::XMVECTOR Actor::GetActorRotationRadians() const noexcept
+{
+	return rootComponent->GetComponentRotationRadians();
+}
+
 DirectX::XMVECTOR Actor::GetActorLocationVector() const noexcept
 {
 	return rootComponent->GetRelativeLocationVector();
 }
 
-void Actor::Draw(Graphics& graphics)
+DirectX::XMVECTOR Actor::GetActorForwardVector() const noexcept
+{
+	return rootComponent->GetComponentForwardVector();
+}
+
+DirectX::XMVECTOR Actor::GetActorUpVector() const noexcept
+{
+	return rootComponent->GetComponentUpVector();
+}
+
+void Actor::Draw(Graphics& graphics, const std::vector<Light*>& lights)
 {
 	if (rootComponent)
 	{
-		rootComponent->Draw(graphics);
+		rootComponent->Draw(graphics, lights);
 	}
 }
 
-void Actor::RenderShadowMap(Graphics& graphics)
+void Actor::Draw(Graphics& graphics, const PassType& passType)
 {
 	if (rootComponent)
 	{
-		rootComponent->RenderShadowMap(graphics);
+		rootComponent->Draw(graphics, passType);
+	}
+}
+
+void Actor::PrepareForPass(Graphics& graphics, Pass* const pass)
+{
+	if (rootComponent)
+	{
+		rootComponent->PrepareForPass(graphics, pass);
+	}
+}
+
+void Actor::Update(Graphics& graphics)
+{
+	if (rootComponent)
+	{
+		rootComponent->Update(graphics);
 	}
 }
 

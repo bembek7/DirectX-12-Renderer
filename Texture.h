@@ -1,17 +1,17 @@
 #pragma once
-#include "Bindable.h"
 #include <wrl/client.h>
+#include "d3dx12\d3dx12.h"
+#include "TexLoader.h"
 
-class Texture : public Bindable
+class Graphics;
+
+class Texture
 {
 public:
-	Texture(Graphics& graphics, const UINT slot, const std::string& fileName);
-	virtual void Bind(Graphics& graphics) noexcept override;
+	Texture(Graphics& graphics, const std::string& fileName, const CD3DX12_CPU_DESCRIPTOR_HANDLE& srvCpuHandle);
 
 	bool HasAlpha() const noexcept;
-	static std::string ResolveID(const UINT slot, const std::string& fileName) noexcept;
+	//static std::string ResolveID(const UINT slot, const std::string& fileName, std::vector<CD3DX12_ROOT_PARAMETER>& rootParameters) noexcept;
 private:
-	bool hasAlpha = false;
-	UINT slot;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView;
+	std::shared_ptr<TexLoader::Image> image;
 };

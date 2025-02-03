@@ -4,9 +4,12 @@
 #include <vector>
 #include <string>
 
+enum class PassType;
+class Pass;
 class Graphics;
 struct aiNode;
 struct aiScene;
+class Light;
 
 class SceneComponent
 {
@@ -14,6 +17,7 @@ class SceneComponent
 public:
 	virtual ~SceneComponent() = default;
 
+	static std::unique_ptr<SceneComponent> CreateComponent(const std::string& componentName);
 	static std::unique_ptr<SceneComponent> CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 	static std::unique_ptr<SceneComponent> LoadComponent(Graphics& graphics, const std::string& fileName);
 
@@ -34,8 +38,10 @@ public:
 		return rawChild;
 	}
 
-	virtual void Draw(Graphics& graphics);
-	virtual void RenderShadowMap(Graphics& graphics);
+	virtual void Draw(Graphics& graphics, const std::vector<Light*>& lights);
+	virtual void Draw(Graphics& graphics, const PassType& passType);
+	virtual void Update(Graphics& graphics);
+	virtual void PrepareForPass(Graphics& graphics, Pass* const pass);
 
 	DirectX::XMMATRIX GetTransformMatrix() const noexcept;
 	void AddRelativeScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept;

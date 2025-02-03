@@ -1,35 +1,30 @@
 #include "PointLight.h"
-#include "ThrowMacros.h"
-#include "Graphics.h"
-#include "Camera.h"
+#include "RootParametersDescription.h"
 
-PointLight::PointLight(Graphics& graphics, const std::string& fileName, const std::string& actorName) :
-	MeshActor(graphics, fileName, actorName)
+PointLight::PointLight(Graphics& graphics, const std::string& actorName) :
+	Light(graphics, actorName, LightType::Point)
 {
-	shadowMapCamera = SceneComponent::AttachComponents<Camera>(std::move(Camera::CreateComponent("Shadow Map Camera")), rootComponent.get());
+	constantBuffers.push_back(std::make_unique<ConstantBufferCBV<LightBuffer>>(graphics, lightBuffer, 0u));
 
-	constantLightBuffer = std::make_unique<ConstantBuffer<LightBuffer>>(graphics, lightBuffer, BufferType::Pixel, 0u);
-	constantShadowMapBuffer = std::make_unique<ConstantBuffer<ShadowMapBuffer>>(graphics, shadowMapBuffer, BufferType::Vertex, 1u);
+	namespace Dx = DirectX;
+	Dx::XMMATRIX reverseZ =
+	{
+		1.0f, 0.0f,  0.0f, 0.0f,
+		0.0f, 1.0f,  0.0f, 0.0f,
+		0.0f, 0.0f, -1.0f, 0.0f,
+		0.0f, 0.0f,  1.0f, 1.0f
+	};
+	const float windowWidth = graphics.GetWindowWidth();
+	const float windowHeight = graphics.GetWindowHeight();
+
+	Dx::XMStoreFloat4x4(&projection, Dx::XMMatrixPerspectiveLH(1.0f, 1.0f, 0.5f, 100.0f) * reverseZ);
 }
 
-void PointLight::SetDiffuseColor(Graphics& graphics, const DirectX::XMFLOAT3 newColor)
-{
-	lightBuffer.diffuseColor = newColor;
-}
-
-void PointLight::Bind(Graphics& graphics)
+void PointLight::Update(Graphics& graphics)
 {
 	DirectX::XMStoreFloat3(&lightBuffer.lightViewLocation, DirectX::XMVector3Transform(GetActorLocationVector(), graphics.GetCamera()));
-	DirectX::XMStoreFloat4x4(&shadowMapBuffer.lightPerspective, DirectX::XMMatrixTranspose(shadowMapCamera->GetMatrix()));
-	constantLightBuffer->Update(graphics);
-	constantShadowMapBuffer->Update(graphics);
-	constantLightBuffer->Bind(graphics);
-	constantShadowMapBuffer->Bind(graphics);
-}
-
-DirectX::XMMATRIX PointLight::GetLightPerspective() const noexcept
-{
-	return shadowMapCamera->GetMatrix();
+	lightBuffer.lightWorldLocation = GetActorLocation();
+	Light::Update(graphics);
 }
 
 void PointLight::RenderActorDetails(Gui& gui)

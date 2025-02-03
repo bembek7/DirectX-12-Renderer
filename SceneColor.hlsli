@@ -1,0 +1,1 @@
+Texture2D sceneColor : register(t0);

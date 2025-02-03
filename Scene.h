@@ -2,30 +2,35 @@
 #include <memory>
 #include <vector>
 #include "Camera.h"
-#include "RegularDrawingPass.h"
-#include "ShadowMapPass.h"
-#include "Skybox.h"
+#include "GPass.h"
+#include "FinalPass.h"
+#include "Actor.h"
+#include "LightPass.h"
+#include "LightPerspectivePass.h"
 
 class Graphics;
-class Actor;
-class PointLight;
+class Light;
 
 class Scene
 {
 public:
 	Scene(Graphics& graphics);
 
-	void AddActor(std::shared_ptr<Actor> actorToAdd);
-	void AddLight(std::shared_ptr<PointLight> lightToAdd);
-	void AddSkybox(std::unique_ptr<Skybox> skyboxToAdd);
+	void AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd);
+	void AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd);
 	void Draw(Graphics& graphics);
-	void RenderControls(Graphics& graphics);
+	void PrepareActorsForPasses(Graphics& graphics);
 	Camera* GetMainCamera();
 private:
-	std::unique_ptr<RegularDrawingPass> drawingPass;
-	std::unique_ptr<ShadowMapPass> shadowMapPass;
-	std::vector<std::shared_ptr<Actor>> actors;
-	std::shared_ptr<PointLight> light;
-	std::unique_ptr<Skybox> skybox;
+	void RenderControls(Graphics& graphics);
+
+private:
+	std::unique_ptr<GPass> gPass;
+	std::unique_ptr<FinalPass> finalPass;
+	std::vector<std::unique_ptr<Actor>> actors;
+	std::vector<std::unique_ptr<LightPass>> lightPasses;
+	std::vector<std::unique_ptr<LightPerspectivePass>> lightPerspectivePasses;
 	std::unique_ptr<Camera> mainCamera;
+	DirectX::XMFLOAT4X4 defaultProj;
+	std::unique_ptr<RTVHeap> lightMapRtv;
 };

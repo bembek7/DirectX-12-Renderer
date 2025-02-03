@@ -1,0 +1,1 @@
+SamplerComparisonState comparisonSampler : register(s0);

@@ -1,0 +1,1 @@
+Texture2D sceneNormal_RoughnessTex : register(t0);

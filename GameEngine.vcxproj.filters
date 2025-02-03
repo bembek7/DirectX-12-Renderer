@@ -16,35 +16,68 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{175d7a0c-9634-4fdf-a05d-e4c84333e085}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Bindables">
-      <UniqueIdentifier>{9c4adb0c-0c00-4c5a-acb2-e13e583dc2e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Bindables">
-      <UniqueIdentifier>{967999dc-9782-40d8-8da8-555ed7346ab7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Actors">
-      <UniqueIdentifier>{75c0199a-7ed8-4a0e-9821-c3027815746f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Actors">
-      <UniqueIdentifier>{ba6da699-b170-4223-a612-079663ceb803}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Components">
-      <UniqueIdentifier>{513c4a27-24df-4d16-a270-e588fd2627a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Components">
-      <UniqueIdentifier>{b845fd7d-2bb5-4869-9201-b40f06fafa44}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\PixelShaders">
       <UniqueIdentifier>{898dc0da-500f-49da-b5da-6d72e64297d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\VertexShaders">
       <UniqueIdentifier>{73481a05-aa0d-45a5-a63c-f282ecda2553}</UniqueIdentifier>
     </Filter>
+    <Filter Include="d3dx12">
+      <UniqueIdentifier>{b1266b4d-0a34-48c4-b8af-f92d32d491bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components">
+      <UniqueIdentifier>{27eb5005-610d-4250-bd64-cbddf3e56fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Bindables">
+      <UniqueIdentifier>{a0923d8c-2242-41cf-a1b4-1872287d892c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{859d35fc-75e1-4413-9886-757538205901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actor">
+      <UniqueIdentifier>{14ffc659-dc4a-4889-bde6-0e446f55feb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor">
+      <UniqueIdentifier>{927e111c-7ee4-4d1a-b4e3-d77cc9c79266}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\Passes">
-      <UniqueIdentifier>{7a271fc9-2ed5-447e-8a81-7baa6aa77983}</UniqueIdentifier>
+      <UniqueIdentifier>{bb14b90b-a685-44bd-8eb9-5e044cb32a89}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Passes">
-      <UniqueIdentifier>{1e0e3312-5a3d-44ea-9511-1ac431589bf4}</UniqueIdentifier>
+      <UniqueIdentifier>{1634c20d-28d8-4b41-8222-4cbfdc6a855d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Pools">
+      <UniqueIdentifier>{d2a958f0-d019-4939-a291-ba5210376649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Pools">
+      <UniqueIdentifier>{f63bd75c-bf0d-44e7-88ca-0fe0d20cc6bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers">
+      <UniqueIdentifier>{f8417bf2-450d-4465-bc95-7564116da4a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\CBs">
+      <UniqueIdentifier>{365410af-40bc-4ec2-9ace-06e7bd4bca61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\Texes">
+      <UniqueIdentifier>{838db9ce-7bd4-4860-9dc7-7f2d375b57e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\Headers\Samplers">
+      <UniqueIdentifier>{aedb4c35-791c-478b-835d-d17fd6d8e34a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\VertexShaders\Headers">
+      <UniqueIdentifier>{e6857978-4b1a-453b-be8a-b99abd276ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\VertexShaders\Headers\CBs">
+      <UniqueIdentifier>{2ac45b1f-79e2-40b4-9050-9a326098dda4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actor\Bindables">
+      <UniqueIdentifier>{731723db-7ee2-4ea2-909a-f007590dc7f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\VertexShaders\GPass">
+      <UniqueIdentifier>{535e10dc-e18c-48a9-9c5d-103926fcac36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\PixelShaders\GPass">
+      <UniqueIdentifier>{4380523d-2389-4cbb-8b32-49ff7b6758c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,17 +93,8 @@
     <ClCompile Include="App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BindablesPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\backends\imgui_impl_dx11.cpp">
-      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\backends\imgui_impl_win32.cpp">
       <Filter>ImGui</Filter>
@@ -96,95 +120,110 @@
     <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Gui.cpp">
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Source Files\Actors</Filter>
-    </ClCompile>
     <ClCompile Include="Bindable.cpp">
-      <Filter>Source Files\Bindables</Filter>
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="MeshActor.cpp">
-      <Filter>Source Files\Actors</Filter>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files\Actors</Filter>
+    <ClCompile Include="RootSignature.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="ScissorRectangle.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
     <ClCompile Include="SceneComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>Source Files\Actor\Bindables</Filter>
     </ClCompile>
-    <ClCompile Include="VertexShader.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="InputLayout.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshComponent.cpp">
-      <Filter>Source Files\Components</Filter>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="MeshComponent.cpp">
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Sampler.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="MeshActor.cpp">
+      <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Blender.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Rasterizer.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="Skybox.cpp">
+    <ClCompile Include="Gui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CubeTexture.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="imgui\backends\imgui_impl_dx12.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="DepthStencilState.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="ShadowRasterizer.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="TexLoader.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DepthStencilView.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DepthCubeTexture.cpp">
-      <Filter>Source Files\Bindables</Filter>
-    </ClCompile>
-    <ClCompile Include="RegularDrawingPass.cpp">
-      <Filter>Source Files\Passes</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMapPass.cpp">
-      <Filter>Source Files\Passes</Filter>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Pass.cpp">
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="Viewport.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="GPass.cpp">
+      <Filter>Source Files\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="PipelineStatesPool.cpp">
+      <Filter>Source Files\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="BindablesPool.cpp">
+      <Filter>Source Files\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadersPool.cpp">
+      <Filter>Source Files\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTargetView.cpp">
-      <Filter>Source Files\Bindables</Filter>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="LightPerspectivePass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="RTVHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FinalPass.cpp">
+      <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="LightPass.cpp">
+      <Filter>Source Files\Passes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,17 +242,8 @@
     <ClInclude Include="BetterWindows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BindablesPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\backends\imgui_impl_dx11.h">
-      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_win32.h">
       <Filter>ImGui</Filter>
@@ -239,17 +269,47 @@
     <ClInclude Include="imgui\imstb_textedit.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Gui.h">
+    <ClInclude Include="ShaderSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Header Files\Actors</Filter>
+    <ClInclude Include="d3dx12\d3dx12_root_signature.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="MeshActor.h">
-      <Filter>Header Files\Actors</Filter>
+    <ClInclude Include="d3dx12\d3dx12_state_object.h">
+      <Filter>d3dx12</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files\Actors</Filter>
+    <ClInclude Include="d3dx12\d3dx12.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_barriers.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_check_feature_support.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_core.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_default.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_pipeline_state_stream.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_property_format_table.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_render_pass.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12\d3dx12_resource_helpers.h">
+      <Filter>d3dx12</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Header Files\Bindables</Filter>
@@ -260,132 +320,228 @@
     <ClInclude Include="IndexBuffer.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="InputLayout.h">
+    <ClInclude Include="RootSignature.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="PixelShader.h">
+    <ClInclude Include="ScissorRectangle.h">
       <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="SceneComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="MeshComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sampler.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Blender.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Rasterizer.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeTexture.h">
-      <Filter>Header Files\Bindables</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthStencilState.h">
+    <ClInclude Include="VertexBuffer.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
     <ClInclude Include="Viewport.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowRasterizer.h">
+    <ClInclude Include="PipelineState.h">
       <Filter>Header Files\Bindables</Filter>
     </ClInclude>
-    <ClInclude Include="DepthCubeTexture.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DepthStencilView.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTargetView.h">
-      <Filter>Header Files\Bindables</Filter>
+    <ClInclude Include="MeshComponent.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMapPass.h">
-      <Filter>Header Files\Passes</Filter>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="RegularDrawingPass.h">
-      <Filter>Header Files\Passes</Filter>
+    <ClInclude Include="MeshActor.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\backends\imgui_impl_dx12.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="TexLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
+    <ClInclude Include="ShadersPool.h">
+      <Filter>Header Files\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineStatesPool.h">
+      <Filter>Header Files\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="GPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="BindablesPool.h">
+      <Filter>Header Files\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferLoader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="RootParametersDescription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPerspectivePass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="RTVHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FinalPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPass.h">
+      <Filter>Header Files\Passes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PhongTexVS.hlsl">
+    <FxCompile Include="PixelOnlyVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMVS.hlsl">
+    <FxCompile Include="FinalPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PointLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SpotLightPassPS.hlsl">
+      <Filter>Resource Files\PixelShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LightPerspectivePassVS.hlsl">
       <Filter>Resource Files\VertexShaders</Filter>
     </FxCompile>
-    <FxCompile Include="PhongColorVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
+    <FxCompile Include="PosNormalVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="SolidVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
+    <FxCompile Include="PositionVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongColorPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="PosNormalTexCoordTanBitanVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="PosNormalTexCoordVS.hlsl">
+      <Filter>Resource Files\VertexShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMSMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="ColorPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="DTNMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexSMPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="DTNMSMATPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="SolidPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="DTNMSMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="PhongTexNMSMATPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <FxCompile Include="DTPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
-    <FxCompile Include="SkyboxPS.hlsl">
-      <Filter>Resource Files\PixelShaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyboxVS.hlsl">
-      <Filter>Resource Files\VertexShaders</Filter>
+    <FxCompile Include="DTSMPS.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="NormalMap.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <None Include="Shadow.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="GPassOut.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
     </None>
     <None Include="Phong.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
     </None>
-    <None Include="Shadow.hlsli">
-      <Filter>Resource Files\PixelShaders</Filter>
+    <None Include="NormalMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="SpecularMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="TextureSampler.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Samplers</Filter>
+    </None>
+    <None Include="RoughnessCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="ColorCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="DiffTex.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="ComparisonSampler.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Samplers</Filter>
+    </None>
+    <None Include="TransformCB.hlsli">
+      <Filter>Resource Files\VertexShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SceneColor.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="PointLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SpotLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="DirectionalLightPropertiesCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="SceneNormal_Roughness.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="SceneSpecularColor.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="ShadowMap.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="SceneViewPosition.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightPass.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="SceneWorldPosition.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightDepthBuffer.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
+    </None>
+    <None Include="LightPerspectiveCB.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\CBs</Filter>
+    </None>
+    <None Include="PointShadow.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers</Filter>
+    </None>
+    <None Include="LightDepthBufferCube.hlsli">
+      <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
   </ItemGroup>
 </Project>

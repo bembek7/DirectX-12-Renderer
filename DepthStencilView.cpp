@@ -1,91 +1,106 @@
-#include "Graphics.h"
 #include "DepthStencilView.h"
-#include <d3d11.h>
+#include "Graphics.h"
 #include "ThrowMacros.h"
 
-DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const UINT width, const UINT height) :
-	usage(usage)
+DepthStencilView::DepthStencilView(Graphics& graphics, const Usage usage, const float clearValue, const UINT width, const UINT height) :
+	usage(usage),
+	clearValue(clearValue)
 {
-	D3D11_TEXTURE2D_DESC texDesc = {};
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.MipLevels = 1u;
-	texDesc.ArraySize = 1u;
-	texDesc.SampleDesc.Count = 1u;
-	texDesc.SampleDesc.Quality = 0u;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc = {};
-	viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	viewDesc.Texture2D.MipSlice = 0u;
-
+	descSize = graphics.GetDsvDescriptorSize();
+	auto resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+	DXGI_FORMAT format{};
+	texturesNum = 1;
 	switch (usage)
 	{
 	case Usage::DepthStencil:
-		texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		resourceFlags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 		break;
 	case Usage::Depth:
-		texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
-		viewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		format = DXGI_FORMAT_D32_FLOAT;
+		break;
+	case Usage::DepthCube:
+		format = DXGI_FORMAT_D32_FLOAT;
+		texturesNum = 6;
 		break;
 	default:
 		break;
 	}
+	const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
+	
+	const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		format,
+		width, height,
+		texturesNum, 0, 1, 0,
+		resourceFlags);
+	const D3D12_CLEAR_VALUE clearValueDesc = {
+		.Format = format,
+		.DepthStencil = { clearValue, 0 },
+	};
+	CHECK_HR(graphics.GetDevice()->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&clearValueDesc,
+		IID_PPV_ARGS(&depthBuffer)));
 
-	CHECK_HR(GetDevice(graphics)->CreateTexture2D(&texDesc, nullptr, &texture));
+	const D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {
+		.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+		.NumDescriptors = texturesNum,
+	};
+	CHECK_HR(graphics.GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&dsvHeap)));
 
-	CHECK_HR(GetDevice(graphics)->CreateDepthStencilView(texture.Get(), &viewDesc, &depthStencilView));
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE{ dsvHeap->GetCPUDescriptorHandleForHeapStart() };
+	for (UINT i = 0; i < texturesNum; i++)
+	{
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsViewDesc = 
+		{
+			.Format = format,
+			.ViewDimension = (usage == Usage::DepthCube) ? D3D12_DSV_DIMENSION_TEXTURE2DARRAY : D3D12_DSV_DIMENSION_TEXTURE2D,
+			.Flags = D3D12_DSV_FLAG_NONE,
+		};
+		if (usage == Usage::DepthCube) 
+		{
+			dsViewDesc.Texture2DArray = 
+			{ 
+				.MipSlice = 0, 
+				.FirstArraySlice = i,
+				.ArraySize = 1 
+			};
+		}
+		graphics.GetDevice()->CreateDepthStencilView(depthBuffer.Get(), &dsViewDesc, dsvHandle);
+		dsvHandle.Offset(descSize);
+	}
 }
 
-DepthStencilView::DepthStencilView(Graphics& graphics, Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, const UINT face) :
-	texture(texture)
+CD3DX12_CPU_DESCRIPTOR_HANDLE DepthStencilView::GetDsvHandle(const UINT bufferIndex) noexcept
 {
-	D3D11_DEPTH_STENCIL_VIEW_DESC descView = {};
-	descView.Format = DXGI_FORMAT_D32_FLOAT;
-	descView.Flags = 0;
-	descView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-	descView.Texture2DArray.MipSlice = 0;
-	descView.Texture2DArray.ArraySize = 1;
-	descView.Texture2DArray.FirstArraySlice = face;
-	CHECK_HR(GetDevice(graphics)->CreateDepthStencilView(texture.Get(), &descView, &depthStencilView));
+	CD3DX12_CPU_DESCRIPTOR_HANDLE bufferHandle;
+	bufferHandle.InitOffsetted(dsvHeap->GetCPUDescriptorHandleForHeapStart(), bufferIndex, descSize);
+	return bufferHandle;
 }
 
-void DepthStencilView::Bind(Graphics& graphics) noexcept
+void DepthStencilView::Clear(ID3D12GraphicsCommandList* const commandList)
 {
-	graphics.SetCurrentDepthStenilView(depthStencilView);
-}
-
-void DepthStencilView::Update(Graphics& graphics)
-{
-	Clear(graphics);
-}
-
-ID3D11DepthStencilView* DepthStencilView::Get() noexcept
-{
-	return depthStencilView.Get();
-}
-
-ID3D11Texture2D* DepthStencilView::GetTexture() noexcept
-{
-	return texture.Get();
-}
-
-void DepthStencilView::Clear(Graphics& graphics)
-{
-	UINT clearFlags = 0;
+	D3D12_CLEAR_FLAGS clearFlags = D3D12_CLEAR_FLAG_DEPTH;
 	switch (usage)
 	{
 	case Usage::DepthStencil:
-		clearFlags = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL;
-		break;
-	case Usage::Depth:
-		clearFlags = D3D11_CLEAR_DEPTH;
+		clearFlags |= D3D12_CLEAR_FLAG_STENCIL;
 		break;
 	default:
 		break;
 	}
-	GetContext(graphics)->ClearDepthStencilView(depthStencilView.Get(), clearFlags, 1.0f, 0u);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE{ dsvHeap->GetCPUDescriptorHandleForHeapStart() };
+	for (UINT i = 0; i < texturesNum; ++i)
+	{
+		commandList->ClearDepthStencilView(dsvHandle, clearFlags, clearValue, 0, 0, nullptr);
+		dsvHandle.Offset(descSize);
+	}
+}
+
+ID3D12Resource* DepthStencilView::GetBuffer() noexcept
+{
+	return depthBuffer.Get();
 }

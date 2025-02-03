@@ -1,5 +1,3 @@
-#include "Shadow.hlsli"
-
 float Attenuate(uniform float attenuationConst, uniform float attenuationLin, uniform float attenuationQuad, const in float distanceToL)
 {
     return 1.0f / (attenuationConst + attenuationLin * distanceToL + attenuationQuad * (distanceToL * distanceToL));
@@ -47,41 +45,6 @@ LightVectorData CalculateLightVectorData(float3 lightViewPos, float3 viewPos)
     lightVector.directionToLight = lightVector.vectorToLight / lightVector.distanceToLight;
     
     return lightVector;
-}
-
-cbuffer LightCBuf : register(b0)
-{
-    const float3 diffuseColor;
-    const float diffuseIntensity;
-    const float3 ambient;
-    const float specularIntensity;
-    const float3 lightViewPos;
-    const float attenuationConst;
-    const float attenuationLin;
-    const float attenuationQuad;
-};
-
-cbuffer RoughnessCBuf : register(b1)
-{
-    const float roughness;
-};
-
-float3 CalulateFinalAmountOfLight(const float3 viewPos, const float3 realViewNormal, const float4 lightPerspectivePos, const float3 specularColor)
-{
-    const LightVectorData lightVector = CalculateLightVectorData(lightViewPos, viewPos);
-    
-    const float lighting = CalculateLighting(lightPerspectivePos);
- 
-    const float attenuation = Attenuate(attenuationConst, attenuationLin, attenuationQuad, lightVector.distanceToLight);
-	
-    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, attenuation, lightVector.directionToLight, realViewNormal);
-	
-    const float3 specular = Speculate(specularColor, diffuseIntensity * specularIntensity, realViewNormal, lightVector.vectorToLight, viewPos, attenuation, roughness);
-	
-    const float3 light = lighting * saturate(diffuse + ambient + specular);
-    const float3 shadow = (1.0f - lighting) * ambient;
-    
-    return light + shadow;
 }
 
 

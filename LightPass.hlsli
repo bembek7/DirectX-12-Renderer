@@ -1,0 +1,6 @@
+#include "Phong.hlsli"
+#include "TextureSampler.hlsli"
+#include "SceneNormal_Roughness.hlsli"
+#include "SceneSpecularColor.hlsli"
+#include "SceneViewPosition.hlsli"
+#include "SceneWorldPosition.hlsli"

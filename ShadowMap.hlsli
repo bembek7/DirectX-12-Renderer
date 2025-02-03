@@ -1,0 +1,1 @@
+Texture2D shadowMap : register(t2);

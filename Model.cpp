@@ -3,75 +3,120 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <stdexcept>
-#include <d3d11.h>
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "VertexShader.h"
-#include "BindablesPool.h"
-#include "InputLayout.h"
 #include "Utils.h"
+#include "ThrowMacros.h"
+#include <d3dcompiler.h>
+#include "ShadersPool.h"
 
 const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Model::vsPaths =
 {
-	{ ShaderSettings{}, L"SolidVS.cso"},
-	{ ShaderSettings::Skybox, L"SkyboxVS.cso" },
-	{ ShaderSettings::Color, L"SolidVS.cso" },
-	{ ShaderSettings::Color | ShaderSettings::Phong, L"PhongColorVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture, L"PhongTexVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap, L"PhongTexNMVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PhongTexVS.cso" },
-	{ ShaderSettings::Phong | ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PhongTexNMVS.cso" },
+	{ ShaderSettings{}, L"PositionVS.cso"},
+	{ ShaderSettings::Color, L"PosNormalVS.cso" },
+	{ ShaderSettings::Texture, L"PosNormalTexCoordVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"PosNormalTexCoordTanBitanVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"PosNormalTexCoordVS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"PosNormalTexCoordTanBitanVS.cso" },
 };
 
 Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderSettings shaderSettings, std::shared_ptr<IndexBuffer> givenIndexBuffer) :
 	indexBuffer(givenIndexBuffer)
 {
+	vertexLayout = GenerateVertexLayout(assignedMesh, shaderSettings);
+
+	if (!indexBuffer)
+	{
+		indexBuffer = GenerateIndexBuffer(graphics, assignedMesh);
+	}
+
+	bindables.push_back(GenerateVertexBuffer(graphics, assignedMesh, vertexLayout));
+
+	std::wstring vertexShaderPath;
+	auto it = Model::vsPaths.find(shaderSettings);
+	if (it != Model::vsPaths.end())
+	{
+		vertexShaderPath = it->second;
+	}
+	else
+	{
+		throw std::runtime_error("Vertex shader path not found for given flags");
+	}
+
+	auto& shadersPool = ShadersPool::GetInstance();
+	vertexShaderBlob = shadersPool.GetShaderBlob(vertexShaderPath); // be wary that its a shared ptr to com ptr
+}
+
+void Model::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
+{
+	for (auto& bindable : bindables)
+	{
+		bindable->Bind(commandList);
+	}
+
+	indexBuffer->Bind(commandList);
+}
+
+Model::VertexLayout Model::GenerateVertexLayout(const aiMesh* const assignedMesh, const ShaderSettings shaderSettings) const
+{
+	std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout;
+	std::unordered_map<VertexElement, UINT> elementOffset;
+	UINT vertexSize = 0U;
+
 	if (assignedMesh->HasPositions())
 	{
-		inputElementDescs.push_back({ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputLayout.push_back({ "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Position] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
-	if (static_cast<bool>(shaderSettings & ShaderSettings::Phong))
+	if (shaderSettings != ShaderSettings{})
 	{
-		inputElementDescs.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputLayout.push_back({ "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Normal] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
-		inputElementDescs.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputLayout.push_back({ "TEX_COORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::TexCoords] = vertexSize;
 		vertexSize += sizeof(float) * 2;
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::NormalMap))
 	{
-		inputElementDescs.push_back({ "TANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputLayout.push_back({ "TANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Tangent] = vertexSize;
 		vertexSize += sizeof(float) * 3;
-		inputElementDescs.push_back({ "BITANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u });
+		inputLayout.push_back({ "BITANGENT", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u });
 		elementOffset[VertexElement::Bitangent] = vertexSize;
 		vertexSize += sizeof(float) * 3;
 	}
 
-	if (!indexBuffer)
-	{
-		for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
-		{
-			for (size_t j = 0; j < assignedMesh->mFaces[i].mNumIndices; j++)
-			{
-				indices.push_back(assignedMesh->mFaces[i].mIndices[j]);
-			}
-		}
+	return { inputLayout, elementOffset, vertexSize };
+}
 
-		indexBuffer = std::make_shared<IndexBuffer>(graphics, indices);
+std::shared_ptr<IndexBuffer> Model::GenerateIndexBuffer(Graphics& graphics, const aiMesh* const assignedMesh) const
+{
+	std::vector<WORD> indices;
+	for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
+	{
+		for (size_t j = 0; j < assignedMesh->mFaces[i].mNumIndices; j++)
+		{
+			indices.push_back(assignedMesh->mFaces[i].mIndices[j]);
+		}
 	}
 
+	return std::make_shared<IndexBuffer>(graphics, indices);
+}
+
+std::unique_ptr<VertexBuffer> Model::GenerateVertexBuffer(Graphics& graphics, const aiMesh* const assignedMesh, const Model::VertexLayout& vertexLayout) const
+{
+	std::vector<float> verticesData;
+	const auto& vertexSize = vertexLayout.vertexSize;
 	const unsigned int numVertices = assignedMesh->mNumVertices;
 	verticesData.resize(vertexSize / sizeof(float) * numVertices);
 	for (size_t i = 0; i < numVertices; i++)
 	{
-		for (const auto& element : elementOffset)
+		for (const auto& element : vertexLayout.elementOffset)
 		{
 			const auto elementIndex = i * vertexSize / sizeof(float) + element.second / sizeof(float);
 			switch (element.first)
@@ -121,40 +166,17 @@ Model::Model(Graphics& graphics, const aiMesh* const assignedMesh, const ShaderS
 		}
 	}
 
-	auto& bindablesPool = BindablesPool::GetInstance();
-
-	bindables.push_back(std::make_unique<VertexBuffer>(graphics, verticesData, vertexSize));
-
-	std::wstring vertexShaderPath;
-	auto it = Model::vsPaths.find(shaderSettings);
-	if (it != Model::vsPaths.end())
-	{
-		vertexShaderPath = it->second;
-	}
-	else
-	{
-		throw std::runtime_error("Vertex shader path not found for given flags");
-	}
-	auto vertexShader = bindablesPool.GetBindable<VertexShader>(graphics, vertexShaderPath);
-	const VertexShader& vertexShaderRef = dynamic_cast<VertexShader&>(*vertexShader);
-	sharedBindables.push_back(bindablesPool.GetBindable<InputLayout>(graphics, inputElementDescs, vertexShaderRef.GetBufferPointer(), vertexShaderRef.GetBufferSize(), Utils::WstringToString(vertexShaderPath)));
-	sharedBindables.push_back(std::move(vertexShader));
-	sharedBindables.push_back(indexBuffer);
+	return std::make_unique<VertexBuffer>(graphics, verticesData, vertexSize, numVertices);
 }
 
-void Model::Bind(Graphics& graphics) noexcept
+CD3DX12_PIPELINE_STATE_STREAM_INPUT_LAYOUT Model::GetInputLayout() const noexcept
 {
-	for (auto& bindable : bindables)
-	{
-		bindable->Update(graphics);
-		bindable->Bind(graphics);
-	}
+	return D3D12_INPUT_LAYOUT_DESC{ vertexLayout.inputLayout.data(), (UINT)vertexLayout.inputLayout.size() };
+}
 
-	for (auto& sharedBindable : sharedBindables)
-	{
-		sharedBindable->Update(graphics);
-		sharedBindable->Bind(graphics);
-	}
+ID3DBlob* Model::GetVSBlob() const noexcept
+{
+	return vertexShaderBlob->Get();
 }
 
 std::shared_ptr<IndexBuffer> Model::ShareIndexBuffer() noexcept
@@ -162,7 +184,7 @@ std::shared_ptr<IndexBuffer> Model::ShareIndexBuffer() noexcept
 	return indexBuffer;
 }
 
-size_t Model::GetIndicesNumber() const noexcept
+UINT Model::GetIndicesNumber() const noexcept
 {
 	return indexBuffer->GetIndicesNumber();
 }

@@ -2,15 +2,10 @@
 
 Viewport::Viewport(const float width, const float height)
 {
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = width;
-	viewport.Height = height;
-	viewport.MaxDepth = 1.f;
-	viewport.MinDepth = 0.f;
+	viewport = CD3DX12_VIEWPORT{ 0.f, 0.f, width, height };
 }
 
-void Viewport::Bind(Graphics& graphics) noexcept
+void Viewport::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
-	GetContext(graphics)->RSSetViewports(1u, &viewport);
+	commandList->RSSetViewports(1, &viewport);
 }
