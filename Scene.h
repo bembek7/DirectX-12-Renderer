@@ -7,6 +7,7 @@
 #include "Actor.h"
 #include "LightPass.h"
 #include "LightPerspectivePass.h"
+#include "RayTracingPass.h"
 
 class Graphics;
 class Light;
@@ -26,6 +27,7 @@ private:
 
 private:
 	std::unique_ptr<GPass> gPass;
+	std::unique_ptr<RayTracingPass> rtPass;
 	std::unique_ptr<FinalPass> finalPass;
 	std::vector<std::unique_ptr<Actor>> actors;
 	std::vector<std::unique_ptr<LightPass>> lightPasses;

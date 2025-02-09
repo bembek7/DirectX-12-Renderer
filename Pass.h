@@ -17,7 +17,8 @@ enum class PassType
 	LightPass,
 	ShadowPass,
 	LightPerspectivePass,
-	FinalPass
+	FinalPass,
+	RayTracingPass
 };
 
 class Pass

@@ -41,17 +41,17 @@ void App::InitializeScene(Graphics& graphics)
 	scene->AddActor(graphics, std::move(back));*/
 
 	auto last = std::chrono::steady_clock::now();
-	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
+	//auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
 	std::stringstream ss = {};
 	ss << "Initalizing sponza took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
 	OutputDebugString(ss.str().c_str());
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 
-	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
+	//sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 	sphere->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
 
-	scene->AddActor(graphics, std::move(sponza));
+	//scene->AddActor(graphics, std::move(sponza));
 	scene->AddActor(graphics, std::move(sphere));
 	
 	scene->AddLight(graphics, std::move(pointLight));

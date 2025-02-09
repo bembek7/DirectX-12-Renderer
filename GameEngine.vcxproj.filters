@@ -79,6 +79,12 @@
     <Filter Include="Resource Files\PixelShaders\GPass">
       <UniqueIdentifier>{4380523d-2389-4cbb-8b32-49ff7b6758c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DXRHelpers">
+      <UniqueIdentifier>{6cdac452-3ad7-42fa-9bde-814df6fa4b74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\RayTracingShaders">
+      <UniqueIdentifier>{5d108269-a4bb-4819-bf8f-03fddde85cd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -224,6 +230,24 @@
     </ClCompile>
     <ClCompile Include="LightPass.cpp">
       <Filter>Source Files\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracingPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRHelpers\nv_helpers_dx12\BottomLevelASGenerator.cpp">
+      <Filter>DXRHelpers</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRHelpers\nv_helpers_dx12\RaytracingPipelineGenerator.cpp">
+      <Filter>DXRHelpers</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRHelpers\nv_helpers_dx12\RootSignatureGenerator.cpp">
+      <Filter>DXRHelpers</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRHelpers\nv_helpers_dx12\ShaderBindingTableGenerator.cpp">
+      <Filter>DXRHelpers</Filter>
+    </ClCompile>
+    <ClCompile Include="DXRHelpers\nv_helpers_dx12\TopLevelASGenerator.cpp">
+      <Filter>DXRHelpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -413,6 +437,27 @@
     <ClInclude Include="LightPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="RayTracingPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\DXRHelper.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\nv_helpers_dx12\BottomLevelASGenerator.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\nv_helpers_dx12\RaytracingPipelineGenerator.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\nv_helpers_dx12\RootSignatureGenerator.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\nv_helpers_dx12\ShaderBindingTableGenerator.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
+    <ClInclude Include="DXRHelpers\nv_helpers_dx12\TopLevelASGenerator.h">
+      <Filter>DXRHelpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelOnlyVS.hlsl">
@@ -462,6 +507,18 @@
     </FxCompile>
     <FxCompile Include="DTSMPS.hlsl">
       <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
+    <FxCompile Include="Common.hlsl">
+      <Filter>Resource Files\RayTracingShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Hit.hlsl">
+      <Filter>Resource Files\RayTracingShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Miss.hlsl">
+      <Filter>Resource Files\RayTracingShaders</Filter>
+    </FxCompile>
+    <FxCompile Include="RayGen.hlsl">
+      <Filter>Resource Files\RayTracingShaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

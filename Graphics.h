@@ -12,11 +12,22 @@
 #include "RootSignature.h"
 #include "Pass.h"
 #include <array>
+#include <dxcapi.h>
+#include <vector>
+#include "nv_helpers_dx12/TopLevelASGenerator.h"
+#include "VertexBuffer.h"
+#include "nv_helpers_dx12/ShaderBindingTableGenerator.h"
 
 class Light;
 
 class Graphics
 {
+	struct AccelerationStructureBuffers
+	{
+		Microsoft::WRL::ComPtr<ID3D12Resource> pScratch;      // Scratch memory for AS builder
+		Microsoft::WRL::ComPtr<ID3D12Resource> pResult;       // Where the AS is
+		Microsoft::WRL::ComPtr<ID3D12Resource> pInstanceDesc; // Hold the matrices of the instances
+	};
 public:
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
@@ -60,7 +71,13 @@ public:
 private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();
+	AccelerationStructureBuffers CreateBottomLevelAS(const std::vector<std::pair<ID3D12Resource*, uint32_t>>& vVertexBuffers);
+	void CreateTopLevelAS(const std::vector<std::pair<ID3D12Resource*, DirectX::XMMATRIX>>& instances);
+	void CreateAccelerationStructures();
 
+	void CreateRaytracingOutputBuffer();
+	void CreateShaderResourceHeap();
+	void CreateShaderBindingTable();
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	static constexpr std::array<FLOAT, 4> clearColor4 = { 0.13f, 0.05f, 0.05f, 1.0f };
@@ -82,13 +99,14 @@ private:
 
 	// Pipeline objects.
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
-	Microsoft::WRL::ComPtr<ID3D12Device2> device;
+	Microsoft::WRL::ComPtr<ID3D12Device5> device;
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargets[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocators[bufferCount];
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> bundleAllocator;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList;
+	
 	UINT rtvDescriptorSize;
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dethPrePassDSVHandle;
@@ -98,4 +116,39 @@ private:
 	HANDLE fenceEvent;
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	UINT64 fenceValues[bufferCount] = { 0 };
+
+
+
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> bottomLevelAS; // Storage for the bottom Level AS
+	std::unique_ptr<VertexBuffer> vertexBuffer;
+	nv_helpers_dx12::TopLevelASGenerator topLevelASGenerator;
+	AccelerationStructureBuffers topLevelASBuffers;
+	std::vector<std::pair<ID3D12Resource*, DirectX::XMMATRIX>> instances;
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateRayGenSignature();
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateMissSignature();
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> CreateHitSignature();
+
+	void CreateRaytracingPipeline();
+
+	Microsoft::WRL::ComPtr<IDxcBlob> rayGenLibrary;
+	Microsoft::WRL::ComPtr<IDxcBlob> hitLibrary;
+	Microsoft::WRL::ComPtr<IDxcBlob> missLibrary;
+
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rayGenSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> hitSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> missSignature;
+
+	// Ray tracing pipeline state
+	Microsoft::WRL::ComPtr<ID3D12StateObject> stateObject;
+	// Ray tracing pipeline state properties, retaining the shader identifiers
+	// to use in the Shader Binding Table
+	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> stateObjectProps;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> outputResource;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvUavHeap;
+
+	nv_helpers_dx12::ShaderBindingTableGenerator sbtHelper;
+	Microsoft::WRL::ComPtr<ID3D12Resource> sbtStorage;
 };

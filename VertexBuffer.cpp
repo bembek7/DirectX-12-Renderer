@@ -24,3 +24,8 @@ void VertexBuffer::Bind(ID3D12GraphicsCommandList* const commandList) noexcept
 {
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 }
+
+ID3D12Resource* VertexBuffer::GetBuffer()
+{
+	return vertexBuffer.Get();
+}
