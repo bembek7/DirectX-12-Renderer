@@ -321,14 +321,13 @@ void Graphics::ClearRenderTargetView()
 	// The hit groups section start after the miss shaders. In this sample we
 	// have one 1 hit group for the triangle
 	uint32_t hitGroupsSectionSize = sbtHelper.GetHitGroupSectionSize();
-	desc.HitGroupTable.StartAddress = AlignUp(
+	desc.HitGroupTable.StartAddress =
 		sbtStorage->GetGPUVirtualAddress() +
 		rayGenerationSectionSizeInBytes +
-		missSectionSizeInBytes,
-		D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT);
+		missSectionSizeInBytes;
 
 	desc.HitGroupTable.SizeInBytes = hitGroupsSectionSize;
-	desc.HitGroupTable.StrideInBytes = AlignUp(sbtHelper.GetHitGroupEntrySize(), D3D12_RAYTRACING_SHADER_RECORD_BYTE_ALIGNMENT);
+	desc.HitGroupTable.StrideInBytes = sbtHelper.GetHitGroupEntrySize();
 
 	// Dimensions of the image to render, identical to a kernel launch dimension
 	desc.Width = windowWidth;
@@ -341,10 +340,10 @@ void Graphics::ClearRenderTargetView()
 	commandList->DispatchRays(&desc);
 
 	// The raytracing output needs to be copied to the actual render target used
-// for display. For this, we need to transition the raytracing output from a
-// UAV to a copy source, and the render target buffer to a copy destination.
-// We can then do the actual copy, before transitioning the render target
-// buffer into a render target, that will be then used to display the image
+	// for display. For this, we need to transition the raytracing output from a
+	// UAV to a copy source, and the render target buffer to a copy destination.
+	// We can then do the actual copy, before transitioning the render target
+	// buffer into a render target, that will be then used to display the image
 	transition = CD3DX12_RESOURCE_BARRIER::Transition(
 		outputResource.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 		D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -504,11 +503,6 @@ Graphics::AccelerationStructureBuffers Graphics::CreateBottomLevelAS(const std::
 {
 	nv_helpers_dx12::BottomLevelASGenerator bottomLevelAS;
 
-
-	struct Vertex // TODO 
-	{
-		Dx::XMFLOAT3 position;
-	};
 	// Adding all vertex buffers and not transforming their position.
 	for (const auto& buffer : vVertexBuffers) {
 		bottomLevelAS.AddVertexBuffer(buffer.first, 0, buffer.second,
@@ -601,11 +595,11 @@ void Graphics::CreateAccelerationStructures()
 	// Build the bottom AS from the Triangle vertex buffer
 	std::vector<float> vertices =
 	{
-		0.5f, 0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
+		 0.0f,   0.5f, 0.0f,	1.0f, 0.f, 0.f,
+		-0.5f,  -0.5f, 0.0f,	0.0f, 1.f, 0.f,
+		 0.5f,	-0.5f, 0.0f,	0.0f, 0.f, 1.f,   
 	};
-	vertexBuffer = std::make_unique<VertexBuffer>(*this, vertices, UINT(sizeof(float) * 3), 3);
+	vertexBuffer = std::make_unique<VertexBuffer>(*this, vertices, UINT(sizeof(Vertex)), 3);
 	ResetCommandListAndAllocator();
 
 	AccelerationStructureBuffers bottomLevelBuffers = CreateBottomLevelAS({ {vertexBuffer->GetBuffer(), 3} });
@@ -654,6 +648,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> Graphics::CreateMissSignature()
 Microsoft::WRL::ComPtr<ID3D12RootSignature> Graphics::CreateHitSignature()
 {
 	nv_helpers_dx12::RootSignatureGenerator rsc;
+	rsc.AddRootParameter(D3D12_ROOT_PARAMETER_TYPE_SRV);
 	return rsc.Generate(device.Get(), true);
 }
 
@@ -807,7 +802,7 @@ void Graphics::CreateShaderBindingTable()
 	sbtHelper.AddMissProgram(L"Miss", {});
 
 	// Adding the triangle hit shader
-	sbtHelper.AddHitGroup(L"HitGroup", {});
+	sbtHelper.AddHitGroup(L"HitGroup", { (void*)(vertexBuffer->GetBuffer()->GetGPUVirtualAddress()) });
 
 	// Compute the size of the SBT given the number of shaders and their
 	// parameters

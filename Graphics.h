@@ -151,4 +151,10 @@ private:
 
 	nv_helpers_dx12::ShaderBindingTableGenerator sbtHelper;
 	Microsoft::WRL::ComPtr<ID3D12Resource> sbtStorage;
+
+	struct Vertex
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 color;
+	};
 };
