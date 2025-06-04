@@ -176,6 +176,7 @@
     </Link>
     <FxCompile>
       <ShaderModel>5.1</ShaderModel>
+      <ObjectFileOutput>$(WorkDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
