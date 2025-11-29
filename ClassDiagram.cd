@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" Name="ClassDiagram">
+  <Class Name="Actor" Collapsed="false" Access="Public" />
+  <Class Name="MeshActor" Collapsed="false" Access="Public" />
+  <Class Name="Light" Collapsed="false" Access="Public" />
+  <Class Name="PointLight" Collapsed="false" Access="Public" />
+  <Class Name="DirectionalLight" Collapsed="false" Access="Public" />
+  <Class Name="SpotLight" Collapsed="false" Access="Public" />
+  <Class Name="Gui" Collapsed="false" Access="Public" />
+  <Class Name="Graphics" Collapsed="false" Access="Public" />
+  <Class Name="Window" Collapsed="false" Access="Public" />
+  <Class Name="Scene" Collapsed="false" Access="Public" />
+  <Class Name="Camera" Collapsed="false" Access="Public" />
+  <Class Name="SceneComponent" Collapsed="false" Access="Public" />
+  <Class Name="MeshComponent" Collapsed="false" Access="Public" />
+  <Class Name="Bindable" Collapsed="false" Access="Public" />
+  <Class Name="IndexBuffer" Collapsed="false" Access="Public" />
+  <Class Name="VertexBuffer" Collapsed="false" Access="Public" />
+  <Class Name="RootSignature" Collapsed="false" Access="Public" />
+  <Class Name="PipelineState" Collapsed="false" Access="Public" />
+  <Class Name="Viewport" Collapsed="false" Access="Public" />
+  <Class Name="ScissorRectangle" Collapsed="false" Access="Public" />
+  <Class Name="ConstantBuffer" Collapsed="false" Access="Public" />
+  <Class Name="Model" Collapsed="false" Access="Public" />
+  <Class Name="Material" Collapsed="false" Access="Public" />
+  <Class Name="Texture" Collapsed="false" Access="Public" />
+  <Class Name="TexLoader" Collapsed="false" Access="Public" />
+  <Class Name="ShadersPool" Collapsed="false" Access="Public" />
+  <Class Name="BindablesPool" Collapsed="false" Access="Public" />
+  <Class Name="PipelineStatesPool" Collapsed="false" Access="Public" />
+  <Class Name="Pass" Collapsed="false" Access="Public" />
+  <Class Name="GPass" Collapsed="false" Access="Public" />
+  <Class Name="LightPass" Collapsed="false" Access="Public" />
+  <Class Name="FinalPass" Collapsed="false" Access="Public" />
+  <Class Name="LightPerspectivePass" Collapsed="false" Access="Public" />
+  <Class Name="RTVHeap" Collapsed="false" Access="Public" />
+  <Class Name="DepthStencilView" Collapsed="false" Access="Public" />
+  <Class Name="App" Collapsed="false" Access="Public" />
+  <Class Name="Utils" Collapsed="false" Access="Public" />
+
+  <!-- Inheritance relationships -->
+  <Inheritance Name="Light->Actor" Base="Actor" Derived="Light" />
+  <Inheritance Name="PointLight->Light" Base="Light" Derived="PointLight" />
+  <Inheritance Name="DirectionalLight->Light" Base="Light" Derived="DirectionalLight" />
+  <Inheritance Name="SpotLight->Light" Base="Light" Derived="SpotLight" />
+  <Inheritance Name="MeshActor->Actor" Base="Actor" Derived="MeshActor" />
+  <Inheritance Name="Camera->SceneComponent" Base="SceneComponent" Derived="Camera" />
+  <Inheritance Name="MeshComponent->SceneComponent" Base="SceneComponent" Derived="MeshComponent" />
+  <Inheritance Name="IndexBuffer->Bindable" Base="Bindable" Derived="IndexBuffer" />
+  <Inheritance Name="VertexBuffer->Bindable" Base="Bindable" Derived="VertexBuffer" />
+  <Inheritance Name="RootSignature->Bindable" Base="Bindable" Derived="RootSignature" />
+  <Inheritance Name="PipelineState->Bindable" Base="Bindable" Derived="PipelineState" />
+  <Inheritance Name="Viewport->Bindable" Base="Bindable" Derived="Viewport" />
+  <Inheritance Name="ScissorRectangle->Bindable" Base="Bindable" Derived="ScissorRectangle" />
+  <Inheritance Name="ConstantBuffer->Bindable" Base="Bindable" Derived="ConstantBuffer" />
+  <Inheritance Name="GPass->Pass" Base="Pass" Derived="GPass" />
+  <Inheritance Name="LightPass->Pass" Base="Pass" Derived="LightPass" />
+  <Inheritance Name="FinalPass->Pass" Base="Pass" Derived="FinalPass" />
+  <Inheritance Name="LightPerspectivePass->Pass" Base="Pass" Derived="LightPerspectivePass" />
+
+  <!-- Aggregation/Composition (owns/contains members) -->
+  <!-- PointLight has LightBuffer member -->
+  <Association Name="PointLight.lightBuffer" From="PointLight" To="ConstantBuffer" Type="Aggregation" Label="LightBuffer (CPU-side data)"/>
+  <!-- Scene owns Actors/Components/Models -->
+  <Association Name="Scene->Actor" From="Scene" To="Actor" Type="Aggregation" Label="actors[]" />
+  <Association Name="Scene->SceneComponent" From="Scene" To="SceneComponent" Type="Aggregation" Label="components[]" />
+  <Association Name="Scene->Model" From="Scene" To="Model" Type="Aggregation" Label="models[]" />
+  <!-- MeshActor owns MeshComponent/Material/Model -->
+  <Association Name="MeshActor->MeshComponent" From="MeshActor" To="MeshComponent" Type="Aggregation" Label="meshComponent" />
+  <Association Name="MeshActor->Material" From="MeshActor" To="Material" Type="Aggregation" Label="material" />
+  <Association Name="MeshActor->Model" From="MeshActor" To="Model" Type="Aggregation" Label="model" />
+  <!-- Pools manage bindables/shaders/pipeline states -->
+  <Association Name="BindablesPool->Bindable" From="BindablesPool" To="Bindable" Type="Aggregation" Label="cache" />
+  <Association Name="ShadersPool->Pass" From="ShadersPool" To="Pass" Type="Aggregation" Label="shaders" />
+  <Association Name="PipelineStatesPool->PipelineState" From="PipelineStatesPool" To="PipelineState" Type="Aggregation" Label="psoCache" />
+
+  <!-- Usage/Associations (parameters, friends, method calls) -->
+  <Association Name="PointLight uses Graphics" From="PointLight" To="Graphics" Type="Dependency" Label="Actor/Update(Graphics)" />
+  <Association Name="PointLight uses Gui" From="PointLight" To="Gui" Type="Dependency" Label="friend; RenderActorDetails(Gui)" />
+  <Association Name="Light uses Graphics" From="Light" To="Graphics" Type="Dependency" Label="render/update" />
+  <Association Name="Actor uses Graphics" From="Actor" To="Graphics" Type="Dependency" Label="render/update" />
+  <Association Name="Pass uses Graphics" From="Pass" To="Graphics" Type="Dependency" Label="Execute(Graphics)" />
+  <Association Name="GPass uses PipelineState" From="GPass" To="PipelineState" Type="Dependency" Label="bind PSO" />
+  <Association Name="LightPass uses PointLight" From="LightPass" To="PointLight" Type="Dependency" Label="shade" />
+  <Association Name="LightPass uses DirectionalLight" From="LightPass" To="DirectionalLight" Type="Dependency" Label="shade" />
+  <Association Name="LightPass uses SpotLight" From="LightPass" To="SpotLight" Type="Dependency" Label="shade" />
+  <Association Name="Model uses MeshComponent" From="Model" To="MeshComponent" Type="Dependency" Label="build meshes" />
+  <Association Name="Material uses Texture" From="Material" To="Texture" Type="Dependency" Label="diffuse/specular/normal" />
+  <Association Name="TexLoader produces Texture" From="TexLoader" To="Texture" Type="Dependency" Label="load" />
+  <Association Name="RTVHeap used by Graphics" From="Graphics" To="RTVHeap" Type="Dependency" Label="resource views" />
+  <Association Name="DepthStencilView used by Graphics" From="Graphics" To="DepthStencilView" Type="Dependency" Label="DSV" />
+
+  <!-- Layout (optional; Visual Studio will auto-layout if absent) -->
+  <Comment>This diagram references classes from headers and sources per project filters and encodes inheritance, aggregation, and usage dependencies.</Comment>
+</ClassDiagram>

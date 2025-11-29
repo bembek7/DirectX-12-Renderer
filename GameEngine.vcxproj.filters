@@ -543,5 +543,7 @@
     <None Include="LightDepthBufferCube.hlsli">
       <Filter>Resource Files\PixelShaders\Headers\Texes</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
+    <None Include="plantuml ClassDiagram.puml" />
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 #include <vector>
 #include <DirectXMath.h>
 #include <memory>
+#include <assimp\vector3.h>
 #include "Model.h"
 #include "SceneComponent.h"
 #include "Material.h"
@@ -31,14 +32,25 @@ protected:
 
 	virtual void RenderComponentDetails(Gui& gui) override;
 
+	virtual void ComponentMoved() override;
+
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
 	void PrepareForGPass(Graphics& graphics, Pass* const pass);
 	void PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass);
 
+	bool IsInsideFrustum(const Graphics::Frustum& frustum) const;
+
 	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
 
+	struct BoundingSphere {
+		DirectX::XMFLOAT3 center;
+		float radius;
+	};
+
+	BoundingSphere CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum) const;
+	void UpdateWorldBoundingSphere();
 private:
 	std::unique_ptr<Model> mainModel;
 	std::unique_ptr<Model> primitiveModel;
@@ -55,6 +67,9 @@ private:
 		DirectX::XMFLOAT4X4 projection;
 	};
 	TransformBuffer transformBuffer = {};
+
+	BoundingSphere modelBoundingSphere;
+	BoundingSphere worldBoundingSphere;
 
 	std::unique_ptr<ConstantBufferConstants<TransformBuffer>> transformConstantBuffer;
 

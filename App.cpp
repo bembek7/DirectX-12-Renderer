@@ -18,6 +18,7 @@ void App::InitializeScene(Graphics& graphics)
 	auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
 	//auto spotLight = std::make_unique<SpotLight>(window.GetGraphics());
 	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
+	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
 	/*auto sphere2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
 	auto sphere3 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere3");
 	auto sphere4 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere4");
@@ -50,13 +51,14 @@ void App::InitializeScene(Graphics& graphics)
 
 	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 	sphere->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	
+
 	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
-	pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, 0.0f });
+	pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, -1.0f });
 
 	scene->AddActor(graphics, std::move(sponza));
 	scene->AddActor(graphics, std::move(sphere));
-	
+	scene->AddActor(graphics, std::move(brickWall));
+
 	scene->AddLight(graphics, std::move(pointLight));
 	//scene->AddLight(graphics, std::move(spotLight));
 	//scene->AddLight(graphics, std::move(directionalLight));
@@ -76,10 +78,37 @@ int App::Run()
 	OutputDebugString(ss.str().c_str());
 	last = std::chrono::steady_clock::now();
 
+#ifdef BENCHMARK
+
+#endif // BENCHMARK
+
+	// Benchmark: record ms per frame for 15 seconds
+	constexpr float benchmarkDuration = 15.0f;
+	std::vector<float> frameTimesMs;
+	auto benchmarkStart = std::chrono::steady_clock::now();
+
 	while (true)
 	{
 		const float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 		last = std::chrono::steady_clock::now();
+
+		// Record frame time if within benchmark duration
+		if (std::chrono::duration<float>(last - benchmarkStart).count() < benchmarkDuration)
+		{
+			frameTimesMs.push_back(deltaTime * 1000.0f);
+		}
+		else if (!frameTimesMs.empty())
+		{
+			// Write results to file once after benchmark
+			std::ofstream outFile("benchmark.txt");
+			for (const auto ms : frameTimesMs)
+			{
+				outFile << ms << '\n';
+			}
+			outFile.close();
+			frameTimesMs.clear(); // Prevent repeated writes
+		}
+
 
 		if (const auto ecode = Window::ProcessMessages())
 		{

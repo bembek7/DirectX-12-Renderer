@@ -117,14 +117,27 @@ void Gui::RenderControlWindow()
 
 void Gui::RenderComponentDetails(SceneComponent* const component)
 {
+	DirectX::XMFLOAT3 location = component->GetRelativeLocation();
+	DirectX::XMFLOAT3 rotation = component->GetRelativeRotation();
+	DirectX::XMFLOAT3 scale = component->GetRelativeScale();
+
 	ImGui::Text("Relative Location");
-	ImGui::DragFloat3("##Location", (float*)&component->relativeLocation, 0.1f, -100.0f, 100.0f);
+	if (ImGui::DragFloat3("##Location", (float*)&location, 0.1f, -100.0f, 100.0f))
+	{
+		component->SetRelativeLocation(location);
+	}
 
 	ImGui::Text("Relative Rotation");
-	ImGui::DragFloat3("##Rotation", (float*)&component->relativeRotation, 1.f, -180.0f, 180.0f);
+	if (ImGui::DragFloat3("##Rotation", (float*)&rotation, 1.f, -180.0f, 180.0f))
+	{
+		component->SetRelativeRotation(rotation);
+	}
 
 	ImGui::Text("Relative Scale");
-	ImGui::DragFloat3("##Scale", (float*)&component->relativeScale, 0.1f, 0.01f, 10.0f);
+	if (ImGui::DragFloat3("##Scale", (float*)&scale, 0.1f, 0.01f, 10.0f))
+	{
+		component->SetRelativeScale(scale);
+	}
 }
 
 void Gui::RenderComponentDetails(MeshComponent* const component)

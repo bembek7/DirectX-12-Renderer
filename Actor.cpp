@@ -6,7 +6,8 @@
 
 Actor::Actor(const std::string& actorName) :
 	actorName(actorName)
-{}
+{
+}
 
 void Actor::AddActorScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept
 {

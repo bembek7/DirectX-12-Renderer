@@ -30,9 +30,10 @@ MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const
 	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
 	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
 
+	modelBoundingSphere = CalculateModelBoundingSphere(assignedMesh->mVertices, assignedMesh->mNumVertices);
+	UpdateWorldBoundingSphere();
 	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
 	mainModel = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, primitiveModel->ShareIndexBuffer());
-	
 	mainMaterial = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
 }
 
@@ -40,6 +41,12 @@ void MeshComponent::RenderComponentDetails(Gui& gui)
 {
 	SceneComponent::RenderComponentDetails(gui);
 	gui.RenderComponentDetails(this);
+}
+
+void MeshComponent::ComponentMoved()
+{
+	SceneComponent::ComponentMoved();
+	UpdateWorldBoundingSphere();
 }
 
 std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
@@ -50,7 +57,11 @@ std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics
 void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
 {
 	SceneComponent::Draw(graphics, passType);
-	
+
+	if (!IsInsideFrustum(graphics.GetFrustum()))
+	{
+		return;
+	}
 	if (passType == PassType::GPass)
 	{
 		mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
@@ -71,7 +82,7 @@ void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
 
 	switch (passType)
 	{
-	case PassType::GPass: 
+	case PassType::GPass:
 		PrepareForGPass(graphics, pass);
 		break;
 	case PassType::LightPerspectivePass:
@@ -116,6 +127,19 @@ void MeshComponent::PrepareForLightPerspectivePass(Graphics& graphics, Pass* con
 	drawingBundles[pass->GetType()] = std::move(drawingBundle);
 }
 
+bool MeshComponent::IsInsideFrustum(const Graphics::Frustum& frustum) const
+{
+	using namespace DirectX;
+
+	for (const auto& plane : frustum.planes) {
+		XMVECTOR normal = XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
+		float distance = XMVectorGetX(XMVector3Dot(normal, XMLoadFloat3(&worldBoundingSphere.center))) + plane.w;
+
+		if (distance < -worldBoundingSphere.radius)
+			return false;
+	}
+	return true;
+}
 
 void MeshComponent::Update(Graphics& graphics)
 {
@@ -172,6 +196,54 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 	}
 
 	return resolvedSettings;
+}
+
+MeshComponent::BoundingSphere MeshComponent::CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum) const
+{
+	if (verticesNum == 0)
+	{
+		return {};
+	}
+	aiVector3D min = vertices[0];
+	aiVector3D max = vertices[0];
+
+	for (unsigned int i = 0; i < verticesNum; ++i)
+	{
+		min.x = std::min(min.x, vertices[i].x);
+		min.y = std::min(min.y, vertices[i].y);
+		min.z = std::min(min.z, vertices[i].z);
+		max.x = std::max(max.x, vertices[i].x);
+		max.y = std::max(max.y, vertices[i].y);
+		max.z = std::max(max.z, vertices[i].z);
+	}
+
+	aiVector3D center = (min + max) * 0.5f;
+
+	float radius = 0.0f;
+	for (unsigned int i = 0; i < verticesNum; ++i)
+	{
+		float dist = (vertices[i] - center).Length();
+		if (dist > radius)
+		{
+			radius = dist;
+		}
+	}
+
+	return { {center.x, center.y, center.z}, radius };
+}
+
+void MeshComponent::UpdateWorldBoundingSphere()
+{
+	using namespace DirectX;
+	const XMVECTOR worldScale = GetComponentScaleVector();
+	const XMVECTOR worldLocation = GetComponentLocationVector();
+	XMVECTOR center = XMLoadFloat3(&modelBoundingSphere.center);
+	const XMMATRIX transform = GetTransformMatrix();
+	center = XMVector3Transform(center, transform);
+	XMStoreFloat3(&worldBoundingSphere.center, center);
+	worldBoundingSphere.radius = modelBoundingSphere.radius * std::max({ XMVectorGetX(worldScale),
+																	XMVectorGetY(worldScale),
+																	XMVectorGetZ(worldScale) });
 }
 
 MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newView, const DirectX::XMMATRIX newProjection)

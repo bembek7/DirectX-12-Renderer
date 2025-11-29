@@ -154,7 +154,7 @@ void Graphics::LoadPipeline(const HWND& hWnd)
 #if defined(_DEBUG)
 		Wrl::ComPtr<ID3D12Debug1> debugController;
 		CHECK_HR(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
-		
+
 		debugController->EnableDebugLayer();
 		//debugController->SetEnableGPUBasedValidation(true);
 
@@ -257,6 +257,75 @@ void Graphics::LoadAssets()
 	}
 }
 
+void Graphics::CalculateFrustum()
+{
+	DirectX::XMFLOAT4X4 m;
+
+	DirectX::XMStoreFloat4x4(&m, GetCamera() * GetProjection());
+
+	// Left
+	frustum.planes[Frustum::Left] = {
+		m._14 + m._11,
+		m._24 + m._21,
+		m._34 + m._31,
+		m._44 + m._41
+	};
+
+	// Right
+	frustum.planes[Frustum::Right] = {
+		m._14 - m._11,
+		m._24 - m._21,
+		m._34 - m._31,
+		m._44 - m._41
+	};
+
+	// Bottom
+	frustum.planes[Frustum::Bottom] = {
+		m._14 + m._12,
+		m._24 + m._22,
+		m._34 + m._32,
+		m._44 + m._42
+	};
+
+	// Top
+	frustum.planes[Frustum::Top] = {
+		m._14 - m._12,
+		m._24 - m._22,
+		m._34 - m._32,
+		m._44 - m._42
+	};
+
+	// Near
+	frustum.planes[Frustum::Near] = {
+		m._13,
+		m._23,
+		m._33,
+		m._43
+	};
+
+	// Far
+	frustum.planes[Frustum::Far] = {
+		m._14 - m._13,
+		m._24 - m._23,
+		m._34 - m._33,
+		m._44 - m._43
+	};
+
+	// Normalize each plane
+	for (auto& plane : frustum.planes) {
+		DirectX::XMVECTOR normal = DirectX::XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
+		float length = DirectX::XMVectorGetX(DirectX::XMVector3Length(normal));
+
+		if (length > 0.0001f)
+		{
+			plane.x /= length;
+			plane.y /= length;
+			plane.z /= length;
+			plane.w /= length;
+		}
+	}
+}
+
 void Graphics::ClearRenderTargetView()
 {
 	const auto& rtv = GetRtvCpuHandle();
@@ -316,11 +385,13 @@ float Graphics::GetWindowHeight() const noexcept
 void Graphics::SetProjection(const DirectX::XMMATRIX proj) noexcept
 {
 	DirectX::XMStoreFloat4x4(&projection, proj);
+	frustumNeedsUpdate = true;
 }
 
 void Graphics::SetProjection(const DirectX::XMFLOAT4X4 proj) noexcept
 {
 	projection = proj;
+	frustumNeedsUpdate = true;
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
@@ -331,11 +402,22 @@ DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 void Graphics::SetCamera(const DirectX::XMMATRIX cam) noexcept
 {
 	DirectX::XMStoreFloat4x4(&camera, cam);
+	frustumNeedsUpdate = true;
 }
 
 DirectX::XMMATRIX Graphics::GetCamera() const noexcept
 {
 	return DirectX::XMLoadFloat4x4(&camera);
+}
+
+Graphics::Frustum Graphics::GetFrustum() noexcept
+{
+	if (frustumNeedsUpdate)
+	{
+		CalculateFrustum();
+		frustumNeedsUpdate = false;
+	}
+	return frustum;
 }
 
 void Graphics::ResetCommandListAndAllocator()

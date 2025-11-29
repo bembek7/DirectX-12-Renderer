@@ -18,6 +18,12 @@ class Light;
 class Graphics
 {
 public:
+	struct Frustum {
+		DirectX::XMFLOAT4 planes[6];
+
+		enum Plane { Left = 0, Right, Bottom, Top, Near, Far };
+	};
+
 	Graphics(const HWND& hWnd, const float windowWidth, const float windowHeight);
 	~Graphics() = default;
 	Graphics(const Graphics&) = delete;
@@ -47,6 +53,8 @@ public:
 	void SetCamera(const DirectX::XMMATRIX cam) noexcept;
 	DirectX::XMMATRIX GetCamera() const noexcept;
 
+	Frustum GetFrustum() noexcept;
+
 	void ResetCommandListAndAllocator();
 	void ExecuteCommandList();
 	void WaitForQueueFinish();
@@ -61,6 +69,7 @@ private:
 	void LoadPipeline(const HWND& hWnd);
 	void LoadAssets();
 
+	void CalculateFrustum();
 public:
 	static constexpr DXGI_FORMAT renderTargetDxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	static constexpr std::array<FLOAT, 4> clearColor4 = { 0.13f, 0.05f, 0.05f, 1.0f };
@@ -71,6 +80,9 @@ private:
 	float windowHeight;
 	DirectX::XMFLOAT4X4 camera;
 	DirectX::XMFLOAT4X4 projection;
+	Frustum frustum;
+	bool frustumNeedsUpdate = true;
+
 	UINT cbvSrvDescriptorSize = 0;
 	UINT dsvDescriptorSize = 0;
 	static constexpr UINT bufferCount = 2;

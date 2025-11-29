@@ -12,7 +12,8 @@
 
 SceneComponent::SceneComponent(const std::string& componentName) :
 	componentName(componentName)
-{}
+{
+}
 
 SceneComponent::SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
 {
@@ -66,6 +67,14 @@ void SceneComponent::DeattachFromParent()
 void SceneComponent::RenderComponentDetails(Gui& gui)
 {
 	gui.RenderComponentDetails(this);
+}
+
+void SceneComponent::ComponentMoved()
+{
+	for (auto& child : children)
+	{
+		child->ComponentMoved();
+	}
 }
 
 std::unique_ptr<SceneComponent> SceneComponent::CreateComponent(const std::string& componentName)
@@ -154,61 +163,73 @@ DirectX::XMMATRIX SceneComponent::GetTransformMatrix() const noexcept
 void SceneComponent::AddRelativeScale(const DirectX::XMFLOAT3 scaleToAdd) noexcept
 {
 	AddRelativeScale(DirectX::XMLoadFloat3(&scaleToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::AddRelativeRotation(const DirectX::XMFLOAT3 rotationToAdd) noexcept
 {
 	AddRelativeRotation(DirectX::XMLoadFloat3(&rotationToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::AddRelativeLocation(const DirectX::XMFLOAT3 locationToAdd) noexcept
 {
 	AddRelativeLocation(DirectX::XMLoadFloat3(&locationToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::AddRelativeScale(const DirectX::XMVECTOR scaleToAdd) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeScale, DirectX::XMVectorAdd(GetRelativeScaleVector(), scaleToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::AddRelativeRotation(const DirectX::XMVECTOR rotationToAdd) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeRotation, DirectX::XMVectorAdd(GetRelativeRotationVector(), rotationToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::AddRelativeLocation(const DirectX::XMVECTOR locationToAdd) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeLocation, DirectX::XMVectorAdd(GetRelativeLocationVector(), locationToAdd));
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeScale(const DirectX::XMFLOAT3 newScale) noexcept
 {
 	relativeScale = newScale;
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeRotation(const DirectX::XMFLOAT3 newRotation) noexcept
 {
 	relativeRotation = newRotation;
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeLocation(const DirectX::XMFLOAT3 newLocation) noexcept
 {
 	relativeLocation = newLocation;
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeScale(const DirectX::XMVECTOR newScale) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeScale, newScale);
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeRotation(const DirectX::XMVECTOR newRotation) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeRotation, newRotation);
+	ComponentMoved();
 }
 
 void SceneComponent::SetRelativeLocation(const DirectX::XMVECTOR newLocation) noexcept
 {
 	DirectX::XMStoreFloat3(&relativeLocation, newLocation);
+	ComponentMoved();
 }
 
 DirectX::XMFLOAT3 SceneComponent::GetRelativeScale() const noexcept

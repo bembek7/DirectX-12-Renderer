@@ -75,13 +75,13 @@ public:
 	DirectX::XMVECTOR GetComponentRotationRadians() const noexcept;
 
 	std::string GetComponentFullName();
-
 protected:
 	SceneComponent(const std::string& componentName);
 	SceneComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene);
 
 	virtual void RenderComponentDetails(Gui& gui);
 
+	virtual void ComponentMoved();
 private:
 	void DeattachFromParent();
 protected:
