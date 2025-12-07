@@ -9,8 +9,9 @@ public:
 	int Run();
 
 private:
+	enum class SceneType;
 	void HandleInput();
-	void InitializeScene(Graphics& graphics);
+	void InitializeScene(Graphics& graphics, SceneType sceneType, int lightSetup);
 private:
 	std::unique_ptr<Scene> scene;
 	Window window = Window(1444, 810);

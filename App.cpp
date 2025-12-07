@@ -8,39 +8,59 @@
 
 namespace Dx = DirectX;
 
-//#define BENCHMARK
+#define BENCHMARK
 #ifdef BENCHMARK
 float gBenchmarkDeltaTime = 0.0f;
 constexpr float benchmarkDuration = 20.0f;
+std::chrono::steady_clock::time_point sceneStartTime;
 #include <fstream>
 #endif // BENCHMARK
 
-void App::InitializeScene(Graphics& graphics)
+enum class App::SceneType
+{
+	Factory,
+	Sponza,
+	// Add two more scenes as needed, e.g. Hangar, Office
+	Hangar,
+	Office
+};
+
+void App::InitializeScene(Graphics& graphics, SceneType sceneType, int lightSetup)
 {
 	const std::string meshesPath = "Meshes\\";
-
 	scene = std::make_unique<Scene>(window.GetGraphics());
-	auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics());
-	//auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
-	//auto spotLight = std::make_unique<SpotLight>(window.GetGraphics());
 
-	//auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
-	auto sanMigeuel = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "factory.obj", "SanMiguel");
+	// Select mesh based on sceneType
+	std::unique_ptr<MeshActor> meshActor;
+	switch (sceneType)
+	{
+	case SceneType::Factory:
+		meshActor = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "factory.obj", "Factory");
+		break;
+	case SceneType::Sponza:
+		meshActor = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
+		meshActor->SetActorTransform({ 0.f, -10.f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.05f, 0.05f, 0.05f });
+		break;
+	case SceneType::Hangar:
+		meshActor = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "factory.obj", "Hangar");
+		break;
+	case SceneType::Office:
+		meshActor = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Office");
+		break;
+	}
+	scene->AddActor(graphics, std::move(meshActor));
 
-	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
+	// Always add directional light
+	scene->AddLight(graphics, std::make_unique<DirectionalLight>(window.GetGraphics()));
 
-	//sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
-	//sanMigeuel->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
-
-	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
-	//pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, -1.0f });
-
-	//scene->AddActor(graphics, std::move(sponza));
-	scene->AddActor(graphics, std::move(sanMigeuel));
-
-	//scene->AddLight(graphics, std::move(pointLight));
-	//scene->AddLight(graphics, std::move(spotLight));
-	scene->AddLight(graphics, std::move(directionalLight));
+	if (lightSetup >= 2)
+	{
+		scene->AddLight(graphics, std::make_unique<SpotLight>(window.GetGraphics()));
+	}
+	if (lightSetup == 3)
+	{
+		scene->AddLight(graphics, std::make_unique<PointLight>(window.GetGraphics()));
+	}
 
 	scene->PrepareActorsForPasses(graphics);
 }
@@ -50,42 +70,68 @@ int App::Run()
 	auto& graphics = window.GetGraphics();
 	auto const gui = graphics.GetGui();
 
-	auto last = std::chrono::steady_clock::now();
-	InitializeScene(graphics);
-	std::stringstream ss;
-	ss << "Scene initialization took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds";
-	OutputDebugString(ss.str().c_str());
-	last = std::chrono::steady_clock::now();
-
 #ifdef BENCHMARK
-	// Benchmark: record ms per frame for 15 seconds
-	std::vector<float> frameTimesMs;
-	auto benchmarkStart = std::chrono::steady_clock::now();
-#endif // BENCHMARK
+	SceneType sceneTypes[4] = { SceneType::Factory, SceneType::Sponza, SceneType::Hangar, SceneType::Office };
+	constexpr int numLightSetups = 3;
+
+	for (int sceneIdx = 0; sceneIdx < 4; ++sceneIdx)
+	{
+		for (int lightSetup = 1; lightSetup <= numLightSetups; ++lightSetup)
+		{
+			InitializeScene(graphics, sceneTypes[sceneIdx], lightSetup);
+			auto last = std::chrono::steady_clock::now();
+
+			std::vector<float> frameTimesMs;
+			auto benchmarkStart = std::chrono::steady_clock::now();
+
+			sceneStartTime = std::chrono::steady_clock::now();
+			while (true)
+			{
+				const float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+				last = std::chrono::steady_clock::now();
+
+				gBenchmarkDeltaTime = deltaTime;
+				if (std::chrono::duration<float>(last - benchmarkStart).count() < benchmarkDuration)
+				{
+					frameTimesMs.push_back(deltaTime * 1000.0f);
+				}
+				else if (!frameTimesMs.empty())
+				{
+					std::string filename = "Benchmarking/benchmark_scene" + std::to_string(sceneIdx + 1) +
+						"_lights" + std::to_string(lightSetup) + ".txt";
+					std::ofstream outFile(filename);
+					for (const auto ms : frameTimesMs)
+					{
+						outFile << ms << '\n';
+					}
+					outFile.close();
+					frameTimesMs.clear();
+					break; // End benchmark for this scenario
+				}
+
+				if (const auto ecode = Window::ProcessMessages())
+				{
+					return *ecode;
+				}
+
+				HandleInput();
+				graphics.RenderBegin();
+				scene->Draw(graphics);
+				gui->RenderPerformanceInfo(unsigned int(1.0f / deltaTime), deltaTime * 1000.0f);
+				graphics.RenderEnd();
+				scene->ProcessRemovals(graphics);
+			}
+		}
+	}
+	graphics.OnDestroy();
+	return 0;
+#else
+	InitializeScene(graphics, App::SceneType::Sponza, 1);
+	auto last = std::chrono::steady_clock::now();
 	while (true)
 	{
 		const float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 		last = std::chrono::steady_clock::now();
-
-#ifdef BENCHMARK
-		gBenchmarkDeltaTime = deltaTime;
-		// Record frame time if within benchmark duration
-		if (std::chrono::duration<float>(last - benchmarkStart).count() < benchmarkDuration)
-		{
-			frameTimesMs.push_back(deltaTime * 1000.0f);
-		}
-		else if (!frameTimesMs.empty())
-		{
-			// Write results to file once after benchmark
-			std::ofstream outFile("Benchmarking/benchmark.txt");
-			for (const auto ms : frameTimesMs)
-			{
-				outFile << ms << '\n';
-			}
-			outFile.close();
-			frameTimesMs.clear(); // Prevent repeated writes
-		}
-#endif // BENCHMARK
 
 		if (const auto ecode = Window::ProcessMessages())
 		{
@@ -103,13 +149,13 @@ int App::Run()
 	graphics.OnDestroy();
 
 	return 0;
+#endif // BENCHMARK
 }
 
 void App::HandleInput()
 {
 #ifdef BENCHMARK
-	static auto benchmarkStart = std::chrono::steady_clock::now();
-	float elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - benchmarkStart).count();
+	float elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - sceneStartTime).count();
 
 	extern float gBenchmarkDeltaTime;
 
