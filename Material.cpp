@@ -15,6 +15,7 @@ const std::unordered_map<ShaderSettings, std::wstring, ShaderSettingsHash> Mater
 	{ ShaderSettings::Texture, L"DTPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap, L"DTNMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::SpecularMap, L"DTSMPS.cso" },
+	{ ShaderSettings::Texture | ShaderSettings::AlphaTesting, L"DTAT.cso"},
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap, L"DTNMSMPS.cso" },
 	{ ShaderSettings::Texture | ShaderSettings::NormalMap | ShaderSettings::SpecularMap | ShaderSettings::AlphaTesting , L"DTNMSMATPS.cso" },
 };
@@ -53,11 +54,13 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	roughnessBuffer = std::make_unique<Roughness>();
 	cBuffers.push_back(std::make_unique<ConstantBufferCBV<Roughness>>(graphics, *roughnessBuffer, 1));
 
+	INT srvOffset = 0u;
 	if (static_cast<bool>(shaderSettings & ShaderSettings::Texture))
 	{
 		aiString texFileName;
 		assignedMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 0u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, srvOffset, srvDescSize);
+		++srvOffset;
 		auto diffTex = std::make_unique<Texture>(graphics, texFileName.C_Str(), srvCpuHandle);
 		if (diffTex->HasAlpha())
 		{
@@ -70,14 +73,16 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	{
 		aiString normalTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_NORMALS, 0, &normalTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 1u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, srvOffset, srvDescSize);
+		++srvOffset;
 		textures.push_back(std::make_unique<Texture>(graphics, normalTexFileName.C_Str(), srvCpuHandle));
 	}
 	if (static_cast<bool>(shaderSettings & ShaderSettings::SpecularMap))
 	{
 		aiString specularTexFileName;
 		assignedMaterial->GetTexture(aiTextureType_SPECULAR, 0, &specularTexFileName);
-		srvCpuHandle.InitOffsetted(srvCpuStartHandle, 2u, srvDescSize);
+		srvCpuHandle.InitOffsetted(srvCpuStartHandle, srvOffset, srvDescSize);
+		++srvOffset;
 		textures.push_back(std::make_unique<Texture>(graphics, specularTexFileName.C_Str(), srvCpuHandle));
 	}
 
@@ -97,7 +102,9 @@ Material::Material(Graphics& graphics, const aiMaterial* const assignedMaterial,
 	}
 	else
 	{
-		throw std::runtime_error("Pixel shader path not found for given flags");
+		std::stringstream errMsg;
+		errMsg << "Pixel shader path not found for given flags: " << static_cast<std::underlying_type_t<ShaderSettings>>(shaderSettings);
+		throw std::runtime_error(errMsg.str());
 	}
 
 	auto& shadersPool = ShadersPool::GetInstance();

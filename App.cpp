@@ -8,60 +8,39 @@
 
 namespace Dx = DirectX;
 
+//#define BENCHMARK
+#ifdef BENCHMARK
+float gBenchmarkDeltaTime = 0.0f;
+constexpr float benchmarkDuration = 20.0f;
+#include <fstream>
+#endif // BENCHMARK
+
 void App::InitializeScene(Graphics& graphics)
 {
 	const std::string meshesPath = "Meshes\\";
 
 	scene = std::make_unique<Scene>(window.GetGraphics());
-
-	//auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics());
-	auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
+	auto directionalLight = std::make_unique<DirectionalLight>(window.GetGraphics());
+	//auto pointLight = std::make_unique<PointLight>(window.GetGraphics());
 	//auto spotLight = std::make_unique<SpotLight>(window.GetGraphics());
-	auto sphere = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere1");
-	auto brickWall = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "brick_wall.obj", "BrickWall");
-	/*auto sphere2 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere2");
-	auto sphere3 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere3");
-	auto sphere4 = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sphere.obj", "Sphere4");
-	auto left = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Left");
-	auto right = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Right");
-	auto front = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Front");
-	auto back = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "box.obj", "Back");*/
-	/*sphere2->SetActorTransform({ 10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	sphere3->SetActorTransform({ 0.f, 0.f, -10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	sphere4->SetActorTransform({ 0.f, 0.f, 10.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
-	left->SetActorTransform({ -15.f, 0.f, 0.0f }, zeroVec, { 0.1f, 30.5f, 30.5f });
-	right->SetActorTransform({ 15.f, 0.f, 0.0f }, zeroVec, { 0.5f, 30.5f, 30.5f });
-	front->SetActorTransform({ 0.f, 0.f, 15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });
-	back->SetActorTransform({ 0.f, 0.f, -15.0f }, zeroVec, { 30.5f, 30.5f, 0.5f });*/
-	/*scene->AddActor(graphics, std::move(sphere2));
-	scene->AddActor(graphics, std::move(sphere3));
-	scene->AddActor(graphics, std::move(sphere4));
-	scene->AddActor(graphics, std::move(left));
-	scene->AddActor(graphics, std::move(right));
-	scene->AddActor(graphics, std::move(front));
-	scene->AddActor(graphics, std::move(back));*/
 
-	auto last = std::chrono::steady_clock::now();
-	auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
-	std::stringstream ss = {};
-	ss << "Initalizing sponza took: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count() << " seconds\n";
-	OutputDebugString(ss.str().c_str());
+	//auto sponza = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "sponza.obj", "Sponza");
+	auto sanMigeuel = std::make_unique<MeshActor>(window.GetGraphics(), meshesPath + "factory.obj", "SanMiguel");
 
 	Dx::XMFLOAT3 zeroVec = { 0.f, 0.f, 0.f };
 
-	sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
-	sphere->SetActorTransform({ -10.f, 0.f, 0.0f }, zeroVec, { 0.5f, 0.5f, 0.5f });
+	//sponza->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
+	//sanMigeuel->SetActorTransform({ 0.f, -10.f, 0.0f }, zeroVec, { 0.05f, 0.05f, 0.05f });
 
 	//spotLight->SetActorLocation(Dx::XMFLOAT3{ 20.f, 0.f, 0.0f });
-	pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, -1.0f });
+	//pointLight->SetActorLocation(Dx::XMFLOAT3{ 0.f, 0.f, -1.0f });
 
-	scene->AddActor(graphics, std::move(sponza));
-	scene->AddActor(graphics, std::move(sphere));
-	scene->AddActor(graphics, std::move(brickWall));
+	//scene->AddActor(graphics, std::move(sponza));
+	scene->AddActor(graphics, std::move(sanMigeuel));
 
-	scene->AddLight(graphics, std::move(pointLight));
+	//scene->AddLight(graphics, std::move(pointLight));
 	//scene->AddLight(graphics, std::move(spotLight));
-	//scene->AddLight(graphics, std::move(directionalLight));
+	scene->AddLight(graphics, std::move(directionalLight));
 
 	scene->PrepareActorsForPasses(graphics);
 }
@@ -79,19 +58,17 @@ int App::Run()
 	last = std::chrono::steady_clock::now();
 
 #ifdef BENCHMARK
-
-#endif // BENCHMARK
-
 	// Benchmark: record ms per frame for 15 seconds
-	constexpr float benchmarkDuration = 15.0f;
 	std::vector<float> frameTimesMs;
 	auto benchmarkStart = std::chrono::steady_clock::now();
-
+#endif // BENCHMARK
 	while (true)
 	{
 		const float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 		last = std::chrono::steady_clock::now();
 
+#ifdef BENCHMARK
+		gBenchmarkDeltaTime = deltaTime;
 		// Record frame time if within benchmark duration
 		if (std::chrono::duration<float>(last - benchmarkStart).count() < benchmarkDuration)
 		{
@@ -100,7 +77,7 @@ int App::Run()
 		else if (!frameTimesMs.empty())
 		{
 			// Write results to file once after benchmark
-			std::ofstream outFile("benchmark.txt");
+			std::ofstream outFile("Benchmarking/benchmark.txt");
 			for (const auto ms : frameTimesMs)
 			{
 				outFile << ms << '\n';
@@ -108,7 +85,7 @@ int App::Run()
 			outFile.close();
 			frameTimesMs.clear(); // Prevent repeated writes
 		}
-
+#endif // BENCHMARK
 
 		if (const auto ecode = Window::ProcessMessages())
 		{
@@ -120,6 +97,7 @@ int App::Run()
 		scene->Draw(graphics);
 		gui->RenderPerformanceInfo(unsigned int(1.0f / deltaTime), deltaTime * 1000.0f);
 		graphics.RenderEnd();
+		scene->ProcessRemovals(graphics);
 	}
 
 	graphics.OnDestroy();
@@ -129,6 +107,51 @@ int App::Run()
 
 void App::HandleInput()
 {
+#ifdef BENCHMARK
+	static auto benchmarkStart = std::chrono::steady_clock::now();
+	float elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - benchmarkStart).count();
+
+	extern float gBenchmarkDeltaTime;
+
+	if (elapsed < benchmarkDuration)
+	{
+		DirectX::XMFLOAT2 cameraMoveInput = { 0.f, 0.f };
+		DirectX::XMFLOAT2 cameraLookInput = { 0.f, 0.f };
+
+		// Use radians for rotation
+		constexpr float turnRightDegreesPerSecond = 90.0f / 3.0f / 0.15f;   // 30 deg/sec / rotation speed
+		constexpr float turnAroundDegreesPerSecond = 180.0f / 3.0f / 0.15f; // 60 deg/sec / rotation speed
+		constexpr float moveSpeed = 15.0f; // units per second (increase for faster movement
+
+		if (elapsed < 3.0f)
+		{
+			// Turn right 90° over 3 seconds
+			cameraLookInput.x = turnRightDegreesPerSecond * gBenchmarkDeltaTime;
+		}
+		else if (elapsed < 6.0f)
+		{
+			// Move forward
+			cameraMoveInput.y = moveSpeed * gBenchmarkDeltaTime;
+		}
+		else if (elapsed < 9.0f)
+		{
+			// Turn around 180° over 3 seconds
+			cameraLookInput.x = -turnAroundDegreesPerSecond * gBenchmarkDeltaTime;
+		}
+		else if (elapsed < 17.0f)
+		{
+			// Move forward (opposite direction)
+			cameraMoveInput.y = moveSpeed * gBenchmarkDeltaTime;
+		}
+		// Last 3 seconds: no movement
+
+		scene->GetMainCamera()->AddMovementInput(cameraMoveInput);
+		scene->GetMainCamera()->AddYawInput(cameraLookInput.x);
+		scene->GetMainCamera()->AddPitchInput(cameraLookInput.y);
+		return;
+	}
+#endif // BENCHMARK
+
 	while (const auto keyPressed = window.ReadPressedKey())
 	{
 		if (keyPressed == VK_ESCAPE)

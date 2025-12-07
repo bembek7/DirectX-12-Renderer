@@ -7,7 +7,7 @@
 namespace Dx = DirectX;
 namespace Wrl = Microsoft::WRL;
 
-IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices)
+IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<uint32_t>& indices)
 {
 	// set the index count
 	indicesNum = (UINT)indices.size();
@@ -17,8 +17,8 @@ IndexBuffer::IndexBuffer(Graphics& graphics, const std::vector<WORD>& indices)
 	indexBufferView =
 	{
 		.BufferLocation = indexBuffer->GetGPUVirtualAddress(),
-		.SizeInBytes = indicesNum * (UINT)sizeof(WORD),
-		.Format = DXGI_FORMAT_R16_UINT,
+		.SizeInBytes = indicesNum * (UINT)sizeof(uint32_t),
+		.Format = DXGI_FORMAT_R32_UINT,
 	};
 }
 

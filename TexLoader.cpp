@@ -40,6 +40,9 @@ std::shared_ptr<TexLoader::Image> TexLoader::GetTexture(Graphics& graphics, cons
 TexLoader::Image TexLoader::LoadTextureFromFile(Graphics& graphics, const std::string& fileName)
 {
 	Dx::ScratchImage scratchImage;
+#if defined(_DEBUG)
+	OutputDebugStringA(("Loading texture: Textures\\" + fileName + "\n").c_str());
+#endif
 	CHECK_HR(Dx::LoadFromWICFile(Utils::StringToWstring("Textures\\" + fileName).c_str(), Dx::WIC_FLAGS_NONE, nullptr, scratchImage));
 
 	Dx::ScratchImage mipChain;

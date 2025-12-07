@@ -17,6 +17,8 @@ public:
 	Scene(Graphics& graphics);
 
 	void AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd);
+	void MarkActorForRemoval(Actor* actorToMark);
+	void ProcessRemovals(Graphics& graphics);
 	void AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd);
 	void Draw(Graphics& graphics);
 	void PrepareActorsForPasses(Graphics& graphics);
@@ -28,6 +30,7 @@ private:
 	std::unique_ptr<GPass> gPass;
 	std::unique_ptr<FinalPass> finalPass;
 	std::vector<std::unique_ptr<Actor>> actors;
+	std::vector<Actor*> actorsToRemove;
 	std::vector<std::unique_ptr<LightPass>> lightPasses;
 	std::vector<std::unique_ptr<LightPerspectivePass>> lightPerspectivePasses;
 	std::unique_ptr<Camera> mainCamera;

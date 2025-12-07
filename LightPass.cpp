@@ -59,11 +59,11 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 	vertexBuffer = std::make_unique<VertexBuffer>(graphics, std::vector<float>
 	{
 		-1.f, 1.f, 0.f, 0.f, 0.f,
-		3.f, 1.f, 0.f, 2.f, 0.f,
-		-1.f, -3.f, 0.f, 0.f, 2.f,
+			3.f, 1.f, 0.f, 2.f, 0.f,
+			-1.f, -3.f, 0.f, 0.f, 2.f,
 	}, UINT(5 * sizeof(float)), 3u);
 
-	indexBuffer = std::make_unique<IndexBuffer>(graphics, std::vector<WORD>{ 0, 1, 2 });
+	indexBuffer = std::make_unique<IndexBuffer>(graphics, std::vector<uint32_t>{ 0, 1, 2 });
 
 	drawingBundle = graphics.CreateBundle();
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -116,7 +116,7 @@ LightPass::LightPass(Graphics& graphics, ID3D12Resource* const sceneNormal_Rough
 void LightPass::Execute(Graphics& graphics, const CD3DX12_CPU_DESCRIPTOR_HANDLE& lightMapRtvHandle)
 {
 	Pass::Execute(graphics);
-	
+
 	graphics.GetMainCommandList()->OMSetRenderTargets(1, &lightMapRtvHandle, TRUE, nullptr);
 
 	graphics.GetMainCommandList()->SetDescriptorHeaps(1u, srvHeap.GetAddressOf());

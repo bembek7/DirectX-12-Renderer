@@ -9,6 +9,7 @@
 #include <sstream>
 #include "DirectionalLight.h"
 #include "SpotLight.h"
+#include "Scene.h"
 
 Gui::Gui(const HWND& hWnd, ID3D12Device* const device, const UINT framesInFlightNum, const DXGI_FORMAT rtFormat)
 {
@@ -50,13 +51,21 @@ void Gui::EndFrame(CD3DX12_CPU_DESCRIPTOR_HANDLE rtv, ID3D12GraphicsCommandList*
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }
 
-void Gui::RenderActorTree(Actor* const actor)
+void Gui::RenderActorTree(Actor* const actor, Scene* const scene)
 {
 	if (actor)
 	{
 		const std::string actorFullName = actor->GetActorFullName();
 		if (ImGui::Begin(actorFullName.c_str()))
 		{
+			if (ImGui::Button("Remove from scene"))
+			{
+				selectedActor = nullptr;
+				selectedComponent = nullptr;
+				scene->MarkActorForRemoval(actor);
+				ImGui::End();
+				return;
+			}
 			RenderComponentTree(actor->rootComponent.get(), actor);
 		}
 		ImGui::End();

@@ -96,7 +96,7 @@ Model::VertexLayout Model::GenerateVertexLayout(const aiMesh* const assignedMesh
 
 std::shared_ptr<IndexBuffer> Model::GenerateIndexBuffer(Graphics& graphics, const aiMesh* const assignedMesh) const
 {
-	std::vector<WORD> indices;
+	std::vector<uint32_t> indices;
 	for (size_t i = 0; i < assignedMesh->mNumFaces; i++)
 	{
 		for (size_t j = 0; j < assignedMesh->mFaces[i].mNumIndices; j++)

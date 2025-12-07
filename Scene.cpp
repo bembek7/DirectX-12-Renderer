@@ -45,6 +45,31 @@ void Scene::AddActor(Graphics& graphics, std::unique_ptr<Actor> actorToAdd)
 	actors.push_back(std::move(actorToAdd));
 }
 
+void Scene::MarkActorForRemoval(Actor* actorToRemove)
+{
+	if(dynamic_cast<Light*>(actorToRemove))
+	{
+		throw std::runtime_error("Light should be removed using respective light removal function");
+	}
+	actorsToRemove.push_back(actorToRemove);
+}
+
+void Scene::ProcessRemovals(Graphics& graphics)
+{
+	if (actorsToRemove.empty())
+	{
+		return;
+	}
+	graphics.WaitForQueueFinish();
+	for (auto& actorPtr : actorsToRemove)
+	{
+		actors.erase(std::remove_if(actors.begin(), actors.end(),
+			[&actorPtr](const std::unique_ptr<Actor>& actor) { return actor.get() == actorPtr; }),
+			actors.end());
+	}
+	actorsToRemove.clear();
+}
+
 void Scene::AddLight(Graphics& graphics, std::unique_ptr<Light> lightToAdd)
 {
 	auto lpp = std::make_unique<LightPerspectivePass>(graphics, lightToAdd->GetLightCamera(), lightToAdd->GetLightProjection(), lightToAdd->GetType());
@@ -101,7 +126,7 @@ void Scene::RenderControls(Graphics& graphics)
 {
 	for (auto& actor : actors)
 	{
-		graphics.GetGui()->RenderActorTree(actor.get());
+		graphics.GetGui()->RenderActorTree(actor.get(), this);
 	}
 	graphics.GetGui()->RenderControlWindow();
 }

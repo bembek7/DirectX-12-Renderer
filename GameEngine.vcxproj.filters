@@ -463,6 +463,9 @@
     <FxCompile Include="DTSMPS.hlsl">
       <Filter>Resource Files\PixelShaders\GPass</Filter>
     </FxCompile>
+    <FxCompile Include="DTAT.hlsl">
+      <Filter>Resource Files\PixelShaders\GPass</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shadow.hlsli">

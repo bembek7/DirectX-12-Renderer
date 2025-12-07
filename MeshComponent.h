@@ -37,11 +37,6 @@ protected:
 private:
 	void UpdateTransformBuffer(Graphics& graphics);
 
-	void PrepareForGPass(Graphics& graphics, Pass* const pass);
-	void PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass);
-
-	bool IsInsideFrustum(const Graphics::Frustum& frustum) const;
-
 	static ShaderSettings ResolveShaderSettings(const aiMesh* const mesh, const aiMaterial* const material);
 
 	struct BoundingSphere {
@@ -49,14 +44,25 @@ private:
 		float radius;
 	};
 
-	BoundingSphere CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum) const;
-	void UpdateWorldBoundingSphere();
 private:
-	std::unique_ptr<Model> mainModel;
-	std::unique_ptr<Model> primitiveModel;
-	std::unique_ptr<Material> mainMaterial;
-	std::unique_ptr<PipelineState> mainPipelineState;
-	std::unordered_map<PassType, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>> drawingBundles;
+	struct Mesh
+	{
+		Mesh(Graphics& graphics, const aiMesh* const assignedMesh, const aiMaterial* const assignedMaterial,
+			const DirectX::XMVECTOR& worldScale, const DirectX::XMMATRIX& transform);
+		static BoundingSphere CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum);
+		void UpdateWorldBoundingSphere(const DirectX::XMVECTOR& worldScale, const DirectX::XMMATRIX& transform);
+		bool IsInsideFrustum(const Graphics::Frustum& frustum) const;
+		void PrepareForGPass(Graphics& graphics, Pass* const pass);
+		void PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass);
+		std::unique_ptr<Model> mainModel;
+		std::unique_ptr<Model> primitiveModel;
+		std::unique_ptr<Material> mainMaterial;
+		std::unique_ptr<PipelineState> mainPipelineState;
+		std::unordered_map<PassType, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>> drawingBundles;
+		BoundingSphere modelBoundingSphere;
+		BoundingSphere worldBoundingSphere;
+	};
+	std::vector<std::unique_ptr<Mesh>> meshes;
 
 	struct TransformBuffer
 	{
@@ -67,9 +73,6 @@ private:
 		DirectX::XMFLOAT4X4 projection;
 	};
 	TransformBuffer transformBuffer = {};
-
-	BoundingSphere modelBoundingSphere;
-	BoundingSphere worldBoundingSphere;
 
 	std::unique_ptr<ConstantBufferConstants<TransformBuffer>> transformConstantBuffer;
 

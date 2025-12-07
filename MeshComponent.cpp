@@ -12,88 +12,77 @@
 #include "Light.h"
 #include <d3d12.h>
 
-MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
-	SceneComponent(graphics, node, scene)
+MeshComponent::Mesh::Mesh(Graphics& graphics, const aiMesh* const assignedMesh, const aiMaterial* const assignedMaterial,
+	const DirectX::XMVECTOR& worldScale, const DirectX::XMMATRIX& transform)
 {
-	if (node->mNumMeshes > 1)
-	{
-		OutputDebugString("Nodes with more than one mesh not handled yet\n");
-	}
-
-	const unsigned int meshIndex = *node->mMeshes;
-
-	const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
-	const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
-
 	ShaderSettings shaderSettings = ResolveShaderSettings(assignedMesh, assignedMaterial);
-
-	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
-	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
-
 	modelBoundingSphere = CalculateModelBoundingSphere(assignedMesh->mVertices, assignedMesh->mNumVertices);
-	UpdateWorldBoundingSphere();
+	UpdateWorldBoundingSphere(worldScale, transform);
 	primitiveModel = std::make_unique<Model>(graphics, assignedMesh, ShaderSettings{});
 	mainModel = std::make_unique<Model>(graphics, assignedMesh, shaderSettings, primitiveModel->ShareIndexBuffer());
 	mainMaterial = std::make_unique<Material>(graphics, assignedMaterial, shaderSettings);
 }
 
-void MeshComponent::RenderComponentDetails(Gui& gui)
+MeshComponent::BoundingSphere MeshComponent::Mesh::CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum)
 {
-	SceneComponent::RenderComponentDetails(gui);
-	gui.RenderComponentDetails(this);
-}
-
-void MeshComponent::ComponentMoved()
-{
-	SceneComponent::ComponentMoved();
-	UpdateWorldBoundingSphere();
-}
-
-std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
-{
-	return std::unique_ptr<MeshComponent>(new MeshComponent(graphics, node, scene));
-}
-
-void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
-{
-	SceneComponent::Draw(graphics, passType);
-
-	if (!IsInsideFrustum(graphics.GetFrustum()))
+	if (verticesNum == 0)
 	{
-		return;
+		return {};
 	}
-	if (passType == PassType::GPass)
+	aiVector3D min = vertices[0];
+	aiVector3D max = vertices[0];
+
+	for (unsigned int i = 0; i < verticesNum; ++i)
 	{
-		mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+		min.x = std::min(min.x, vertices[i].x);
+		min.y = std::min(min.y, vertices[i].y);
+		min.z = std::min(min.z, vertices[i].z);
+		max.x = std::max(max.x, vertices[i].x);
+		max.y = std::max(max.y, vertices[i].y);
+		max.z = std::max(max.z, vertices[i].z);
 	}
 
-	graphics.ExecuteBundle(drawingBundles[passType].Get());
+	aiVector3D center = (min + max) * 0.5f;
 
-	UpdateTransformBuffer(graphics);
-	transformConstantBuffer->Bind(graphics.GetMainCommandList());
-	graphics.GetMainCommandList()->DrawIndexedInstanced(mainModel->GetIndicesNumber(), 1, 0, 0, 0);
-}
-
-void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
-{
-	SceneComponent::PrepareForPass(graphics, pass);
-
-	auto passType = pass->GetType();
-
-	switch (passType)
+	float radius = 0.0f;
+	for (unsigned int i = 0; i < verticesNum; ++i)
 	{
-	case PassType::GPass:
-		PrepareForGPass(graphics, pass);
-		break;
-	case PassType::LightPerspectivePass:
-		PrepareForLightPerspectivePass(graphics, pass);
-		break;
-	default:
-		break;
+		float dist = (vertices[i] - center).Length();
+		if (dist > radius)
+		{
+			radius = dist;
+		}
 	}
+
+	return { {center.x, center.y, center.z}, radius };
 }
 
-void MeshComponent::PrepareForGPass(Graphics& graphics, Pass* const pass)
+void MeshComponent::Mesh::UpdateWorldBoundingSphere(const DirectX::XMVECTOR& worldScale, const DirectX::XMMATRIX& transform)
+{
+	using namespace DirectX;
+	XMVECTOR center = XMLoadFloat3(&modelBoundingSphere.center);
+	center = XMVector3Transform(center, transform);
+	XMStoreFloat3(&worldBoundingSphere.center, center);
+	worldBoundingSphere.radius = modelBoundingSphere.radius * std::max({ XMVectorGetX(worldScale),
+																	XMVectorGetY(worldScale),
+																	XMVectorGetZ(worldScale) });
+}
+
+bool MeshComponent::Mesh::IsInsideFrustum(const Graphics::Frustum& frustum) const
+{
+	using namespace DirectX;
+
+	for (const auto& plane : frustum.planes) {
+		XMVECTOR normal = XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
+		float distance = XMVectorGetX(XMVector3Dot(normal, XMLoadFloat3(&worldBoundingSphere.center))) + plane.w;
+
+		if (distance < -worldBoundingSphere.radius)
+			return false;
+	}
+	return true;
+}
+
+void MeshComponent::Mesh::PrepareForGPass(Graphics& graphics, Pass* const pass)
 {
 	auto pss = pass->GetPSS();
 	pss.inputLayout = mainModel->GetInputLayout();
@@ -116,7 +105,7 @@ void MeshComponent::PrepareForGPass(Graphics& graphics, Pass* const pass)
 	drawingBundles[pass->GetType()] = std::move(drawingBundle);
 }
 
-void MeshComponent::PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass)
+void MeshComponent::Mesh::PrepareForLightPerspectivePass(Graphics& graphics, Pass* const pass)
 {
 	auto drawingBundle = graphics.CreateBundle();
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -127,29 +116,99 @@ void MeshComponent::PrepareForLightPerspectivePass(Graphics& graphics, Pass* con
 	drawingBundles[pass->GetType()] = std::move(drawingBundle);
 }
 
-bool MeshComponent::IsInsideFrustum(const Graphics::Frustum& frustum) const
+MeshComponent::MeshComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene) :
+	SceneComponent(graphics, node, scene)
 {
-	using namespace DirectX;
+	const unsigned int meshIndex = *node->mMeshes;
 
-	for (const auto& plane : frustum.planes) {
-		XMVECTOR normal = XMVectorSet(plane.x, plane.y, plane.z, 0.0f);
-		float distance = XMVectorGetX(XMVector3Dot(normal, XMLoadFloat3(&worldBoundingSphere.center))) + plane.w;
+	const auto& transformInfo = RPD::cbsInfo.at(RPD::CBTypes::Transform);
+	transformConstantBuffer = std::make_unique<ConstantBufferConstants<TransformBuffer>>(transformBuffer, 0u);
 
-		if (distance < -worldBoundingSphere.radius)
-			return false;
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+	{
+		const unsigned int meshIndex = node->mMeshes[i];
+		const aiMesh* const assignedMesh = scene->mMeshes[meshIndex];
+		const aiMaterial* const assignedMaterial = scene->mMaterials[assignedMesh->mMaterialIndex];
+		meshes.push_back(std::make_unique<Mesh>(graphics, assignedMesh, assignedMaterial,
+			GetComponentScaleVector(), GetTransformMatrix()));
 	}
-	return true;
+}
+
+void MeshComponent::RenderComponentDetails(Gui& gui)
+{
+	SceneComponent::RenderComponentDetails(gui);
+	gui.RenderComponentDetails(this);
+}
+
+void MeshComponent::ComponentMoved()
+{
+	SceneComponent::ComponentMoved();
+	for (auto& mesh : meshes)
+	{
+		mesh->UpdateWorldBoundingSphere(GetComponentScaleVector(), GetTransformMatrix());
+	}
+}
+
+std::unique_ptr<MeshComponent> MeshComponent::CreateComponent(Graphics& graphics, const aiNode* const node, const aiScene* const scene)
+{
+	return std::unique_ptr<MeshComponent>(new MeshComponent(graphics, node, scene));
+}
+
+void MeshComponent::Draw(Graphics& graphics, const PassType& passType)
+{
+	SceneComponent::Draw(graphics, passType);
+	UpdateTransformBuffer(graphics);
+
+	for (auto& mesh : meshes)
+	{
+		if (!mesh->IsInsideFrustum(graphics.GetFrustum()))
+		{
+			continue;
+		}
+		if (passType == PassType::GPass)
+		{
+			mesh->mainMaterial->BindDescriptorHeap(graphics.GetMainCommandList());
+		}
+		graphics.ExecuteBundle(mesh->drawingBundles[passType].Get());
+		transformConstantBuffer->Bind(graphics.GetMainCommandList());
+		graphics.GetMainCommandList()->DrawIndexedInstanced(mesh->mainModel->GetIndicesNumber(), 1, 0, 0, 0);
+	}
+}
+
+void MeshComponent::PrepareForPass(Graphics& graphics, Pass* const pass)
+{
+	SceneComponent::PrepareForPass(graphics, pass);
+
+	auto passType = pass->GetType();
+
+	for (auto& mesh : meshes)
+	{
+		switch (passType)
+		{
+		case PassType::GPass:
+			mesh->PrepareForGPass(graphics, pass);
+			break;
+		case PassType::LightPerspectivePass:
+			mesh->PrepareForLightPerspectivePass(graphics, pass);
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void MeshComponent::Update(Graphics& graphics)
 {
 	SceneComponent::Update(graphics);
-	mainMaterial->Update();
+	for (auto& mesh : meshes)
+	{
+		mesh->mainMaterial->Update();
+	}
 }
 
 Material* MeshComponent::GetMaterial() noexcept
 {
-	return mainMaterial.get();
+	return meshes[0]->mainMaterial.get();
 }
 
 void MeshComponent::UpdateTransformBuffer(Graphics& graphics)
@@ -196,54 +255,6 @@ ShaderSettings MeshComponent::ResolveShaderSettings(const aiMesh* const mesh, co
 	}
 
 	return resolvedSettings;
-}
-
-MeshComponent::BoundingSphere MeshComponent::CalculateModelBoundingSphere(const aiVector3D* const vertices, unsigned int verticesNum) const
-{
-	if (verticesNum == 0)
-	{
-		return {};
-	}
-	aiVector3D min = vertices[0];
-	aiVector3D max = vertices[0];
-
-	for (unsigned int i = 0; i < verticesNum; ++i)
-	{
-		min.x = std::min(min.x, vertices[i].x);
-		min.y = std::min(min.y, vertices[i].y);
-		min.z = std::min(min.z, vertices[i].z);
-		max.x = std::max(max.x, vertices[i].x);
-		max.y = std::max(max.y, vertices[i].y);
-		max.z = std::max(max.z, vertices[i].z);
-	}
-
-	aiVector3D center = (min + max) * 0.5f;
-
-	float radius = 0.0f;
-	for (unsigned int i = 0; i < verticesNum; ++i)
-	{
-		float dist = (vertices[i] - center).Length();
-		if (dist > radius)
-		{
-			radius = dist;
-		}
-	}
-
-	return { {center.x, center.y, center.z}, radius };
-}
-
-void MeshComponent::UpdateWorldBoundingSphere()
-{
-	using namespace DirectX;
-	const XMVECTOR worldScale = GetComponentScaleVector();
-	const XMVECTOR worldLocation = GetComponentLocationVector();
-	XMVECTOR center = XMLoadFloat3(&modelBoundingSphere.center);
-	const XMMATRIX transform = GetTransformMatrix();
-	center = XMVector3Transform(center, transform);
-	XMStoreFloat3(&worldBoundingSphere.center, center);
-	worldBoundingSphere.radius = modelBoundingSphere.radius * std::max({ XMVectorGetX(worldScale),
-																	XMVectorGetY(worldScale),
-																	XMVectorGetZ(worldScale) });
 }
 
 MeshComponent::TransformBuffer::TransformBuffer(const DirectX::XMMATRIX newTransform, const DirectX::XMMATRIX newView, const DirectX::XMMATRIX newProjection)

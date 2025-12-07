@@ -7,7 +7,7 @@
 FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture, ID3D12Resource* const lightMapTexture) :
 	Pass(graphics, PassType::FinalPass,
 		{  },
-		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap},
+		{ RPD::TextureTypes::SceneColor, RPD::TextureTypes::LightMap },
 		{ RPD::SamplerTypes::Anisotropic })
 {
 	const float windowWidth = graphics.GetWindowWidth();
@@ -31,18 +31,18 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 	auto pixelShaderBlob = shadersPool.GetShaderBlob(L"FinalPassPS.cso");
 	pipelineStateStream.vertexShader = CD3DX12_SHADER_BYTECODE(vertexShaderBlob->Get());
 	pipelineStateStream.pixelShader = CD3DX12_SHADER_BYTECODE(pixelShaderBlob->Get());
-	pipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEPTH_STENCIL_DESC{.DepthEnable = FALSE, .StencilEnable = FALSE });
+	pipelineStateStream.depthStencil = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEPTH_STENCIL_DESC{ .DepthEnable = FALSE, .StencilEnable = FALSE });
 
 	pipelineState = std::make_unique<PipelineState>(graphics, pipelineStateStream);
 
 	vertexBuffer = std::make_unique<VertexBuffer>(graphics, std::vector<float>
 	{
 		-1.f, 1.f, 0.f, 0.f, 0.f,
-		3.f, 1.f, 0.f, 2.f, 0.f,
-		-1.f, -3.f, 0.f, 0.f, 2.f,
+			3.f, 1.f, 0.f, 2.f, 0.f,
+			-1.f, -3.f, 0.f, 0.f, 2.f,
 	}, UINT(5 * sizeof(float)), 3u);
 
-	indexBuffer = std::make_unique<IndexBuffer>(graphics, std::vector<WORD>{ 0, 1, 2 });
+	indexBuffer = std::make_unique<IndexBuffer>(graphics, std::vector<uint32_t>{ 0, 1, 2 });
 
 	drawingBundle = graphics.CreateBundle();
 	drawingBundle->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -62,7 +62,7 @@ FinalPass::FinalPass(Graphics& graphics, ID3D12Resource* const sceneColorTexture
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvCpuHandle{ srvHeap->GetCPUDescriptorHandleForHeapStart() };
 
 	graphics.CreateSRV(sceneColorTexture, srvCpuHandle);
-	
+
 	srvCpuHandle.Offset(1, graphics.GetCbvSrvDescriptorSize());
 
 	graphics.CreateSRV(lightMapTexture, srvCpuHandle);
